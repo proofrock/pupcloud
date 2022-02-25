@@ -44,15 +44,15 @@
 
   export function getIcon(mt: string): string {
     return mt == "directory"
-      ? "📁"
+      ? "file-manager"
       : isMimeTypeImage(mt)
-      ? "🖼️"
+      ? "image-x-generic"
       : isMimeTypeVideo(mt)
-      ? "📹"
+      ? "video-x-generic"
       : isMimeTypeAudio(mt)
-      ? "🎧"
+      ? "audio-x-generic"
       : isMimeTypeText(mt)
-      ? "📝"
-      : "📄";
+      ? "text-x-generic"
+      : "application-octet-stream";
   }
 </script>
