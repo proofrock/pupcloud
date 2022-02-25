@@ -23,7 +23,6 @@
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
   import { File, Mule, SORTERS } from "./Struct.svelte";
-  import Properties from "./Properties.svelte";
   import IconGrid from "./SVG/IconGrid.svelte";
   import IconList from "./SVG/IconList.svelte";
   import IconSortAlphAsc from "./SVG/IconSortAlphAsc.svelte";
@@ -147,6 +146,3 @@
 <div>&nbsp;</div>
 <div>&nbsp;</div>
 <div>&nbsp;</div>
-{#each mule.items as file (file.uuid)}
-  <Properties {file} />
-{/each}

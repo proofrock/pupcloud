@@ -17,6 +17,7 @@
    */
 
   import ListRow from "./ListRow.svelte";
+  import Properties from "./Properties.svelte";
   import type { File } from "./Struct.svelte";
 
   export let fileList: File[];
@@ -35,3 +36,6 @@
     {/each}
   </table>
 </div>
+{#each itemList as item (item.uuid)}
+  <Properties {item} />
+{/each}

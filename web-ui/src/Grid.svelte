@@ -18,6 +18,7 @@
 
   import { createEventDispatcher } from "svelte";
   import GridCell from "./GridCell.svelte";
+  import Properties from "./Properties.svelte";
   import type { File } from "./Struct.svelte";
 
   export let fileList: File[];
@@ -43,3 +44,6 @@
     </div>
   {/each}
 </div>
+{#each itemList as item (item.uuid)}
+  <Properties {item} />
+{/each}
