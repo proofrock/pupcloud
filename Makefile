@@ -39,3 +39,26 @@ run:
 
 run-ui:
 	cd web-ui && npm install && npm run dev
+
+docker:
+	sudo docker build -t local_pupcloud:latest .
+
+docker-publish:
+	make docker
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:latest
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.0.1
+	sudo docker push germanorizzo/pupcloud:latest
+	sudo docker push germanorizzo/pupcloud:v0.0.1
+	sudo docker rmi local_pupcloud:latest
+	sudo docker rmi germanorizzo/pupcloud:latest
+	sudo docker rmi germanorizzo/pupcloud:v0.0.1
+
+docker-publish-arm:
+	make docker
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:latest-arm
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.0.1-arm
+	sudo docker push germanorizzo/pupcloud:latest-arm
+	sudo docker push germanorizzo/pupcloud:v0.0.1-arm
+	sudo docker rmi local_pupcloud:latest
+	sudo docker rmi germanorizzo/pupcloud:latest-arm
+	sudo docker rmi germanorizzo/pupcloud:v0.0.1-arm
