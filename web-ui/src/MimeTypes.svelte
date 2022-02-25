@@ -33,11 +33,16 @@
     return mt.startsWith("text/");
   }
 
+  export function isMimeTypePDF(mt: string) {
+    return mt == "application/pdf";
+  }
+
   export function isMimeTypeSupported(mt: string) {
     return (
       isMimeTypeImage(mt) ||
       isMimeTypeVideo(mt) ||
       isMimeTypeAudio(mt) ||
+      isMimeTypePDF(mt) ||
       isMimeTypeText(mt)
     );
   }
@@ -53,6 +58,8 @@
       ? "audio-x-generic"
       : isMimeTypeText(mt)
       ? "text-x-generic"
+      : isMimeTypePDF(mt)
+      ? "application-pdf"
       : "application-octet-stream";
   }
 </script>

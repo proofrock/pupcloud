@@ -25,6 +25,7 @@
     isMimeTypeSupported,
     isMimeTypeVideo,
     isMimeTypeAudio,
+    isMimeTypePDF,
   } from "./MimeTypes.svelte";
   import TextShower from "./TextShower.svelte";
   import IconDownload from "./SVG/IconDownload.svelte";
@@ -229,6 +230,11 @@
                   Your browser does not support the audio tag.
                 </audio>
               </div>
+            {:else if isMimeTypePDF(file.mimeType)}
+              <embed
+                class="centered centered-maxscreen w100 h100"
+                type={file.mimeType}
+                src={getWS(file)} />
             {/if}
           {:else}
             <img
