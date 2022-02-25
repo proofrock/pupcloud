@@ -237,7 +237,10 @@
               </div>
             {/if}
           {:else}
-            <div class="centered very-big-text">{file.icon}</div>
+            <img
+              class="centered"
+              alt={file.icon}
+              src="icons/48x48/{file.icon}.svg" />
           {/if}
           <div class="caption">{file.name}</div>
         </div>

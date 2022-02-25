@@ -37,7 +37,9 @@
   style="max-width:90vh"
   {id}
   data-ax="modal">
-  <div class="modal-header ellipsis">{file.icon}&nbsp;{file.name}</div>
+  <div class="modal-header ellipsis">
+    <img class="centered" alt={item.icon} src="icons/48x48/{item.icon}.svg" />&nbsp;{item.name}
+  </div>
   <div class="modal-content">
     <table>
       <tr>
