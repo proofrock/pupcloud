@@ -65,80 +65,84 @@
       sorter = _sorter;
     };
   }
+
+  function gridOrList() {
+    mode = mode == "GRID" ? "LIST" : "GRID";
+  }
 </script>
 
-<nav class="navbar">
+<nav class="navbar" style="height: 40px;">
   <Breadcrumb {path} on:pathEvent />
-  <button
-    title="View mode"
-    class="btn btn-small shadow-1 mx-2 ml-auto"
-    on:click={() => {
-      mode = mode == 'GRID' ? 'LIST' : 'GRID';
-    }}>
-    {#if mode == 'GRID'}
-      <IconGrid size={24} />
-    {:else}
-      <IconList size={24} />
-    {/if}
-  </button>
-  <div class="dropdown" id="SortBy">
-    <button title="Sort by" class="btn btn-small shadow-1 m-2 dropdown-trigger">
-      {#if sorter == SORTERS.ABC}
-        <IconSortAlphAsc size={24} />
-      {:else if sorter == SORTERS.CBA}
-        <IconSortAlphDesc size={24} />
-      {:else if sorter == SORTERS.OldFirst}
-        <IconSortDateAsc size={24} />
-      {:else if sorter == SORTERS.OldLast}
-        <IconSortDateDesc size={24} />
-      {:else if sorter == SORTERS.SmallFirst}
-        <IconSortSizeAsc size={24} />
-      {:else if sorter == SORTERS.SmallLast}
-        <IconSortSizeDesc size={24} />
+  <div class="navbar-menu ml-auto" style="height: 40px;">
+    <div class="navbar-link" title="View mode" on:click={gridOrList}>
+      {#if mode == 'GRID'}
+        <IconGrid size={24} />
+      {:else}
+        <IconList size={24} />
       {/if}
-    </button>
-    <div class="dropdown-content dropdown-right white shadow-1 rounded-3">
+    </div>
+    <div class="dropdown" id="SortBy">
       <div
-        class="dropdown-item"
-        on:click={resort(SORTERS.ABC)}
+        class="navbar-link dropdown-trigger"
+        title="Sort by"
+        style="height: 40px;">
+        {#if sorter == SORTERS.ABC}
+          <IconSortAlphAsc size={24} />
+        {:else if sorter == SORTERS.CBA}
+          <IconSortAlphDesc size={24} />
+        {:else if sorter == SORTERS.OldFirst}
+          <IconSortDateAsc size={24} />
+        {:else if sorter == SORTERS.OldLast}
+          <IconSortDateDesc size={24} />
+        {:else if sorter == SORTERS.SmallFirst}
+          <IconSortSizeAsc size={24} />
+        {:else if sorter == SORTERS.SmallLast}
+          <IconSortSizeDesc size={24} />
+        {/if}
+      </div>
+      <div class="dropdown-content dropdown-right white shadow-1">
+        <div
+          class="dropdown-item"
+          on:click={resort(SORTERS.ABC)}
           class:active={sorter == SORTERS.ABC}
           title="Sort alphabetically, ascending">
-        <IconSortAlphAsc size={24} />
-      </div>
-      <div
-        class="dropdown-item"
-        on:click={resort(SORTERS.CBA)}
+          <IconSortAlphAsc size={24} />
+        </div>
+        <div
+          class="dropdown-item"
+          on:click={resort(SORTERS.CBA)}
           class:active={sorter == SORTERS.CBA}
           title="Sort alphabetically, descending">
-        <IconSortAlphDesc size={24} />
-      </div>
-      <div
-        class="dropdown-item"
-        on:click={resort(SORTERS.OldFirst)}
+          <IconSortAlphDesc size={24} />
+        </div>
+        <div
+          class="dropdown-item"
+          on:click={resort(SORTERS.OldFirst)}
           class:active={sorter == SORTERS.OldFirst}
           title="Sort by date, ascending">
-        <IconSortDateAsc size={24} />
-      </div>
-      <div
-        class="dropdown-item"
-        on:click={resort(SORTERS.OldLast)}
+          <IconSortDateAsc size={24} />
+        </div>
+        <div
+          class="dropdown-item"
+          on:click={resort(SORTERS.OldLast)}
           class:active={sorter == SORTERS.OldLast}
           title="Sort by date, descending">
-        <IconSortDateDesc size={24} />
-      </div>
-      <div
-        class="dropdown-item"
-        on:click={resort(SORTERS.SmallFirst)}
+          <IconSortDateDesc size={24} />
+        </div>
+        <div
+          class="dropdown-item"
+          on:click={resort(SORTERS.SmallFirst)}
           class:active={sorter == SORTERS.SmallFirst}
           title="Sort by size, ascending">
-        <IconSortSizeAsc size={24} />
-      </div>
-      <div
-        class="dropdown-item"
-        on:click={resort(SORTERS.SmallLast)}
+          <IconSortSizeAsc size={24} />
+        </div>
+        <div
+          class="dropdown-item"
+          on:click={resort(SORTERS.SmallLast)}
           class:active={sorter == SORTERS.SmallLast}
           title="Sort by size, descending">
-        <IconSortSizeDesc size={24} />
+          <IconSortSizeDesc size={24} />
+        </div>
       </div>
     </div>
   </div>
