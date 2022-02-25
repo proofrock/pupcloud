@@ -35,7 +35,7 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 
 ## Supported file types for viewing
 
-In the file system view, you can click on a file to open it. Currently it
+In the file system view, you can click on a file to open it. Currently pupcloud
 supports:
 
 - Images
@@ -46,6 +46,13 @@ supports:
 
 Detection of file types is done by mime type, and viewing relies on the
 browser's capabilities... that are fairly complete, truth to be told.
+
+## Known bugs
+
+- In rare cases, MIME type detection is wrong. It relies on Go builtin
+  functions, so it needs to be investigated more.
+- In list view, the menu trigger (`...`) is rendered over the menu itself.
+  Waiting for upstream fix.
 
 ## Changelog
 
