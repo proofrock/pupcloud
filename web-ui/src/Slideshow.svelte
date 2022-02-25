@@ -27,6 +27,7 @@
     isMimeTypeAudio,
   } from "./MimeTypes.svelte";
   import TextShower from "./TextShower.svelte";
+  import IconDownload from "./SVG/IconDownload.svelte";
 
   export let files: File[] = [];
   export let fileIdx: number = 0;
@@ -243,7 +244,9 @@
       {/if}
     {/each}
     <div class="download" title="Download">
-      <a target="_blank" href={getWS(files[fileIdx], true)}>Download</a>
+      <a target="_blank" href={getWS(files[fileIdx], true)}>
+        <IconDownload size={24} color="white" />
+      </a>
     </div>
     <div class="prev" on:click={prev}>&#10094;</div>
     <div class="next" on:click={next}>&#10095;</div>

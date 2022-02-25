@@ -77,9 +77,9 @@
       mode = mode == 'GRID' ? 'LIST' : 'GRID';
     }}>
     {#if mode == 'GRID'}
-      <IconGrid size={18} />
+      <IconGrid size={24} />
     {:else}
-      <IconList size={18} />
+      <IconList size={24} />
     {/if}
   </button>
   <div class="dropdown" id="SortBy">

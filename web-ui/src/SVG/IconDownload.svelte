@@ -3,7 +3,7 @@
   export let color: string = "#000000";
 </script>
 
-<!--https://dev.materialdesignicons.com/icon/sort-ascending-->
+<!--https://dev.materialdesignicons.com/icon/download-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -11,7 +11,5 @@
   width={size}
   height={size}
   viewBox="0 0 {size} {size}">
-  <path
-    fill={color}
-    d="M19 17H22L18 21L14 17H17V3H19M2 17H12V19H2M6 5V7H2V5M2 11H9V13H2V11Z" />
+  <path fill={color} d="M5,20H19V18H5M19,9H15V3H9V9H5L12,16L19,9Z" />
 </svg>
