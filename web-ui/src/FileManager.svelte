@@ -24,6 +24,14 @@
   import List from "./List.svelte";
   import { File, Mule, SORTERS } from "./Struct.svelte";
   import Properties from "./Properties.svelte";
+  import IconGrid from "./SVG/IconGrid.svelte";
+  import IconList from "./SVG/IconList.svelte";
+  import IconSortAlphAsc from "./SVG/IconSortAlphAsc.svelte";
+  import IconSortAlphDesc from "./SVG/IconSortAlphDesc.svelte";
+  import IconSortDateAsc from "./SVG/IconSortDateAsc.svelte";
+  import IconSortDateDesc from "./SVG/IconSortDateDesc.svelte";
+  import IconSortSizeAsc from "./SVG/IconSortSizeAsc.svelte";
+  import IconSortSizeDesc from "./SVG/IconSortSizeDesc.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -63,58 +71,72 @@
 <nav class="navbar">
   <Breadcrumb {path} on:pathEvent />
   <button
+    title="View mode"
     class="btn btn-small shadow-1 mx-2 ml-auto"
     on:click={() => {
       mode = mode == 'GRID' ? 'LIST' : 'GRID';
     }}>
-    {mode == 'GRID' ? 'List' : 'Grid'}
+    {#if mode == 'GRID'}
+      <IconGrid size={18} />
+    {:else}
+      <IconList size={18} />
+    {/if}
   </button>
   <div class="dropdown" id="SortBy">
-    <button class="btn btn-small shadow-1 mx-2 dropdown-trigger">Sort by...
+    <button title="Sort by" class="btn btn-small shadow-1 m-2 dropdown-trigger">
+      {#if sorter == SORTERS.ABC}
+        <IconSortAlphAsc size={24} />
+      {:else if sorter == SORTERS.CBA}
+        <IconSortAlphDesc size={24} />
+      {:else if sorter == SORTERS.OldFirst}
+        <IconSortDateAsc size={24} />
+      {:else if sorter == SORTERS.OldLast}
+        <IconSortDateDesc size={24} />
+      {:else if sorter == SORTERS.SmallFirst}
+        <IconSortSizeAsc size={24} />
+      {:else if sorter == SORTERS.SmallLast}
+        <IconSortSizeDesc size={24} />
+      {/if}
     </button>
     <div class="dropdown-content dropdown-right white shadow-1 rounded-3">
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.ABC)}
         class:active={sorter == SORTERS.ABC}>
-        By name, ascending
+        <IconSortAlphAsc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.CBA)}
         class:active={sorter == SORTERS.CBA}>
-        By name, descending
+        <IconSortAlphDesc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.OldFirst)}
         class:active={sorter == SORTERS.OldFirst}>
-        By mod. date, ascending
+        <IconSortDateAsc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.OldLast)}
         class:active={sorter == SORTERS.OldLast}>
-        By mod. date, descending
+        <IconSortDateDesc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.SmallFirst)}
         class:active={sorter == SORTERS.SmallFirst}>
-        By size, ascending
+        <IconSortSizeAsc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.SmallLast)}
         class:active={sorter == SORTERS.SmallLast}>
-        By size, descending
+        <IconSortSizeDesc size={24} />
       </div>
     </div>
   </div>
-
-  <!--button class="btn btn-small shadow-1 mx-2" style="float: right;">
-    Filter...
-  </button-->
 </nav>
 <div>&nbsp;</div>
 {#if mode == 'GRID'}
