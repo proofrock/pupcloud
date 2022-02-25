@@ -20,7 +20,7 @@
   import Properties from "./Properties.svelte";
   import type { File } from "./Struct.svelte";
 
-  export let fileList: File[];
+  export let itemList: File[];
 </script>
 
 <div class="table-responsive w100">
@@ -31,8 +31,8 @@
       <th class="hide-sm-down">Mod. Date</th>
       <th />
     </tr>
-    {#each fileList as file (file.uuid)}
-      <ListRow {file} on:message />
+    {#each itemList as item (item.uuid)}
+      <ListRow {item} on:message />
     {/each}
   </table>
 </div>

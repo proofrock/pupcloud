@@ -101,47 +101,52 @@
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.ABC)}
-        class:active={sorter == SORTERS.ABC}>
+          class:active={sorter == SORTERS.ABC}
+          title="Sort alphabetically, ascending">
         <IconSortAlphAsc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.CBA)}
-        class:active={sorter == SORTERS.CBA}>
+          class:active={sorter == SORTERS.CBA}
+          title="Sort alphabetically, descending">
         <IconSortAlphDesc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.OldFirst)}
-        class:active={sorter == SORTERS.OldFirst}>
+          class:active={sorter == SORTERS.OldFirst}
+          title="Sort by date, ascending">
         <IconSortDateAsc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.OldLast)}
-        class:active={sorter == SORTERS.OldLast}>
+          class:active={sorter == SORTERS.OldLast}
+          title="Sort by date, descending">
         <IconSortDateDesc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.SmallFirst)}
-        class:active={sorter == SORTERS.SmallFirst}>
+          class:active={sorter == SORTERS.SmallFirst}
+          title="Sort by size, ascending">
         <IconSortSizeAsc size={24} />
       </div>
       <div
         class="dropdown-item"
         on:click={resort(SORTERS.SmallLast)}
-        class:active={sorter == SORTERS.SmallLast}>
+          class:active={sorter == SORTERS.SmallLast}
+          title="Sort by size, descending">
         <IconSortSizeDesc size={24} />
       </div>
     </div>
   </div>
 </nav>
-<div>&nbsp;</div>
 {#if mode == 'GRID'}
-  <Grid fileList={mule.items} on:message={click} />
+  <Grid itemList={mule.items} on:message={click} />
 {:else}
-  <List fileList={mule.items} on:message={click} />
+  <List itemList={mule.items} on:message={click} />
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>

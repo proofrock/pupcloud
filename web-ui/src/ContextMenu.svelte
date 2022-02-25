@@ -18,7 +18,7 @@
 
   import type { File } from "./Struct.svelte";
 
-  export let file: File;
+  export let item: File;
 
   // to be able to specify stopPropagation
   function noop() {}
@@ -27,7 +27,7 @@
 <div class="dropdown-content dropdown-right white shadow-1 rounded-3">
   <div
     class="dropdown-item modal-trigger"
-    data-target={'modal-properties-' + file.uuid}
+    data-target={'modal-properties-' + item.uuid}
     on:click|stopPropagation={noop}>
     Properties
   </div>

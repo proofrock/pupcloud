@@ -22,16 +22,16 @@
   import DotDotDot from "./DotDotDot.svelte";
   import type { File } from "./Struct.svelte";
 
-  export let file: File;
+  export let item: File;
 
   const dispatch = createEventDispatcher();
 
   onMount(() => {
-    new Dropdown("#ddList-" + file.uuid);
+    new Dropdown("#ddList-" + item.uuid);
   });
 
   onDestroy(() => {
-    destroy("#ddList-" + file.uuid);
+    destroy("#ddList-" + item.uuid);
   });
 
   function click(uuid: string): (e: Event) => void {
@@ -48,22 +48,22 @@
 
 <!-- svelte-ignore missing-declaration -->
 <tr>
-  <td on:click={click(file.uuid)}>
+  <td on:click={click(item.uuid)}>
     <div class="cursor-pointer wid220 ellipsis hide-md-up">
-      {file.icon}&nbsp;<span>{file.name}</span>
+      <img alt={item.icon} src="icons/16x16/{item.icon}.svg" />&nbsp;<span>{item.name}</span>
     </div>
     <div class="cursor-pointer hide-sm-down">
-      {file.icon}&nbsp;<span>{file.name}</span>
+      <img alt={item.icon} src="icons/16x16/{item.icon}.svg" />&nbsp;<span>{item.name}</span>
     </div>
   </td>
-  <td>{file.size}</td>
-  <td class="hide-sm-down">{file.chDate}</td>
+  <td>{item.size}</td>
+  <td class="hide-sm-down">{item.chDate}</td>
   <td>
-    <div class="w100 dropdown" id="ddList-{file.uuid}">
+    <div class="w100 dropdown" id="ddList-{item.uuid}">
       <span class="dropdown-trigger" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
-      <ContextMenu {file} />
+      <ContextMenu {item} />
     </div>
   </td>
 </tr>

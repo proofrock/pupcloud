@@ -21,7 +21,7 @@
   import Properties from "./Properties.svelte";
   import type { File } from "./Struct.svelte";
 
-  export let fileList: File[];
+  export let itemList: File[];
 
   const dispatch = createEventDispatcher();
 
@@ -35,12 +35,12 @@
 </script>
 
 <div class="grix xs2 sm3 md4 lg6 xl12">
-  {#each fileList as file (file.uuid)}
+  {#each itemList as item (item.uuid)}
     <div
       class="m-3 cursor-pointer"
-      on:click={click(file.uuid)}
-      title={file.name}>
-      <GridCell {file} />
+      on:click={click(item.uuid)}
+      title={item.name}>
+      <GridCell {item} />
     </div>
   {/each}
 </div>

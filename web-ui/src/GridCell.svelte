@@ -22,14 +22,14 @@
   import { Dropdown, destroy } from "axentix";
   import DotDotDot from "./DotDotDot.svelte";
 
-  export let file: File;
+  export let item: File;
 
   onMount(() => {
-    new Dropdown("#ddGrid-" + file.uuid);
+    new Dropdown("#ddGrid-" + item.uuid);
   });
 
   onDestroy(() => {
-    destroy("#ddGrid-" + file.uuid);
+    destroy("#ddGrid-" + item.uuid);
   });
 
   // to be able to specify stopPropagation
@@ -37,18 +37,20 @@
 </script>
 
 <div class="card shadow-1 hoverable-1 rounded-3 overflow-visible">
+  <!-- svelte-ignore missing-declaration -->
   <div class="card-content lh-1">
-    <span class="font-w100 hide-sm-down">{file.size}</span>
-    <div class="dropdown" id="ddGrid-{file.uuid}" style="float: right;">
+    <span class="font-w100 hide-sm-down">{item.size}</span>
+    <div class="dropdown" id="ddGrid-{item.uuid}" style="float: right;">
       <span class="dropdown-trigger" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
-      <ContextMenu {file} />
+      <ContextMenu {item} />
     </div>
     <div style="clear: both;">&nbsp;</div>
-    <div class="font-s9 text-center">{file.icon}</div>
+    <div class="font-s9 text-center">
+      <img alt={item.icon} src="icons/48x48/{item.icon}.svg" />
+    </div>
     <div>&nbsp;</div>
-    <div>&nbsp;</div>
-    <div class="text-center ellipsis">{file.name}</div>
+    <div class="text-center ellipsis">{item.name}</div>
   </div>
 </div>

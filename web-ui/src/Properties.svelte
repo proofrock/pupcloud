@@ -16,12 +16,12 @@
    * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-  import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { Modal, destroy } from "axentix";
   import type { File } from "./Struct.svelte";
 
-  export let file: File;
-  let id = "modal-properties-" + file.uuid;
+  export let item: File;
+  let id = "modal-properties-" + item.uuid;
 
   onMount(() => {
     new Modal("#" + id);
@@ -44,31 +44,31 @@
     <table>
       <tr>
         <td>File name:</td>
-        <td>{file.name}</td>
+        <td>{item.name}</td>
       </tr>
       <tr>
         <td>Size:</td>
-        <td>{file.size}</td>
+        <td>{item.size}</td>
       </tr>
       <tr>
         <td>Mod. date:</td>
-        <td>{file.chDate}</td>
+        <td>{item.chDate}</td>
       </tr>
       <tr>
         <td>Type:</td>
-        <td>{file.mimeType}</td>
+        <td>{item.mimeType}</td>
       </tr>
       <tr>
         <td>Owner:</td>
-        <td>{file.owner}</td>
+        <td>{item.owner}</td>
       </tr>
       <tr>
         <td>Group:</td>
-        <td>{file.group}</td>
+        <td>{item.group}</td>
       </tr>
       <tr>
         <td>Permissions:</td>
-        <td>{file.permissions}</td>
+        <td>{item.permissions}</td>
       </tr>
     </table>
   </div>

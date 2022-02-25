@@ -109,10 +109,6 @@
     max-height: 100%;
   }
 
-  .very-big-text {
-    font-size: 200px;
-  }
-
   .download {
     color: white;
     text-decoration: underline dotted;
@@ -127,10 +123,8 @@
     background-color: floralwhite;
     min-width: 40%;
     min-height: 60%;
-    width: fit-content;
-    height: fit-content;
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     overflow: auto;
     padding: 10px;
     padding-top: 0px;
@@ -177,8 +171,8 @@
     font-size: 16px;
     padding: 8px 12px;
     top: 12px;
-    left: 20px;
-    right: 20px;
+    left: 30px;
+    right: 30px;
     text-align: center;
   }
 
@@ -204,14 +198,14 @@
   </div>
 {:else}
   <div class="blanket" transition:fade>
-    <div class="x-top-right" on:click={close} />
+    <div class="x-top-right cursor-pointer" on:click={close} />
     {#each files as file, idx (file.uuid)}
       {#if fileIdx == idx}
         <div class="slideshow-container" transition:fade>
           <div class="numbertext">{idx + 1} / {files.length}</div>
           {#if isMimeTypeSupported(file.mimeType)}
             {#if isMimeTypeText(file.mimeType)}
-              <div class="centered text-pane">
+              <div class="centered centered-maxscreen text-pane">
                 <TextShower url={getWS(file)} {file} />
               </div>
             {:else if isMimeTypeImage(file.mimeType)}
