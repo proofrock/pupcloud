@@ -86,8 +86,7 @@
       on:message={openSlideshow} />
     <footer
       class="footer blue dark-2 font-s1 lh-1 hide-sm-down"
-      style="position:fixed; bottom:0;">
-      <span><span class="pup-a">Pupcloud</span>
+      style="position:fixed; bottom:0; z-index:11;">
         {config.version} - Made with <a
           class="pup-a"
           href="https://gofiber.io/">Fiber</a>, <a
