@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.0.1
+# 🐶 Pupcloud v0.1.0
 
 Put your files on the web!
 
@@ -56,7 +56,7 @@ browser's capabilities... that are fairly complete, truth to be told.
 
 ## Changelog
 
-### v0.0.1
+### v0.1.0
 
 - First version;
 - Navigation, preview, download of files.
