@@ -87,14 +87,22 @@
     <footer
       class="footer blue dark-2 font-s1 lh-1 hide-sm-down"
       style="position:fixed; bottom:0; z-index:11;">
+      <span><a
+          class="pup-a"
+          target="_blank"
+          href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
         {config.version} - Made with <a
           class="pup-a"
+          target="_blank"
           href="https://gofiber.io/">Fiber</a>, <a
           class="pup-a"
+          target="_blank"
           href="https://useaxentix.com/">Axentix</a>, <a
           class="pup-a"
+          target="_blank"
           href="https://svelte.dev/">Svelte</a>, <a
           class="pup-a"
+          target="_blank"
           href="https://go.dev/">Go</a> and ❤️</span>
     </footer>
   {:else}
