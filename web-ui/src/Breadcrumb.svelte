@@ -33,9 +33,11 @@
 
 <p class="font-w100" style="float: left;">
   <!-- svelte-ignore a11y-missing-attribute -->
-  📍 <a
-    on:click={goto(-1)}
-    class="font-w300 cursor-pointer"><u><i>...</i></u></a>&nbsp;/&nbsp; {#each path as pItem, idx}
+  📍 {#if path.length > 0}
+    <a
+      on:click={goto(-1)}
+      class="font-w300 cursor-pointer"><u><i>root</i></u></a>
+  {/if}&nbsp;/&nbsp; {#each path as pItem, idx}
     {#if idx < path.length - 1}
       <!-- svelte-ignore a11y-missing-attribute -->
       <a
