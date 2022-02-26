@@ -1,1 +1,26 @@
-{"path":["thisIsADir","anotherDir"],"items":[{"mimeType":"directory","name":"a3rdDir","size":-1,"chDate":1645297788,"owner":"mano (1000)","group":"mano (1000)","permissions":"drwxr-xr-x"},{"mimeType":"text/plain","name":"empty","size":0,"chDate":1645859613,"owner":"mano (1000)","group":"mano (1000)","permissions":"-rw-r--r--"}]}
+{
+    "path": [
+        "thisIsADir",
+        "anotherDir"
+    ],
+    "items": [
+        {
+            "mimeType": "directory",
+            "name": "a3rdDir",
+            "size": -1,
+            "chDate": 1645297788,
+            "owner": "mano (1000)",
+            "group": "mano (1000)",
+            "permissions": "drwxr-xr-x"
+        },
+        {
+            "mimeType": "text/plain",
+            "name": "empty",
+            "size": 0,
+            "chDate": 1645859613,
+            "owner": "mano (1000)",
+            "group": "mano (1000)",
+            "permissions": "-rw-r--r--"
+        }
+    ]
+}
