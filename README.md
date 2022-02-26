@@ -49,6 +49,11 @@ supports:
 Detection of file types is done by mime type, and viewing relies on the
 browser's capabilities... that are fairly complete, truth to be told.
 
+## Docker
+
+See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for
+instructions.
+
 ## Known bugs
 
 - In rare cases, MIME type detection is wrong. It relies on Go builtin
