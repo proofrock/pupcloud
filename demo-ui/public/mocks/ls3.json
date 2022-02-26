@@ -1,1 +1,8 @@
-{"path":["thisIsADir","anotherDir","a3rdDir"],"items":[]}
+{
+    "path": [
+        "thisIsADir",
+        "anotherDir",
+        "a3rdDir"
+    ],
+    "items": []
+}

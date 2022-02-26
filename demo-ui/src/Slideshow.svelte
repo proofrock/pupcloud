@@ -116,7 +116,7 @@
     font-size: 16px;
     padding: 8px 12px;
     position: fixed;
-    top: 12px;
+    top: 10px;
     right: 28px;
   }
 
@@ -190,13 +190,14 @@
 <!-- svelte-ignore a11y-media-has-caption -->
 <!-- svelte-ignore missing-declaration -->
 {#if fullscreen}
-  <div class="blanket-fullscreen" on:click={closeFullscreen} transition:fade>
-    <img
-      alt={files[fileIdx].name}
-      title={files[fileIdx].name}
-      class="centered"
-      src={getWS(files[fileIdx])} />
-  </div>
+  <div class="blanket-fullscreen cursor-pointer" transition:fade />
+  <img
+    alt={files[fileIdx].name}
+    title={files[fileIdx].name}
+    class="centered cursor-pointer"
+    src={getWS(files[fileIdx])}
+    on:click={closeFullscreen}
+    transition:fade />
 {:else}
   <div class="blanket" transition:fade>
     <div class="x-top-right cursor-pointer" on:click={close} />
