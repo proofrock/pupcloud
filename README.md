@@ -43,7 +43,7 @@ supports:
 - Images
 - Audio
 - Video
-- PDF documents
+- PDF documents (for desktop browsers)
 - Text-like files (txt, html, sources...)
 
 Detection of file types is done by mime type, and viewing relies on the
@@ -59,6 +59,11 @@ browser's capabilities... that are fairly complete, truth to be told.
 ## Changelog
 
 ### v0.1.1
+
+- Stable demo site
+- Fixes to Dockerfile
+
+### v0.1.0
 
 - First version;
 - Navigation, preview, download of files.
