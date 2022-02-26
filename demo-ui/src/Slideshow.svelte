@@ -116,7 +116,7 @@
     font-size: 16px;
     padding: 8px 12px;
     position: fixed;
-    top: 12px;
+    top: 10px;
     right: 28px;
   }
 
