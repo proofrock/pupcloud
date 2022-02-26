@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.1.1
+# 🐶 Pupcloud v0.1.2
 
 Put your files on the web!
 
@@ -55,18 +55,6 @@ browser's capabilities... that are fairly complete, truth to be told.
   functions, so it needs to be investigated more.
 - In list view, the menu trigger (`...`) is rendered over the menu itself.
   Waiting for upstream fix.
-
-## Changelog
-
-### v0.1.1
-
-- Stable demo site
-- Fixes to Dockerfile
-
-### v0.1.0
-
-- First version;
-- Navigation, preview, download of files.
 
 ## Credits
 
