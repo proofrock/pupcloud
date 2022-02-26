@@ -6,6 +6,7 @@ cleanup:
 	rm -rf bin
 	rm -rf web-ui/node_modules
 	rm -rf web-ui/public/build
+	rm -rf demo-ui/node_modules
 
 build-prepare:
 	make cleanup
@@ -16,6 +17,11 @@ build-ui:
 	cd web-ui && npm install && npm run build
 	rm -rf src/static/*
 	cp -r web-ui/public/* src/static/
+
+build-demo-ui:
+	rm -rf demo-ui/node_modules
+	rm -rf demo-ui/public/build
+	cd demo-ui && npm install && npm run build
 
 build-static:
 	make build-ui
@@ -35,10 +41,15 @@ zbuild:
 
 run:
 	make build
-	bin/pupcloud -r testFs/
+	bin/pupcloud -r demo-ui/public/testFs/
 
 run-ui:
 	cd web-ui && npm install && npm run dev
+
+run-demo-ui:
+	rm -rf demo-ui/node_modules
+	rm -rf demo-ui/public/build
+	cd demo-ui && npm install && npm run dev
 
 docker:
 	sudo docker build -t local_pupcloud:latest .
