@@ -46,14 +46,22 @@
   function noop() {}
 </script>
 
+<style>
+  .txt-mid {
+    vertical-align: middle;
+  }
+</style>
+
 <!-- svelte-ignore missing-declaration -->
 <tr>
   <td on:click={click(item.uuid)}>
     <div class="cursor-pointer wid220 ellipsis hide-md-up">
-      <img alt={item.icon} src="icons/16x16/{item.icon}.svg" />&nbsp;<span>{item.name}</span>
+      <img alt={item.icon} class="txt-mid" src="icons/16x16/{item.icon}.svg" />&nbsp;<span
+        class="txt-mid">{item.name}</span>
     </div>
     <div class="cursor-pointer hide-sm-down">
-      <img alt={item.icon} src="icons/16x16/{item.icon}.svg" />&nbsp;<span>{item.name}</span>
+      <img alt={item.icon} class="txt-mid" src="icons/16x16/{item.icon}.svg" />&nbsp;<span
+        class="txt-mid">{item.name}</span>
     </div>
   </td>
   <td>{item.size}</td>
