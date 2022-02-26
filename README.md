@@ -14,6 +14,8 @@ procedure. Just execute it and be done. In due time, it will have:
 - File operations (delete/copy/move...);
 - Everything that fits in a pup-sized cloud ;-)
 
+[Demo here](https://pupcloud-8a4ymrr0t-me-germanorizzo.vercel.app/)
+
 ## Basic usage
 
 Pupcloud is distributed as a single executable file. Download and unpack the
