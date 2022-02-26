@@ -17,7 +17,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"log"
@@ -89,6 +91,7 @@ func main() {
 	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to")
 	port := flag.IntP("port", "p", 17178, "The port to run on")
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
+	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password")
 
 	flag.Parse()
 
@@ -107,9 +110,9 @@ func main() {
 
 	app.Use(compress.New())
 
-	app.Get("/features", features(*title))
-	app.Get("/ls", ls(*root))
-	app.Get("/file", file(*root))
+	app.Get("/features", features(*title, *pwdHash))
+	app.Get("/ls", ls(*root, *pwdHash))
+	app.Get("/file", file(*root, *pwdHash))
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -120,14 +123,43 @@ func main() {
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", *bindTo, *port)))
 }
 
-func features(title string) func(c *fiber.Ctx) error {
+func features(title, pwdHash string) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
+		if err := auth(c, pwdHash); err != nil {
+			return err
+		}
+
 		return c.JSON(featuRes{Version, title})
 	}
 }
 
-func ls(root string) func(c *fiber.Ctx) error {
+func auth(c *fiber.Ctx, pwdHash string) error {
+	if pwdHash == "" {
+		return nil
+	}
+
+	pwd := c.Query("pwd")
+	if pwd == "" {
+		pwd = c.Get("x-pupcloud-pwd")
+	}
+	if pwd == "" {
+		return fiber.ErrUnauthorized
+	}
+
+	hash := sha256.Sum256([]byte(pwd))
+	if !strings.HasPrefix(hex.EncodeToString(hash[:]), strings.ToLower(pwdHash)) {
+		return fiber.ErrUnauthorized
+	}
+
+	return nil
+}
+
+func ls(root, pwdHash string) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
+		if err := auth(c, pwdHash); err != nil {
+			return err
+		}
+
 		path := c.Query("path", "/")
 
 		rootAndPath := filepath.Join(root, path)
@@ -177,8 +209,12 @@ func ls(root string) func(c *fiber.Ctx) error {
 }
 
 // Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go
-func file(root string) func(c *fiber.Ctx) error {
+func file(root, pwdHash string) func(c *fiber.Ctx) error {
 	return func(c *fiber.Ctx) error {
+		if err := auth(c, pwdHash); err != nil {
+			return err
+		}
+
 		path := c.Query("path")
 		forDownload := c.Query("dl", "0") == "1"
 		if path == "" {
