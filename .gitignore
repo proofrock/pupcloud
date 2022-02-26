@@ -1,12 +1,14 @@
 .DS_Store
 
 pupcloud
-bin/
-testFs/
+/bin
+/testFs
 /.vscode
 
 /web-ui/node_modules/
 /web-ui/public/build/
+
+/demo-ui/node_modules/
 
 # Binaries for programs and plugins
 *.exe

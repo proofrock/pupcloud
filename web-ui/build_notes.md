@@ -1,3 +1,13 @@
+## Change port of `run dev`
+
+In `package.json`:
+
+```json
+"scripts": {
+  [...]
+  "start": "sirv public --no-clear --port 17178 --host",
+```
+
 ## Rollup: avoid typescript map warning
 
 https://stackoverflow.com/questions/63128597/how-to-get-rid-of-the-rollup-plugin-typescript-rollup-sourcemap-option-must
