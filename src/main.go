@@ -36,7 +36,7 @@ import (
 	"github.com/proofrock/pupcloud/commons"
 )
 
-const Version = "v0.1.0"
+const Version = "v0.1.1"
 
 //go:embed static
 var static embed.FS
