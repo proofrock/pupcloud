@@ -17,23 +17,27 @@
 package main
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"embed"
 	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	flag "github.com/spf13/pflag"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/proofrock/pupcloud/commons"
 )
@@ -109,10 +113,18 @@ func main() {
 	)
 
 	app.Use(compress.New())
+	app.Use(csrf.New())
 
-	app.Get("/features", features(*title, *pwdHash))
-	app.Get("/ls", ls(*root, *pwdHash))
-	app.Get("/file", file(*root, *pwdHash))
+	app.Use(func(c *fiber.Ctx) error {
+		c.Locals("pwdHash", *pwdHash)
+		c.Locals("root", *root)
+		c.Locals("title", *title)
+		return c.Next()
+	})
+
+	app.Get("/features", features)
+	app.Get("/ls", ls)
+	app.Get("/file", file)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -123,118 +135,158 @@ func main() {
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", *bindTo, *port)))
 }
 
-func features(title, pwdHash string) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		if err := auth(c, pwdHash); err != nil {
-			return err
-		}
+var sessions sync.Map
 
-		return c.JSON(featuRes{Version, title})
+// https://gist.github.com/dopey/c69559607800d2f2f90b1b1ed4e550fb
+func genRndStr(n int) string {
+	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
+	ret := make([]byte, n)
+	for i := 0; i < n; i++ {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			panic(err)
+		}
+		ret[i] = letters[num.Int64()]
 	}
+
+	return string(ret)
 }
 
-func auth(c *fiber.Ctx, pwdHash string) error {
+func doAuth(c *fiber.Ctx, pwdHash string) error {
 	if pwdHash == "" {
 		return nil
+	}
+
+	val := c.Cookies("pupcloud-session")
+	if val != "" {
+		if _, ok := sessions.Load(val); ok {
+			return nil
+		}
 	}
 
 	pwd := c.Query("pwd")
 	if pwd == "" {
 		pwd = c.Get("x-pupcloud-pwd")
 	}
+
+	// FIXME I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
+	// prompt in the browser
 	if pwd == "" {
-		return fiber.ErrUnauthorized
+		return fiber.NewError(499, "Password required or wrong password")
 	}
 
 	hash := sha256.Sum256([]byte(pwd))
 	if !strings.HasPrefix(hex.EncodeToString(hash[:]), strings.ToLower(pwdHash)) {
-		return fiber.ErrUnauthorized
+		return fiber.NewError(499, "Password required or wrong password")
 	}
+
+	rnd := genRndStr(16)
+	cookie := new(fiber.Cookie)
+	cookie.Name = "pupcloud-session"
+	cookie.Value = rnd
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.SessionOnly = true
+	cookie.SameSite = "strict"
+	c.Cookie(cookie)
+	sessions.Store(rnd, true)
 
 	return nil
 }
 
-func ls(root, pwdHash string) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		if err := auth(c, pwdHash); err != nil {
-			return err
-		}
+func features(c *fiber.Ctx) error {
+	pwdHash := c.Locals("pwdHash").(string)
+	title := c.Locals("title").(string)
 
-		path := c.Query("path", "/")
-
-		rootAndPath := filepath.Join(root, path)
-		file, errPath := os.Stat(rootAndPath)
-		if errPath != nil {
-			return c.Status(fiber.StatusNotFound).SendString("Path not found")
-		}
-		if !file.IsDir() {
-			return c.Download(rootAndPath)
-		}
-
-		files, errPath := os.ReadDir(rootAndPath)
-		if errPath != nil {
-			return c.Status(fiber.StatusNotFound).SendString("Path not found")
-		}
-
-		res := res{Path: make([]string, 0), Items: make([]item, 0)}
-
-		for _, it := range strings.Split(path, "/") {
-			if it != "" {
-				res.Path = append(res.Path, it)
-			}
-		}
-
-		for _, f := range files {
-			var item item
-			item.Name = f.Name()
-			finfo, finfoError := f.Info()
-			if finfoError != nil {
-				continue
-			}
-			item.ChDate = finfo.ModTime().Unix()
-			item.Permissions = finfo.Mode().String()
-			fullPath := filepath.Join(rootAndPath, f.Name())
-			item.Owner, item.Group = getUserAndGroup(fullPath)
-			if f.IsDir() {
-				item.MimeType = "directory"
-				item.Size = -1
-			} else {
-				item.MimeType = getFileContentType(fullPath)
-				item.Size = finfo.Size()
-			}
-			res.Items = append(res.Items, item)
-		}
-		return c.JSON(res)
+	if err := doAuth(c, pwdHash); err != nil {
+		return err
 	}
+
+	return c.JSON(featuRes{Version, title})
+}
+
+func ls(c *fiber.Ctx) error {
+	pwdHash := c.Locals("pwdHash").(string)
+	root := c.Locals("root").(string)
+
+	if err := doAuth(c, pwdHash); err != nil {
+		return err
+	}
+
+	path := c.Query("path", "/")
+
+	rootAndPath := filepath.Join(root, path)
+	file, errPath := os.Stat(rootAndPath)
+	if errPath != nil {
+		return c.Status(fiber.StatusNotFound).SendString("Path not found")
+	}
+	if !file.IsDir() {
+		return c.Download(rootAndPath)
+	}
+
+	files, errPath := os.ReadDir(rootAndPath)
+	if errPath != nil {
+		return c.Status(fiber.StatusNotFound).SendString("Path not found")
+	}
+
+	res := res{Path: make([]string, 0), Items: make([]item, 0)}
+
+	for _, it := range strings.Split(path, "/") {
+		if it != "" {
+			res.Path = append(res.Path, it)
+		}
+	}
+
+	for _, f := range files {
+		var item item
+		item.Name = f.Name()
+		finfo, finfoError := f.Info()
+		if finfoError != nil {
+			continue
+		}
+		item.ChDate = finfo.ModTime().Unix()
+		item.Permissions = finfo.Mode().String()
+		fullPath := filepath.Join(rootAndPath, f.Name())
+		item.Owner, item.Group = getUserAndGroup(fullPath)
+		if f.IsDir() {
+			item.MimeType = "directory"
+			item.Size = -1
+		} else {
+			item.MimeType = getFileContentType(fullPath)
+			item.Size = finfo.Size()
+		}
+		res.Items = append(res.Items, item)
+	}
+	return c.JSON(res)
 }
 
 // Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go
-func file(root, pwdHash string) func(c *fiber.Ctx) error {
-	return func(c *fiber.Ctx) error {
-		if err := auth(c, pwdHash); err != nil {
-			return err
-		}
+func file(c *fiber.Ctx) error {
+	pwdHash := c.Locals("pwdHash").(string)
+	root := c.Locals("root").(string)
 
-		path := c.Query("path")
-		forDownload := c.Query("dl", "0") == "1"
-		if path == "" {
-			return fiber.ErrNotFound
-		}
-
-		fullPath := filepath.Join(root, path)
-		present, contentType, length := getFileInfoForHTTP(fullPath)
-		if !present {
-			return fiber.ErrNotFound
-		}
-
-		c.Set("Content-Type", contentType)
-		c.Set("Content-Length", fmt.Sprintf("%d", length))
-		if forDownload {
-			c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filepath.Base(fullPath)))
-		} else {
-			c.Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", filepath.Base(fullPath)))
-		}
-
-		return c.SendFile(fullPath)
+	if err := doAuth(c, pwdHash); err != nil {
+		return err
 	}
+
+	path := c.Query("path")
+	forDownload := c.Query("dl", "0") == "1"
+	if path == "" {
+		return fiber.ErrNotFound
+	}
+
+	fullPath := filepath.Join(root, path)
+	present, contentType, length := getFileInfoForHTTP(fullPath)
+	if !present {
+		return fiber.ErrNotFound
+	}
+
+	c.Set("Content-Type", contentType)
+	c.Set("Content-Length", fmt.Sprintf("%d", length))
+	if forDownload {
+		c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filepath.Base(fullPath)))
+	} else {
+		c.Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", filepath.Base(fullPath)))
+	}
+
+	return c.SendFile(fullPath)
 }
