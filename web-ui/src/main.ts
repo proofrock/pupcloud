@@ -15,9 +15,9 @@
  * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import App from "./App.svelte";
+import Auth from "./Auth.svelte";
 
-const app = new App({
+const app = new Auth({
   target: document.body,
 });
 

@@ -20,11 +20,11 @@
   import "../node_modules/axentix/dist/axentix.min.css";
 
   import { Config, File, Mule, SORTERS } from "./Struct.svelte";
-  import { onMount } from "svelte";
   import Slideshow from "./Slideshow.svelte";
   import FileManager from "./FileManager.svelte";
 
-  $: config = Config.empty();
+  export let config: Config;
+
   $: mule = Mule.empty();
 
   $: path = [];
@@ -49,10 +49,6 @@
       path
     ).sort(sorter);
   }
-
-  onMount(async () => {
-    config = Config.fromAny(await (await fetch("/features")).json());
-  });
 
   function openSlideshow(event) {
     slideshowIndex = mule.files.findIndex(
