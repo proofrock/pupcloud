@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.1.2
+# 🐶 Pupcloud v0.2.0
 
 Put your files on the web!
 
@@ -9,7 +9,6 @@ Pupcloud aims to be as simple as possible, while retaining all the features you
 would like it to have. It doesn't need a database, or a particular installation
 procedure. Just execute it and be done. In due time, it will have:
 
-- Authentication;
 - File sharing;
 - File operations (delete/copy/move...);
 - Everything that fits in a pup-sized cloud ;-)
@@ -77,8 +76,6 @@ instructions.
 
 - In rare cases, MIME type detection is wrong. It relies on Go builtin
   functions, so it needs to be investigated more.
-- In list view, the menu trigger (`...`) is rendered over the menu itself.
-  Waiting for upstream fix.
 
 ## Credits
 
