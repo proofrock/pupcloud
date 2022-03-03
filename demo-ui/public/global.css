@@ -15,6 +15,17 @@
  * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+.blanket {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  background: slategray;
+  z-index: 0;
+  padding: 0px;
+}
+
 .pup-a {
   font-weight: bold;
   text-decoration: underline dotted;
@@ -28,4 +39,12 @@
 
 .wid220 {
   width: 220px;
+}
+
+.dd-fix {
+  z-index: unset!important;
+}
+
+.dd-cnt-fix {
+  z-index: var(--ax-dropdown-z-index)!important;
 }

@@ -40,8 +40,8 @@
   <!-- svelte-ignore missing-declaration -->
   <div class="card-content lh-1">
     <span class="font-w100 hide-sm-down">{item.size}</span>
-    <div class="dropdown" id="ddGrid-{item.uuid}" style="float: right;">
-      <span class="dropdown-trigger" on:click|stopPropagation={noop}>
+    <div class="dropdown dd-fix" id="ddGrid-{item.uuid}" style="float: right;">
+      <span data-target="ddGrid-{item.uuid}" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
       <ContextMenu {item} />

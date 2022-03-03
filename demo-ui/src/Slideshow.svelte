@@ -63,28 +63,6 @@
 </script>
 
 <style>
-  .blanket {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    left: 0px;
-    top: 0px;
-    background: slategray;
-    z-index: 0;
-    padding: 0px;
-  }
-
-  .blanket-fullscreen {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    left: 0px;
-    top: 0px;
-    background: slategray;
-    z-index: 0;
-    padding: 0px;
-  }
-
   /* 'X' to close slideshow and fullscreen */
   .x-top-right {
     position: fixed;
@@ -190,7 +168,7 @@
 <!-- svelte-ignore a11y-media-has-caption -->
 <!-- svelte-ignore missing-declaration -->
 {#if fullscreen}
-  <div class="blanket-fullscreen cursor-pointer" transition:fade />
+  <div class="blanket cursor-pointer" transition:fade />
   <img
     alt={files[fileIdx].name}
     title={files[fileIdx].name}

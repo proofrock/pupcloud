@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.1.2
+# 🐶 Pupcloud v0.2.0
 
 Put your files on the web!
 
@@ -9,7 +9,6 @@ Pupcloud aims to be as simple as possible, while retaining all the features you
 would like it to have. It doesn't need a database, or a particular installation
 procedure. Just execute it and be done. In due time, it will have:
 
-- Authentication;
 - File sharing;
 - File operations (delete/copy/move...);
 - Everything that fits in a pup-sized cloud ;-)
@@ -35,7 +34,7 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 - specify a different port;
 - bind to a network interface.
 
-## Supported file types for viewing
+### Supported file types for viewing
 
 In the file system view, you can click on a file to open it. Currently pupcloud
 supports:
@@ -49,6 +48,25 @@ supports:
 Detection of file types is done by mime type, and viewing relies on the
 browser's capabilities... that are fairly complete, truth to be told.
 
+## Authentication
+
+You can set a password for accessing pupcloud, by using the `-P` parameter on
+the commandline. You must provide the SHA-256 sum of the password you want to
+use, in hex format.
+
+You can provide the whole hash, or just the first part, of any length you want
+to keep the commandline short. Of course, the longer the hash, the safer the
+system.
+
+```bash
+# Password is "ciao", with 128 bit of strength (truncated at 16 bytes)
+pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
+```
+
+You can use [this site](https://emn178.github.io/online-tools/sha256.html) to
+hash the password, it doesn't send the password on the net (at least at the time
+I am writing ).
+
 ## Docker
 
 See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for
@@ -58,8 +76,6 @@ instructions.
 
 - In rare cases, MIME type detection is wrong. It relies on Go builtin
   functions, so it needs to be investigated more.
-- In list view, the menu trigger (`...`) is rendered over the menu itself.
-  Waiting for upstream fix.
 
 ## Credits
 
@@ -70,12 +86,12 @@ Server:
 
 Web UI:
 
-- [svelte](https://svelte.dev/) [MIT]
 - [axentix](https://useaxentix.com/) [MIT]
-- [Material Design Icons](https://materialdesignicons.com/) [Pictogrammers Free
-  License]
+- [Material Design Icons](https://materialdesignicons.com/) [Pictogrammers Free]
+- [svelte](https://svelte.dev/) [MIT]
+- [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT] License]
 - yeyushengfan258's
   [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme)
   [GPLv3]
 
-...and Go, Typescript, VSCode!
+...and Go, Typescript, VSCode via CodeServer.

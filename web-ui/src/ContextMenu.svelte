@@ -24,7 +24,8 @@
   function noop() {}
 </script>
 
-<div class="dropdown-content dropdown-right white shadow-1 rounded-3">
+<div
+  class="dropdown-content dd-cnt-fix dropdown-right white shadow-1 rounded-3">
   <div
     class="dropdown-item modal-trigger"
     data-target={'modal-properties-' + item.uuid}
