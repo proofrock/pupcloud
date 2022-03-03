@@ -81,9 +81,10 @@
         <IconList size={24} />
       {/if}
     </div>
-    <div class="dropdown" id="SortBy">
+    <div class="dropdown dd-fix" id="SortBy">
       <div
-        class="navbar-link dropdown-trigger"
+        class="navbar-link"
+        data-target="SortBy"
         title="Sort by"
         style="height: 40px;">
         {#if sorter == SORTERS.ABC}
@@ -100,7 +101,7 @@
           <IconSortSizeDesc size={24} />
         {/if}
       </div>
-      <div class="dropdown-content dropdown-right white shadow-1">
+      <div class="dropdown-content dd-cnt-fix dropdown-right white shadow-1">
         <div
           class="dropdown-item"
           on:click={resort(SORTERS.ABC)}

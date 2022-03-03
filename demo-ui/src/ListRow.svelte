@@ -67,8 +67,8 @@
   <td>{item.size}</td>
   <td class="hide-sm-down">{item.chDate}</td>
   <td>
-    <div class="w100 dropdown" id="ddList-{item.uuid}">
-      <span class="dropdown-trigger" on:click|stopPropagation={noop}>
+    <div class="w100 dropdown dd-fix" id="ddList-{item.uuid}">
+      <span data-target="ddList-{item.uuid}" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
       <ContextMenu {item} />
