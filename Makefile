@@ -7,6 +7,7 @@ cleanup:
 	rm -rf web-ui/node_modules
 	rm -rf web-ui/public/build
 	rm -rf demo-ui/node_modules
+	rm -f src/pupcloud
 
 build-prepare:
 	make cleanup
