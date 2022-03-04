@@ -17,15 +17,11 @@
 package main
 
 import (
-	"fmt"
 	"mime"
 	"net/http"
 	"os"
-	"os/user"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"syscall"
 )
 
 const MIME_TYPE_TEXT_PLAIN = "text/plain"
@@ -62,31 +58,6 @@ func getFileContentType(path string) string {
 	contentType := http.DetectContentType(buffer)
 
 	return contentType
-}
-
-// Adapted from https://pirivan.gitlab.io/post/how-to-retrieve-file-ownership-information-in-golang/
-func getUserAndGroup(path string) (string, string) {
-	fileInfo, err := os.Stat(path)
-	if err != nil {
-		return "--", "--"
-	}
-
-	stat, ok := fileInfo.Sys().(*syscall.Stat_t)
-	if !ok {
-		return "--", "--"
-	}
-
-	usr, err := user.LookupId(strconv.FormatUint(uint64(stat.Uid), 10))
-	if err != nil {
-		return "--", "--"
-	}
-	group, err := user.LookupGroupId(strconv.FormatUint(uint64(stat.Gid), 10))
-	if err != nil {
-		return "--", "--"
-	}
-
-	return fmt.Sprintf("%s (%s)", usr.Username, usr.Uid),
-		fmt.Sprintf("%s (%s)", group.Name, group.Gid)
 }
 
 func getFileInfoForHTTP(path string) (present bool, contentType string, length int64) {
