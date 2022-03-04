@@ -16,33 +16,25 @@
    * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-  import { createEventDispatcher } from "svelte";
-  import GridCell from "./GridCell.svelte";
-  import Properties from "./Properties.svelte";
-  import type { File } from "./Struct.svelte";
+  import ListRow from "./ListRow.svelte";
+  import Properties from "../Snippets/Properties.svelte";
+  import type { File } from "../Struct.svelte";
 
   export let itemList: File[];
-
-  const dispatch = createEventDispatcher();
-
-  function click(uuid: string): (e: Event) => void {
-    return (e: Event) => {
-      dispatch("message", {
-        uuid: uuid,
-      });
-    };
-  }
 </script>
 
-<div class="grix xs2 sm3 md4 lg6 xl12">
-  {#each itemList as item (item.uuid)}
-    <div
-      class="m-3 cursor-pointer"
-      on:click={click(item.uuid)}
-      title={item.name}>
-      <GridCell {item} />
-    </div>
-  {/each}
+<div class="table-responsive w100">
+  <table class="table">
+    <tr>
+      <th>Name</th>
+      <th>Size</th>
+      <th class="hide-sm-down">Mod. Date</th>
+      <th />
+    </tr>
+    {#each itemList as item (item.uuid)}
+      <ListRow {item} on:message />
+    {/each}
+  </table>
 </div>
 {#each itemList as item (item.uuid)}
   <Properties {item} />

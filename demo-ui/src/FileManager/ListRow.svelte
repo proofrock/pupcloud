@@ -18,9 +18,9 @@
 
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import { Dropdown, destroy } from "axentix";
-  import ContextMenu from "./ContextMenu.svelte";
-  import DotDotDot from "./DotDotDot.svelte";
-  import type { File } from "./Struct.svelte";
+  import ContextMenu from "../Snippets/ContextMenu.svelte";
+  import DotDotDot from "../Snippets/DotDotDot.svelte";
+  import type { File } from "../Struct.svelte";
 
   export let item: File;
 

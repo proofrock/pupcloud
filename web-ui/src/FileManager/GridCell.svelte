@@ -16,11 +16,11 @@
    * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-  import ContextMenu from "./ContextMenu.svelte";
-  import type { File } from "./Struct.svelte";
+  import ContextMenu from "../Snippets/ContextMenu.svelte";
+  import type { File } from "../Struct.svelte";
   import { onMount, onDestroy } from "svelte";
   import { Dropdown, destroy } from "axentix";
-  import DotDotDot from "./DotDotDot.svelte";
+  import DotDotDot from "../Snippets/DotDotDot.svelte";
 
   export let item: File;
 

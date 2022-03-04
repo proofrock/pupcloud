@@ -16,20 +16,19 @@
    * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-  import type { File } from "./Struct.svelte";
+  import { onMount } from "svelte";
+  import type { File } from "../Struct.svelte";
 
-  export let item: File;
+  export let url: string;
+  export let file: File;
 
-  // to be able to specify stopPropagation
-  function noop() {}
+  $: contents = "";
+
+  onMount(async () => {
+    contents = await (await fetch(url)).text();
+  });
 </script>
 
-<div
-  class="dropdown-content dd-cnt-fix dropdown-right white shadow-1 rounded-3">
-  <div
-    class="dropdown-item modal-trigger"
-    data-target={'modal-properties-' + item.uuid}
-    on:click|stopPropagation={noop}>
-    Properties
-  </div>
+<div title={file.name}>
+  <pre>{contents}</pre>
 </div>

@@ -19,18 +19,18 @@
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import { Dropdown, destroy } from "axentix";
 
-  import Breadcrumb from "./Breadcrumb.svelte";
+  import Breadcrumb from "../Snippets/Breadcrumb.svelte";
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
-  import { File, Mule, SORTERS } from "./Struct.svelte";
-  import IconGrid from "./SVG/IconGrid.svelte";
-  import IconList from "./SVG/IconList.svelte";
-  import IconSortAlphAsc from "./SVG/IconSortAlphAsc.svelte";
-  import IconSortAlphDesc from "./SVG/IconSortAlphDesc.svelte";
-  import IconSortDateAsc from "./SVG/IconSortDateAsc.svelte";
-  import IconSortDateDesc from "./SVG/IconSortDateDesc.svelte";
-  import IconSortSizeAsc from "./SVG/IconSortSizeAsc.svelte";
-  import IconSortSizeDesc from "./SVG/IconSortSizeDesc.svelte";
+  import { File, Mule, SORTERS } from "../Struct.svelte";
+  import IconGrid from "../SVG/IconGrid.svelte";
+  import IconList from "../SVG/IconList.svelte";
+  import IconSortAlphAsc from "../SVG/IconSortAlphAsc.svelte";
+  import IconSortAlphDesc from "../SVG/IconSortAlphDesc.svelte";
+  import IconSortDateAsc from "../SVG/IconSortDateAsc.svelte";
+  import IconSortDateDesc from "../SVG/IconSortDateDesc.svelte";
+  import IconSortSizeAsc from "../SVG/IconSortSizeAsc.svelte";
+  import IconSortSizeDesc from "../SVG/IconSortSizeDesc.svelte";
 
   export let path: string[];
   export let mule: Mule;
