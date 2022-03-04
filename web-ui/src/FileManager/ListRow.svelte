@@ -23,6 +23,7 @@
   import type { File } from "../Struct.svelte";
 
   export let item: File;
+  export let readOnly: boolean;
 
   const dispatch = createEventDispatcher();
 
@@ -71,7 +72,7 @@
       <span data-target="ddList-{item.uuid}" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
-      <ContextMenu {item} />
+      <ContextMenu {item} {readOnly} on:toPaste on:reload />
     </div>
   </td>
 </tr>

@@ -67,6 +67,19 @@ You can use [this site](https://emn178.github.io/online-tools/sha256.html) to
 hash the password, it doesn't send the password on the net (at least at the time
 I am writing ).
 
+## Roadmap
+
+| Feature                                    | Done | Version |
+| ------------------------------------------ | ---- | ------- |
+| Basic navigation                           | ✔️   | v0.1.0  |
+| File preview/gallery                       | ✔️   | v0.1.0  |
+| Authentication                             | ✔️   | v0.2.0  |
+| Write operations (delete, copy, rename...) | ❌    |         |
+| Read-only mode                             | ❌    |         |
+| File sharing                               | ❌    |         |
+| Special files (permissions, links...)      | ❌    |         |
+| Read-only password                         | ❌    |         |
+
 ## Docker
 
 See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for

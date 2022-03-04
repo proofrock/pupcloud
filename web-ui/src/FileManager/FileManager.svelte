@@ -17,7 +17,8 @@
    */
 
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
-  import { Dropdown, destroy } from "axentix";
+  import { Dropdown, destroy, config } from "axentix";
+  import { fade } from "svelte/transition";
 
   import Breadcrumb from "../Snippets/Breadcrumb.svelte";
   import Grid from "./Grid.svelte";
@@ -31,11 +32,16 @@
   import IconSortDateDesc from "../SVG/IconSortDateDesc.svelte";
   import IconSortSizeAsc from "../SVG/IconSortSizeAsc.svelte";
   import IconSortSizeDesc from "../SVG/IconSortSizeDesc.svelte";
+  import IconPaste from "../SVG/IconPaste.svelte";
+  import IconUnpaste from "../SVG/IconUnpaste.svelte";
 
   export let path: string[];
   export let mule: Mule;
   export let sorter: (f1: File, f2: File) => number;
   export let mode: string;
+  export let readOnly: boolean;
+
+  $: toPaste = null;
 
   const dispatch = createEventDispatcher();
 
@@ -60,6 +66,19 @@
     }
   }
 
+  function markToPaste(event) {
+    console;
+    toPaste = event.detail.file;
+  }
+
+  function unmarkToPaste() {
+    toPaste = null;
+  }
+
+  function nodo() {
+    alert("Not implemented in the demo site");
+  }
+
   function resort(_sorter: (f1: File, f2: File) => number): () => void {
     return function () {
       sorter = _sorter;
@@ -74,6 +93,19 @@
 <nav class="navbar" style="height: 40px;">
   <Breadcrumb {path} on:pathEvent />
   <div class="navbar-menu ml-auto" style="height: 40px;">
+    {#if !!toPaste}
+      <div class="navbar-link" title="Paste" transition:fade on:click={nodo}>
+        <IconPaste color="#BBBBBB" size={24} />
+      </div>
+      <div
+        class="navbar-link"
+        title="Abort paste"
+        transition:fade
+        on:click={unmarkToPaste}>
+        <IconUnpaste color="#BBBBBB" size={24} />
+      </div>
+    {/if}
+    <div>&nbsp;</div>
     <div class="navbar-link" title="View mode" on:click={gridOrList}>
       {#if mode == 'GRID'}
         <IconGrid size={24} />
@@ -149,9 +181,19 @@
   </div>
 </nav>
 {#if mode == 'GRID'}
-  <Grid itemList={mule.items} on:message={click} />
+  <Grid
+    itemList={mule.items}
+    {readOnly}
+    on:message={click}
+    on:toPaste={markToPaste}
+    on:reload />
 {:else}
-  <List itemList={mule.items} on:message={click} />
+  <List
+    itemList={mule.items}
+    {readOnly}
+    on:message={click}
+    on:toPaste={markToPaste}
+    on:reload />
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>

@@ -23,6 +23,7 @@
   import DotDotDot from "../Snippets/DotDotDot.svelte";
 
   export let item: File;
+  export let readOnly: boolean;
 
   onMount(() => {
     new Dropdown("#ddGrid-" + item.uuid);
@@ -44,7 +45,7 @@
       <span data-target="ddGrid-{item.uuid}" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
-      <ContextMenu {item} />
+      <ContextMenu {item} {readOnly} on:toPaste on:reload />
     </div>
     <div style="clear: both;">&nbsp;</div>
     <div class="font-s9 text-center">

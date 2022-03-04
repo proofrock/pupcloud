@@ -39,7 +39,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/proofrock/pupcloud/commons"
 )
 
 const Version = "v0.2.0"
@@ -60,7 +59,7 @@ func errHandler(ctx *fiber.Ctx, err error) error {
 		}
 	}
 
-	return ctx.Status(code).JSON(commons.ErrorRes{Code: code, Message: msg})
+	return ctx.Status(code).SendString(msg)
 }
 
 type item struct {
@@ -128,6 +127,8 @@ func main() {
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/fsOps/del", fsDel)
+	app.Get("/fsOps/rename", fsRename)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -172,7 +173,7 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 		pwd = c.Get("x-pupcloud-pwd")
 	}
 
-	// FIXME I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
+	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
 	if pwd == "" {
 		return fiber.NewError(499, "Password required or wrong password")
@@ -290,4 +291,54 @@ func file(c *fiber.Ctx) error {
 	}
 
 	return c.SendFile(fullPath)
+}
+
+func fsDel(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	if path == "" {
+		return fiber.ErrNotFound
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	if err := os.RemoveAll(fullPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsRename(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	nuName := c.Query("name")
+	if path == "" || nuName == "" {
+		return fiber.ErrNotFound
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	newPath := filepath.Join(filepath.Dir(fullPath), nuName)
+	if err := os.Rename(fullPath, newPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
 }

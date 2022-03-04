@@ -29,31 +29,56 @@
   // to be able to specify stopPropagation
   function noop() {}
 
-  function nodo() {
-    alert("Not implemented in the demo site");
-  }
-
   async function rename() {
     const { value: nuName } = await Swal.fire({
       titleText: "Enter new name",
       confirmButtonColor: "#0a6bb8",
       showCancelButton: true,
       input: "text",
-      inputValue: item.name,
+      inputValue: item.name.replaceAll("/", ""),
       inputAttributes: {
         autocapitalize: "off",
         autocorrect: "off",
       },
     });
-    if (!!nuName) {
-      if (item.name == nuName) {
-        await Swal.fire({
-          title: "Error",
-          text: "Old and new name must be different",
-          confirmButtonColor: "#0a6bb8",
-        });
-      } else nodo();
+
+    if (!nuName) {
+      return;
     }
+
+    if (item.name == nuName) {
+      await Swal.fire({
+        icon: "error",
+        text: "Old and new name must be different",
+        confirmButtonColor: "#0a6bb8",
+      });
+      return;
+    }
+
+    await Swal.fire({
+      icon: "error",
+      text: "Not implemented in the demo site",
+      confirmButtonColor: "#0a6bb8",
+    });
+  }
+
+  async function del() {
+    const { value: confirm } = await Swal.fire({
+      html: "Do you really want to delete<br/><code>" + item.path + "</code>",
+      icon: "question",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      cancelButtonText: "No",
+    });
+    if (!confirm) {
+      return;
+    }
+
+    await Swal.fire({
+      icon: "error",
+      text: "Not implemented in the demo site",
+      confirmButtonColor: "#0a6bb8",
+    });
   }
 
   function toPaste() {
@@ -84,6 +109,6 @@
       Copy
     </div>
     <div class="dropdown-item" on:click|stopPropagation={rename}>Rename</div>
-    <div class="dropdown-item" on:click|stopPropagation={nodo}>Delete</div>
+    <div class="dropdown-item" on:click|stopPropagation={del}>Delete</div>
   {/if}
 </div>
