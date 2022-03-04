@@ -17,8 +17,9 @@
    */
 
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
-  import { Dropdown, destroy, config } from "axentix";
   import { fade } from "svelte/transition";
+  import { Dropdown, destroy } from "axentix";
+  import Swal from "sweetalert2";
 
   import Breadcrumb from "../Snippets/Breadcrumb.svelte";
   import Grid from "./Grid.svelte";
@@ -42,6 +43,7 @@
   export let readOnly: boolean;
 
   $: toPaste = null;
+  $: isCut = false;
 
   const dispatch = createEventDispatcher();
 
@@ -69,14 +71,43 @@
   function markToPaste(event) {
     console;
     toPaste = event.detail.file;
+    isCut = event.detail.isCut;
   }
 
   function unmarkToPaste() {
     toPaste = null;
+    isCut = false;
   }
 
-  function nodo() {
-    alert("Not implemented in the demo site");
+  async function doPaste() {
+    if (!isCut) {
+      alert("Not implemented in the demo site");
+      return;
+    }
+
+    const dest = path.join("/") + "/";
+
+    const res: Response = await fetch(
+      "/fsOps/move?path=" +
+        encodeURIComponent(toPaste.path) +
+        "&destDir=" +
+        encodeURIComponent(dest)
+    );
+    if (res.status != 200) {
+      await Swal.fire({
+        icon: "error",
+        text: await res.text(),
+        confirmButtonColor: "#0a6bb8",
+      });
+    } else {
+      await Swal.fire({
+        icon: "success",
+        titleText: "Done!",
+        confirmButtonColor: "#0a6bb8",
+      });
+      unmarkToPaste();
+      dispatch("reload", {});
+    }
   }
 
   function resort(_sorter: (f1: File, f2: File) => number): () => void {
@@ -94,7 +125,7 @@
   <Breadcrumb {path} on:pathEvent />
   <div class="navbar-menu ml-auto" style="height: 40px;">
     {#if !!toPaste}
-      <div class="navbar-link" title="Paste" transition:fade on:click={nodo}>
+      <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
         <IconPaste color="#BBBBBB" size={24} />
       </div>
       <div
