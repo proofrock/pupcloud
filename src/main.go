@@ -33,6 +33,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/otiai10/copy"
 	flag "github.com/spf13/pflag"
 
 	"github.com/gofiber/fiber/v2"
@@ -130,6 +131,7 @@ func main() {
 	app.Get("/fsOps/del", fsDel)
 	app.Get("/fsOps/rename", fsRename)
 	app.Get("/fsOps/move", fsMove)
+	app.Get("/fsOps/copy", fsCopy)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -377,14 +379,42 @@ func fsMove(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
 
-	println(fullPath)
-	println(newPath)
-
 	if fileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
 	if err := os.Rename(fullPath, newPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsCopy(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	destDir := c.Query("destDir")
+	if path == "" || destDir == "" {
+		return fiber.ErrNotFound
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
+
+	if fileExists(newPath) {
+		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
+	}
+
+	if err := copy.Copy(fullPath, newPath); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 

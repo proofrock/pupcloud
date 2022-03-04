@@ -64,7 +64,10 @@
 
   async function del() {
     const { value: confirm } = await Swal.fire({
-      html: "Do you really want to delete<br/><code>" + item.path + "</code>",
+      html:
+        "Do you really want to delete<br/><code>" +
+        item.path +
+        "</code>&nbsp;?",
       icon: "question",
       confirmButtonColor: "#0a6bb8",
       showCancelButton: true,

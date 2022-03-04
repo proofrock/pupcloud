@@ -80,15 +80,14 @@
   }
 
   async function doPaste() {
-    if (!isCut) {
-      alert("Not implemented in the demo site");
-      return;
-    }
+    const srv = isCut ? "move" : "copy";
 
     const dest = path.join("/") + "/";
 
     const res: Response = await fetch(
-      "/fsOps/move?path=" +
+      "/fsOps/" +
+        srv +
+        "?path=" +
         encodeURIComponent(toPaste.path) +
         "&destDir=" +
         encodeURIComponent(dest)

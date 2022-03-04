@@ -95,6 +95,7 @@ instructions.
 Server:
 
 - [fiber](https://gofiber.io/) [MIT]
+- otiai10's [copy](https://github.com/otiai10/copy) [MIT]
 - spf13's [pflag](https://github.com/spf13/pflag) [BSD 3-Clause]
 
 Web UI:
