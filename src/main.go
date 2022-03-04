@@ -79,8 +79,9 @@ type res struct {
 }
 
 type featuRes struct {
-	Version string `json:"version"`
-	Title   string `json:"title"`
+	Version  string `json:"version"`
+	Title    string `json:"title"`
+	ReadOnly bool   `json:"readonly"`
 }
 
 func main() {
@@ -96,6 +97,7 @@ func main() {
 	port := flag.IntP("port", "p", 17178, "The port to run on")
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password")
+	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS")
 
 	flag.Parse()
 
@@ -119,6 +121,7 @@ func main() {
 		c.Locals("pwdHash", *pwdHash)
 		c.Locals("root", *root)
 		c.Locals("title", *title)
+		c.Locals("readOnly", *readOnly)
 		return c.Next()
 	})
 
@@ -194,24 +197,23 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 }
 
 func features(c *fiber.Ctx) error {
-	pwdHash := c.Locals("pwdHash").(string)
-	title := c.Locals("title").(string)
-
-	if err := doAuth(c, pwdHash); err != nil {
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
 		return err
 	}
 
-	return c.JSON(featuRes{Version, title})
+	return c.JSON(featuRes{
+		Version,
+		c.Locals("title").(string),
+		c.Locals("readOnly").(bool),
+	})
 }
 
 func ls(c *fiber.Ctx) error {
-	pwdHash := c.Locals("pwdHash").(string)
-	root := c.Locals("root").(string)
-
-	if err := doAuth(c, pwdHash); err != nil {
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
 		return err
 	}
 
+	root := c.Locals("root").(string)
 	path := c.Query("path", "/")
 
 	rootAndPath := filepath.Join(root, path)
@@ -261,10 +263,7 @@ func ls(c *fiber.Ctx) error {
 
 // Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go
 func file(c *fiber.Ctx) error {
-	pwdHash := c.Locals("pwdHash").(string)
-	root := c.Locals("root").(string)
-
-	if err := doAuth(c, pwdHash); err != nil {
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
 		return err
 	}
 
@@ -273,6 +272,8 @@ func file(c *fiber.Ctx) error {
 	if path == "" {
 		return fiber.ErrNotFound
 	}
+
+	root := c.Locals("root").(string)
 
 	fullPath := filepath.Join(root, path)
 	present, contentType, length := getFileInfoForHTTP(fullPath)

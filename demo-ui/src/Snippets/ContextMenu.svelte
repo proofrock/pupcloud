@@ -16,20 +16,74 @@
    * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
    */
 
+  import { createEventDispatcher } from "svelte";
+
   import type { File } from "../Struct.svelte";
+  import Swal from "sweetalert2";
 
   export let item: File;
+  export let readOnly: boolean;
+
+  const dispatch = createEventDispatcher();
 
   // to be able to specify stopPropagation
   function noop() {}
+
+  function nodo() {
+    alert("Not implemented in the demo site");
+  }
+
+  async function rename() {
+    const { value: nuName } = await Swal.fire({
+      titleText: "Enter new name",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      input: "text",
+      inputValue: item.name,
+      inputAttributes: {
+        autocapitalize: "off",
+        autocorrect: "off",
+      },
+    });
+    if (!!nuName) {
+      if (item.name == nuName) {
+        await Swal.fire({
+          title: "Error",
+          text: "Old and new name must be different",
+          confirmButtonColor: "#0a6bb8",
+        });
+      } else nodo();
+    }
+  }
+
+  function toPaste() {
+    dispatch("toPaste", { file: item });
+  }
 </script>
 
 <div
   class="dropdown-content dd-cnt-fix dropdown-right white shadow-1 rounded-3">
-  <div
-    class="dropdown-item modal-trigger"
-    data-target={'modal-properties-' + item.uuid}
-    on:click|stopPropagation={noop}>
-    Properties
-  </div>
+  {#if item.isDir && item.name == '../'}
+    <div class="dropdown-item text-grey">Special dir</div>
+  {:else if readOnly}
+    <div
+      class="dropdown-item modal-trigger"
+      data-target={'modal-properties-' + item.uuid}
+      on:click|stopPropagation={noop}>
+      Properties
+    </div>
+  {:else}
+    <div
+      class="dropdown-item divider modal-trigger"
+      data-target={'modal-properties-' + item.uuid}
+      on:click|stopPropagation={noop}>
+      Properties
+    </div>
+    <div class="dropdown-item" on:click|stopPropagation={toPaste}>Cut</div>
+    <div class="dropdown-item divider" on:click|stopPropagation={toPaste}>
+      Copy
+    </div>
+    <div class="dropdown-item" on:click|stopPropagation={rename}>Rename</div>
+    <div class="dropdown-item" on:click|stopPropagation={nodo}>Delete</div>
+  {/if}
 </div>
