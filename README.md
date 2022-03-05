@@ -69,19 +69,19 @@ I am writing ).
 
 ## Roadmap
 
-| Feature                                    | Done | Version |
-| ------------------------------------------ | ---- | ------- |
-| Basic navigation                           | ✔️    | v0.1.0  |
-| File preview/gallery                       | ✔️    | v0.1.0  |
-| Authentication                             | ✔️    | v0.2.0  |
-| Write operations (delete, copy, rename...) | ❌    |         |
-| Read-only mode                             | ❌    |         |
-| File upload                                | ❌    |         |
-| File sharing                               | ❌    |         |
-| Special file modes (permissions, links...) | ❌    |         |
-| Mobile tweaks (swipe, ...)                 | ❌    |         |
-| Internationalization                       | ❌    |         |
-| Separate password for Read-Write           | ❌    |         |
+| Feature                                    | Status | Version |
+| ------------------------------------------ | ------ | ------- |
+| Basic navigation                           | ✔️     | v0.1.0  |
+| File preview/gallery                       | ✔️     | v0.1.0  |
+| Authentication                             | ✔️     | v0.2.0  |
+| Write operations (delete, copy, rename...) | ✔️     | v0.3.0  |
+| Read-only mode                             | ✔️     | v0.3.0  |
+| File upload                                | ❌     |         |
+| File sharing                               | ❌     |         |
+| Special file modes (permissions, links...) | ❌     |         |
+| Mobile tweaks (swipe, ...)                 | ❌     |         |
+| Internationalization                       | ❌     |         |
+| Separate password for Read-Write           | ❌     |         |
 
 ## Docker
 
