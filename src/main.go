@@ -17,14 +17,12 @@
 package main
 
 import (
-	"crypto/rand"
 	"crypto/sha256"
 	"embed"
 	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"log"
-	"math/big"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -34,6 +32,7 @@ import (
 	"time"
 
 	"github.com/otiai10/copy"
+	"github.com/proofrock/pupcloud/commons"
 	flag "github.com/spf13/pflag"
 
 	"github.com/gofiber/fiber/v2"
@@ -145,21 +144,6 @@ func main() {
 
 var sessions sync.Map
 
-// https://gist.github.com/dopey/c69559607800d2f2f90b1b1ed4e550fb
-func genRndStr(n int) string {
-	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
-	ret := make([]byte, n)
-	for i := 0; i < n; i++ {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
-		if err != nil {
-			panic(err)
-		}
-		ret[i] = letters[num.Int64()]
-	}
-
-	return string(ret)
-}
-
 func doAuth(c *fiber.Ctx, pwdHash string) error {
 	if pwdHash == "" {
 		return nil
@@ -188,7 +172,7 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 		return fiber.NewError(499, "Password required or wrong password")
 	}
 
-	rnd := genRndStr(16)
+	rnd := commons.GenRndStr(16)
 	cookie := new(fiber.Cookie)
 	cookie.Name = "pupcloud-session"
 	cookie.Value = rnd
@@ -297,14 +281,6 @@ func file(c *fiber.Ctx) error {
 	return c.SendFile(fullPath)
 }
 
-func fileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
 func fsDel(c *fiber.Ctx) error {
 	if c.Locals("readOnly").(bool) {
 		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
@@ -349,7 +325,7 @@ func fsRename(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(filepath.Dir(fullPath), nuName)
 
-	if fileExists(newPath) {
+	if commons.FileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
@@ -380,7 +356,7 @@ func fsMove(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
 
-	if fileExists(newPath) {
+	if commons.FileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
@@ -411,7 +387,7 @@ func fsCopy(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
 
-	if fileExists(newPath) {
+	if commons.FileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
@@ -440,7 +416,7 @@ func fsNewFolder(c *fiber.Ctx) error {
 
 	fullPath := filepath.Join(root, path)
 
-	if fileExists(fullPath) {
+	if commons.FileExists(fullPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
