@@ -61,6 +61,10 @@
   function closeSlideshow() {
     slideshowIndex = -1;
   }
+
+  function reload() {
+    loadPath(path);
+  }
 </script>
 
 <svelte:head>
@@ -78,7 +82,8 @@
       bind:sorter
       bind:mode
       on:pathEvent={chPath}
-      on:message={openSlideshow} />
+      on:message={openSlideshow}
+      on:reload={reload} />
     <footer
       class="footer blue dark-2 font-s1 lh-1 hide-sm-down"
       style="position:fixed; bottom:0; z-index:11;">

@@ -56,7 +56,7 @@
     }
 
     await Swal.fire({
-      icon: "error",
+      icon: "warning",
       text: "Not implemented in the demo site",
       confirmButtonColor: "#0a6bb8",
     });
@@ -78,14 +78,16 @@
     }
 
     await Swal.fire({
-      icon: "error",
+      icon: "warning",
       text: "Not implemented in the demo site",
       confirmButtonColor: "#0a6bb8",
     });
   }
 
-  function toPaste() {
-    dispatch("toPaste", { file: item });
+  function toPaste(isCut: boolean) {
+    return function () {
+      dispatch("toPaste", { file: item, isCut: isCut });
+    };
   }
 </script>
 
@@ -107,8 +109,12 @@
       on:click|stopPropagation={noop}>
       Properties
     </div>
-    <div class="dropdown-item" on:click|stopPropagation={toPaste}>Cut</div>
-    <div class="dropdown-item divider" on:click|stopPropagation={toPaste}>
+    <div class="dropdown-item" on:click|stopPropagation={toPaste(true)}>
+      Cut
+    </div>
+    <div
+      class="dropdown-item divider"
+      on:click|stopPropagation={toPaste(false)}>
       Copy
     </div>
     <div class="dropdown-item" on:click|stopPropagation={rename}>Rename</div>

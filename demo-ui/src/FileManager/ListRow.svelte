@@ -72,7 +72,7 @@
       <span data-target="ddList-{item.uuid}" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
-      <ContextMenu {item} {readOnly} on:toPaste />
+      <ContextMenu {item} {readOnly} on:toPaste on:reload />
     </div>
   </td>
 </tr>

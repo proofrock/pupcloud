@@ -31,7 +31,7 @@ Then, open `http://localhost:17178` with a browser. As simple as that!
 Execute `pupcloud -h` to see the other configuration options. For now you can:
 
 - disable all the write operations (`--readonly`);
-- setup authentication (see [below](#auth))
+- setup authentication (see [below](#auth));
 - specify a title/brand for the window (`--title`);
 - use a different port (`-p`);
 - bind to a network interface (`--bind-to`).

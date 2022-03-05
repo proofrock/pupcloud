@@ -33,7 +33,7 @@
       <th />
     </tr>
     {#each itemList as item (item.uuid)}
-      <ListRow {item} {readOnly} on:message on:toPaste />
+      <ListRow {item} {readOnly} on:message on:toPaste on:reload />
     {/each}
   </table>
 </div>

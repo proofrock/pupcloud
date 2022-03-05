@@ -44,7 +44,7 @@
       on:click={click(item.uuid)}
       title={item.name}
       style="z-index: {itemList.length + 1 - i}">
-      <GridCell {item} {readOnly} on:toPaste />
+      <GridCell {item} {readOnly} on:toPaste on:reload />
     </div>
   {/each}
 </div>
