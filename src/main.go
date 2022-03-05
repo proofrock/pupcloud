@@ -33,13 +33,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/otiai10/copy"
 	flag "github.com/spf13/pflag"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
-	"github.com/proofrock/pupcloud/commons"
 )
 
 const Version = "v0.2.0"
@@ -60,7 +60,7 @@ func errHandler(ctx *fiber.Ctx, err error) error {
 		}
 	}
 
-	return ctx.Status(code).JSON(commons.ErrorRes{Code: code, Message: msg})
+	return ctx.Status(code).SendString(msg)
 }
 
 type item struct {
@@ -79,8 +79,9 @@ type res struct {
 }
 
 type featuRes struct {
-	Version string `json:"version"`
-	Title   string `json:"title"`
+	Version  string `json:"version"`
+	Title    string `json:"title"`
+	ReadOnly bool   `json:"readonly"`
 }
 
 func main() {
@@ -96,6 +97,7 @@ func main() {
 	port := flag.IntP("port", "p", 17178, "The port to run on")
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password")
+	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS")
 
 	flag.Parse()
 
@@ -119,12 +121,18 @@ func main() {
 		c.Locals("pwdHash", *pwdHash)
 		c.Locals("root", *root)
 		c.Locals("title", *title)
+		c.Locals("readOnly", *readOnly)
 		return c.Next()
 	})
 
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/fsOps/del", fsDel)
+	app.Get("/fsOps/rename", fsRename)
+	app.Get("/fsOps/move", fsMove)
+	app.Get("/fsOps/copy", fsCopy)
+	app.Get("/fsOps/newFolder", fsNewFolder)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -169,7 +177,7 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 		pwd = c.Get("x-pupcloud-pwd")
 	}
 
-	// FIXME I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
+	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
 	if pwd == "" {
 		return fiber.NewError(499, "Password required or wrong password")
@@ -194,24 +202,23 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 }
 
 func features(c *fiber.Ctx) error {
-	pwdHash := c.Locals("pwdHash").(string)
-	title := c.Locals("title").(string)
-
-	if err := doAuth(c, pwdHash); err != nil {
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
 		return err
 	}
 
-	return c.JSON(featuRes{Version, title})
+	return c.JSON(featuRes{
+		Version,
+		c.Locals("title").(string),
+		c.Locals("readOnly").(bool),
+	})
 }
 
 func ls(c *fiber.Ctx) error {
-	pwdHash := c.Locals("pwdHash").(string)
-	root := c.Locals("root").(string)
-
-	if err := doAuth(c, pwdHash); err != nil {
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
 		return err
 	}
 
+	root := c.Locals("root").(string)
 	path := c.Query("path", "/")
 
 	rootAndPath := filepath.Join(root, path)
@@ -261,10 +268,7 @@ func ls(c *fiber.Ctx) error {
 
 // Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go
 func file(c *fiber.Ctx) error {
-	pwdHash := c.Locals("pwdHash").(string)
-	root := c.Locals("root").(string)
-
-	if err := doAuth(c, pwdHash); err != nil {
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
 		return err
 	}
 
@@ -273,6 +277,8 @@ func file(c *fiber.Ctx) error {
 	if path == "" {
 		return fiber.ErrNotFound
 	}
+
+	root := c.Locals("root").(string)
 
 	fullPath := filepath.Join(root, path)
 	present, contentType, length := getFileInfoForHTTP(fullPath)
@@ -289,4 +295,158 @@ func file(c *fiber.Ctx) error {
 	}
 
 	return c.SendFile(fullPath)
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
+
+func fsDel(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	if path == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	if err := os.RemoveAll(fullPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsRename(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	nuName := c.Query("name")
+	if path == "" || nuName == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	newPath := filepath.Join(filepath.Dir(fullPath), nuName)
+
+	if fileExists(newPath) {
+		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
+	}
+
+	if err := os.Rename(fullPath, newPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsMove(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	destDir := c.Query("destDir")
+	if path == "" || destDir == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
+
+	if fileExists(newPath) {
+		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
+	}
+
+	if err := os.Rename(fullPath, newPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsCopy(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	destDir := c.Query("destDir")
+	if path == "" || destDir == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
+
+	if fileExists(newPath) {
+		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
+	}
+
+	if err := copy.Copy(fullPath, newPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsNewFolder(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	if path == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+
+	if fileExists(fullPath) {
+		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
+	}
+
+	if err := os.Mkdir(fullPath, os.FileMode(int(0755))); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
 }

@@ -20,8 +20,8 @@
   import "../node_modules/axentix/dist/axentix.min.css";
 
   import { Config, File, Mule, SORTERS } from "./Struct.svelte";
-  import Slideshow from "./Slideshow.svelte";
-  import FileManager from "./FileManager.svelte";
+  import Slideshow from "./Preview/Slideshow.svelte";
+  import FileManager from "./FileManager/FileManager.svelte";
 
   export let config: Config;
 
@@ -73,6 +73,7 @@
     </nav>
     <FileManager
       {path}
+      readOnly={config.readOnly}
       bind:mule
       bind:sorter
       bind:mode

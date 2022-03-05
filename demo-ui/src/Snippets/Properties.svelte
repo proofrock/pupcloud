@@ -18,7 +18,7 @@
 
   import { onMount, onDestroy } from "svelte";
   import { Modal, destroy } from "axentix";
-  import type { File } from "./Struct.svelte";
+  import type { File } from "../Struct.svelte";
 
   export let item: File;
   let id = "modal-properties-" + item.uuid;
