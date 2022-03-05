@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.3.0
+
+- "Write" operations
+ - Cut/Copy/Paste
+ - Delete
+ - Rename
+ - Create Folder
+- Read-only mode (`--readonly`)
+- Support for Windows
+- Minor UI fixes
+
 ## v0.2.0
 
 - Authentication (`-P`);

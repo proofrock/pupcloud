@@ -41,7 +41,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
-const Version = "v0.2.0"
+const Version = "v0.3.0"
 
 //go:embed static
 var static embed.FS
