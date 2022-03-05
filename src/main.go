@@ -132,6 +132,7 @@ func main() {
 	app.Get("/fsOps/rename", fsRename)
 	app.Get("/fsOps/move", fsMove)
 	app.Get("/fsOps/copy", fsCopy)
+	app.Get("/fsOps/newFolder", fsNewFolder)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -315,7 +316,7 @@ func fsDel(c *fiber.Ctx) error {
 
 	path := c.Query("path")
 	if path == "" {
-		return fiber.ErrNotFound
+		return fiber.ErrBadRequest
 	}
 
 	root := c.Locals("root").(string)
@@ -340,7 +341,7 @@ func fsRename(c *fiber.Ctx) error {
 	path := c.Query("path")
 	nuName := c.Query("name")
 	if path == "" || nuName == "" {
-		return fiber.ErrNotFound
+		return fiber.ErrBadRequest
 	}
 
 	root := c.Locals("root").(string)
@@ -371,7 +372,7 @@ func fsMove(c *fiber.Ctx) error {
 	path := c.Query("path")
 	destDir := c.Query("destDir")
 	if path == "" || destDir == "" {
-		return fiber.ErrNotFound
+		return fiber.ErrBadRequest
 	}
 
 	root := c.Locals("root").(string)
@@ -402,7 +403,7 @@ func fsCopy(c *fiber.Ctx) error {
 	path := c.Query("path")
 	destDir := c.Query("destDir")
 	if path == "" || destDir == "" {
-		return fiber.ErrNotFound
+		return fiber.ErrBadRequest
 	}
 
 	root := c.Locals("root").(string)
@@ -415,6 +416,35 @@ func fsCopy(c *fiber.Ctx) error {
 	}
 
 	if err := copy.Copy(fullPath, newPath); err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+
+	return c.SendStatus(200)
+}
+
+func fsNewFolder(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	path := c.Query("path")
+	if path == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+
+	if fileExists(fullPath) {
+		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
+	}
+
+	if err := os.Mkdir(fullPath, os.FileMode(int(0755))); err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 

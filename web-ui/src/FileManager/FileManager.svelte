@@ -35,6 +35,7 @@
   import IconSortSizeDesc from "../SVG/IconSortSizeDesc.svelte";
   import IconPaste from "../SVG/IconPaste.svelte";
   import IconUnpaste from "../SVG/IconUnpaste.svelte";
+  import IconNewFolder from "../SVG/IconNewFolder.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -118,6 +119,41 @@
   function gridOrList() {
     mode = mode == "GRID" ? "LIST" : "GRID";
   }
+
+  async function newFolder() {
+    const { value: name } = await Swal.fire({
+      titleText: "Enter folder name",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      input: "text",
+      inputAttributes: {
+        autocapitalize: "off",
+        autocorrect: "off",
+      },
+    });
+
+    if (!name) {
+      return;
+    }
+
+    const res: Response = await fetch(
+      "/fsOps/newFolder?path=" + encodeURIComponent(path.join("/") + "/" + name)
+    );
+    if (res.status != 200) {
+      await Swal.fire({
+        icon: "error",
+        text: await res.text(),
+        confirmButtonColor: "#0a6bb8",
+      });
+    } else {
+      await Swal.fire({
+        icon: "success",
+        titleText: "Done!",
+        confirmButtonColor: "#0a6bb8",
+      });
+      dispatch("reload", {});
+    }
+  }
 </script>
 
 <nav class="navbar" style="height: 40px;">
@@ -136,6 +172,11 @@
       </div>
     {/if}
     <div>&nbsp;</div>
+    {#if !readOnly}
+      <div class="navbar-link" title="Create folder" on:click={newFolder}>
+        <IconNewFolder size={24} />
+      </div>
+    {/if}
     <div class="navbar-link" title="View mode" on:click={gridOrList}>
       {#if mode == 'GRID'}
         <IconGrid size={24} />
