@@ -27,18 +27,20 @@
   export class Config {
     readonly version: string;
     readonly title: string;
+    readonly readOnly: boolean;
 
-    constructor(version: string, title: string) {
+    constructor(version: string, title: string, readOnly: boolean) {
       this.version = version;
       this.title = title;
+      this.readOnly = readOnly;
     }
 
     static empty(): Config {
-      return new Config("", "");
+      return new Config("", "", false);
     }
 
     static fromAny(obj: any): Config {
-      return new Config(obj.version, obj.title);
+      return new Config(obj.version, obj.title, obj.readOnly);
     }
   }
 

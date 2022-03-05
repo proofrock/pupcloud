@@ -18,7 +18,7 @@
 
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
-  import type { File } from "./Struct.svelte";
+  import type { File } from "../Struct.svelte";
   import {
     isMimeTypeText,
     isMimeTypeImage,
@@ -26,9 +26,9 @@
     isMimeTypeVideo,
     isMimeTypeAudio,
     isMimeTypePDF,
-  } from "./MimeTypes.svelte";
-  import TextShower from "./TextShower.svelte";
-  import IconDownload from "./SVG/IconDownload.svelte";
+  } from "../MimeTypes.svelte";
+  import TextShower from "../Snippets/TextShower.svelte";
+  import IconDownload from "../SVG/IconDownload.svelte";
 
   export let files: File[] = [];
   export let fileIdx: number = 0;

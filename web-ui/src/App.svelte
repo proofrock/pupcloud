@@ -20,8 +20,8 @@
   import "../node_modules/axentix/dist/axentix.min.css";
 
   import { Config, File, Mule, SORTERS } from "./Struct.svelte";
-  import Slideshow from "./Slideshow.svelte";
-  import FileManager from "./FileManager.svelte";
+  import Slideshow from "./Preview/Slideshow.svelte";
+  import FileManager from "./FileManager/FileManager.svelte";
 
   export let config: Config;
 
@@ -63,6 +63,10 @@
   function closeSlideshow() {
     slideshowIndex = -1;
   }
+
+  function reload() {
+    loadPath(path);
+  }
 </script>
 
 <svelte:head>
@@ -75,11 +79,13 @@
     </nav>
     <FileManager
       {path}
+      readOnly={config.readOnly}
       bind:mule
       bind:sorter
       bind:mode
       on:pathEvent={chPath}
-      on:message={openSlideshow} />
+      on:message={openSlideshow}
+      on:reload={reload} />
     <footer
       class="footer blue dark-2 font-s1 lh-1 hide-sm-down"
       style="position:fixed; bottom:0; z-index:11;">

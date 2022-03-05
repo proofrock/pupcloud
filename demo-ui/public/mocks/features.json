@@ -1,4 +1,5 @@
 {
-    "version": "v0.2.0",
-    "title": "🐶 Pupcloud Demo"
+    "version": "v0.3.0",
+    "title": "🐶 Pupcloud Demo",
+    "readOnly": false
 }

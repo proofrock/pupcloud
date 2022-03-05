@@ -17,7 +17,7 @@
    */
 
   import { onMount } from "svelte";
-  import type { File } from "./Struct.svelte";
+  import type { File } from "../Struct.svelte";
 
   export let url: string;
   export let file: File;

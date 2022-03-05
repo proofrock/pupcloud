@@ -17,25 +17,34 @@
    */
 
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import { fade } from "svelte/transition";
   import { Dropdown, destroy } from "axentix";
+  import Swal from "sweetalert2";
 
-  import Breadcrumb from "./Breadcrumb.svelte";
+  import Breadcrumb from "../Snippets/Breadcrumb.svelte";
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
-  import { File, Mule, SORTERS } from "./Struct.svelte";
-  import IconGrid from "./SVG/IconGrid.svelte";
-  import IconList from "./SVG/IconList.svelte";
-  import IconSortAlphAsc from "./SVG/IconSortAlphAsc.svelte";
-  import IconSortAlphDesc from "./SVG/IconSortAlphDesc.svelte";
-  import IconSortDateAsc from "./SVG/IconSortDateAsc.svelte";
-  import IconSortDateDesc from "./SVG/IconSortDateDesc.svelte";
-  import IconSortSizeAsc from "./SVG/IconSortSizeAsc.svelte";
-  import IconSortSizeDesc from "./SVG/IconSortSizeDesc.svelte";
+  import { File, Mule, SORTERS } from "../Struct.svelte";
+  import IconGrid from "../SVG/IconGrid.svelte";
+  import IconList from "../SVG/IconList.svelte";
+  import IconSortAlphAsc from "../SVG/IconSortAlphAsc.svelte";
+  import IconSortAlphDesc from "../SVG/IconSortAlphDesc.svelte";
+  import IconSortDateAsc from "../SVG/IconSortDateAsc.svelte";
+  import IconSortDateDesc from "../SVG/IconSortDateDesc.svelte";
+  import IconSortSizeAsc from "../SVG/IconSortSizeAsc.svelte";
+  import IconSortSizeDesc from "../SVG/IconSortSizeDesc.svelte";
+  import IconPaste from "../SVG/IconPaste.svelte";
+  import IconUnpaste from "../SVG/IconUnpaste.svelte";
+  import IconNewFolder from "../SVG/IconNewFolder.svelte";
 
   export let path: string[];
   export let mule: Mule;
   export let sorter: (f1: File, f2: File) => number;
   export let mode: string;
+  export let readOnly: boolean;
+
+  $: toPaste = null;
+  $: isCut = false;
 
   const dispatch = createEventDispatcher();
 
@@ -60,6 +69,47 @@
     }
   }
 
+  function markToPaste(event) {
+    console;
+    toPaste = event.detail.file;
+    isCut = event.detail.isCut;
+  }
+
+  function unmarkToPaste() {
+    toPaste = null;
+    isCut = false;
+  }
+
+  async function doPaste() {
+    const srv = isCut ? "move" : "copy";
+
+    const dest = path.join("/") + "/";
+
+    const res: Response = await fetch(
+      "/fsOps/" +
+        srv +
+        "?path=" +
+        encodeURIComponent(toPaste.path) +
+        "&destDir=" +
+        encodeURIComponent(dest)
+    );
+    if (res.status != 200) {
+      await Swal.fire({
+        icon: "error",
+        text: await res.text(),
+        confirmButtonColor: "#0a6bb8",
+      });
+    } else {
+      await Swal.fire({
+        icon: "success",
+        titleText: "Done!",
+        confirmButtonColor: "#0a6bb8",
+      });
+      unmarkToPaste();
+      dispatch("reload", {});
+    }
+  }
+
   function resort(_sorter: (f1: File, f2: File) => number): () => void {
     return function () {
       sorter = _sorter;
@@ -69,11 +119,52 @@
   function gridOrList() {
     mode = mode == "GRID" ? "LIST" : "GRID";
   }
+
+  async function newFolder() {
+    const { value: name } = await Swal.fire({
+      titleText: "Enter folder name",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      input: "text",
+      inputAttributes: {
+        autocapitalize: "off",
+        autocorrect: "off",
+      },
+    });
+
+    if (!name) {
+      return;
+    }
+
+    await Swal.fire({
+      icon: "warning",
+      text: "Not implemented in the demo site",
+      confirmButtonColor: "#0a6bb8",
+    });
+  }
 </script>
 
 <nav class="navbar" style="height: 40px;">
   <Breadcrumb {path} on:pathEvent />
   <div class="navbar-menu ml-auto" style="height: 40px;">
+    {#if !!toPaste}
+      <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
+        <IconPaste color="#BBBBBB" size={24} />
+      </div>
+      <div
+        class="navbar-link"
+        title="Abort paste"
+        transition:fade
+        on:click={unmarkToPaste}>
+        <IconUnpaste color="#BBBBBB" size={24} />
+      </div>
+    {/if}
+    <div>&nbsp;</div>
+    {#if !readOnly}
+      <div class="navbar-link" title="Create folder" on:click={newFolder}>
+        <IconNewFolder size={24} />
+      </div>
+    {/if}
     <div class="navbar-link" title="View mode" on:click={gridOrList}>
       {#if mode == 'GRID'}
         <IconGrid size={24} />
@@ -149,9 +240,19 @@
   </div>
 </nav>
 {#if mode == 'GRID'}
-  <Grid itemList={mule.items} on:message={click} />
+  <Grid
+    itemList={mule.items}
+    {readOnly}
+    on:message={click}
+    on:toPaste={markToPaste}
+    on:reload />
 {:else}
-  <List itemList={mule.items} on:message={click} />
+  <List
+    itemList={mule.items}
+    {readOnly}
+    on:message={click}
+    on:toPaste={markToPaste}
+    on:reload />
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>

@@ -30,9 +30,11 @@ Then, open `http://localhost:17178` with a browser. As simple as that!
 
 Execute `pupcloud -h` to see the other configuration options. For now you can:
 
-- specify a title/brand for the window;
-- specify a different port;
-- bind to a network interface.
+- disable all the write operations (`--readonly`);
+- setup authentication (see [below](#auth));
+- specify a title/brand for the window (`--title`);
+- use a different port (`-p`);
+- bind to a network interface (`--bind-to`).
 
 ### Supported file types for viewing
 
@@ -48,7 +50,7 @@ supports:
 Detection of file types is done by mime type, and viewing relies on the
 browser's capabilities... that are fairly complete, truth to be told.
 
-## Authentication
+## <a name="auth"></a>Authentication
 
 You can set a password for accessing pupcloud, by using the `-P` parameter on
 the commandline. You must provide the SHA-256 sum of the password you want to
@@ -67,6 +69,22 @@ You can use [this site](https://emn178.github.io/online-tools/sha256.html) to
 hash the password, it doesn't send the password on the net (at least at the time
 I am writing ).
 
+## Roadmap
+
+| Feature                                    | Status | Version |
+| ------------------------------------------ | ------ | ------- |
+| Basic navigation                           | ✔️     | v0.1.0  |
+| File preview/gallery                       | ✔️     | v0.1.0  |
+| Authentication                             | ✔️     | v0.2.0  |
+| Write operations (delete, copy, rename...) | ✔️     | v0.3.0  |
+| Read-only mode                             | ✔️     | v0.3.0  |
+| File upload                                | ❌     |         |
+| File sharing                               | ❌     |         |
+| Special file modes (permissions, links...) | ❌     |         |
+| Mobile tweaks (swipe, ...)                 | ❌     |         |
+| Internationalization                       | ❌     |         |
+| Separate password for Read-Write           | ❌     |         |
+
 ## Docker
 
 See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for
@@ -82,6 +100,7 @@ instructions.
 Server:
 
 - [fiber](https://gofiber.io/) [MIT]
+- otiai10's [copy](https://github.com/otiai10/copy) [MIT]
 - spf13's [pflag](https://github.com/spf13/pflag) [BSD 3-Clause]
 
 Web UI:
