@@ -30,9 +30,11 @@ Then, open `http://localhost:17178` with a browser. As simple as that!
 
 Execute `pupcloud -h` to see the other configuration options. For now you can:
 
-- specify a title/brand for the window;
-- specify a different port;
-- bind to a network interface.
+- disable all the write operations (`--readonly`);
+- setup authentication (see [below](#auth))
+- specify a title/brand for the window (`--title`);
+- use a different port (`-p`);
+- bind to a network interface (`--bind-to`).
 
 ### Supported file types for viewing
 
@@ -48,7 +50,7 @@ supports:
 Detection of file types is done by mime type, and viewing relies on the
 browser's capabilities... that are fairly complete, truth to be told.
 
-## Authentication
+## <a name="auth"></a>Authentication
 
 You can set a password for accessing pupcloud, by using the `-P` parameter on
 the commandline. You must provide the SHA-256 sum of the password you want to
