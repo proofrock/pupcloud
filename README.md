@@ -71,14 +71,17 @@ I am writing ).
 
 | Feature                                    | Done | Version |
 | ------------------------------------------ | ---- | ------- |
-| Basic navigation                           | ✔️   | v0.1.0  |
-| File preview/gallery                       | ✔️   | v0.1.0  |
-| Authentication                             | ✔️   | v0.2.0  |
+| Basic navigation                           | ✔️    | v0.1.0  |
+| File preview/gallery                       | ✔️    | v0.1.0  |
+| Authentication                             | ✔️    | v0.2.0  |
 | Write operations (delete, copy, rename...) | ❌    |         |
 | Read-only mode                             | ❌    |         |
+| File upload                                | ❌    |         |
 | File sharing                               | ❌    |         |
-| Special files (permissions, links...)      | ❌    |         |
-| Read-only password                         | ❌    |         |
+| Special file modes (permissions, links...) | ❌    |         |
+| Mobile tweaks (swipe, ...)                 | ❌    |         |
+| Internationalization                       | ❌    |         |
+| Separate password for Read-Write           | ❌    |         |
 
 ## Docker
 
