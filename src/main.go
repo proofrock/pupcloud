@@ -39,9 +39,10 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
-const Version = "v0.3.0"
+const Version = "v0.4.0"
 
 //go:embed static
 var static embed.FS
@@ -114,7 +115,12 @@ func main() {
 	)
 
 	app.Use(compress.New())
-	app.Use(csrf.New())
+	// FIXME: it works, but does it do anything?
+	app.Use(csrf.New(csrf.Config{
+		CookieSameSite: "Strict",
+		Expiration:     24 * time.Hour,
+		KeyGenerator:   utils.UUIDv4,
+	}))
 
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("pwdHash", *pwdHash)
@@ -127,11 +133,12 @@ func main() {
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
-	app.Get("/fsOps/del", fsDel)
-	app.Get("/fsOps/rename", fsRename)
-	app.Get("/fsOps/move", fsMove)
-	app.Get("/fsOps/copy", fsCopy)
-	app.Get("/fsOps/newFolder", fsNewFolder)
+	app.Delete("/fsOps/del", fsDel)
+	app.Post("/fsOps/rename", fsRename)
+	app.Post("/fsOps/move", fsMove)
+	app.Post("/fsOps/copy", fsCopy)
+	app.Put("/fsOps/newFolder", fsNewFolder)
+	app.Put("/fsOps/upload", fsUpload)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -172,7 +179,7 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 		return fiber.NewError(499, "Password required or wrong password")
 	}
 
-	rnd := commons.GenRndStr(16)
+	rnd := utils.UUIDv4()
 	cookie := new(fiber.Cookie)
 	cookie.Name = "pupcloud-session"
 	cookie.Value = rnd
@@ -425,4 +432,36 @@ func fsNewFolder(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(200)
+}
+
+func fsUpload(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "It's not multipart")
+	}
+
+	path := c.Query("path")
+	if path == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+
+	files := form.File["doc"]
+	for _, file := range files {
+		if err := c.SaveFile(file, filepath.Join(fullPath, file.Filename)); err != nil {
+			return err
+		}
+	}
+	return err
 }

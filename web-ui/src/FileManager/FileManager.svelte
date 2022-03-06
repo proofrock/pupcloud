@@ -25,6 +25,7 @@
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
   import { File, Mule, SORTERS } from "../Struct.svelte";
+  import { getCookie } from "../Utils.svelte";
   import IconGrid from "../SVG/IconGrid.svelte";
   import IconList from "../SVG/IconList.svelte";
   import IconSortAlphAsc from "../SVG/IconSortAlphAsc.svelte";
@@ -36,6 +37,7 @@
   import IconPaste from "../SVG/IconPaste.svelte";
   import IconUnpaste from "../SVG/IconUnpaste.svelte";
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
+  import IconUpload from "../SVG/IconUpload.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -117,8 +119,55 @@
     }
 
     const res: Response = await fetch(
-      "/fsOps/newFolder?path=" + encodeURIComponent(path.join("/") + "/" + name)
+      "/fsOps/newFolder?path=" +
+        encodeURIComponent(path.join("/") + "/" + name),
+      {
+        method: "PUT",
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
+      }
     );
+    if (res.status != 200) {
+      await Swal.fire({
+        icon: "error",
+        text: await res.text(),
+        confirmButtonColor: "#0a6bb8",
+      });
+    } else {
+      await Swal.fire({
+        icon: "success",
+        titleText: "Done!",
+        confirmButtonColor: "#0a6bb8",
+      });
+      dispatch("reload", {});
+    }
+  }
+
+  async function doUpload() {
+    const { value: files } = await Swal.fire({
+      titleText: "Select files",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      input: "file",
+    });
+
+    if (!files) return;
+
+    const fd = new FormData();
+    fd.append("doc", files);
+
+    const res: Response = await fetch(
+      "/fsOps/upload?path=" + encodeURIComponent(path.join("/") + "/"),
+      {
+        method: "PUT",
+        body: fd,
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
+      }
+    );
+
     if (res.status != 200) {
       await Swal.fire({
         icon: "error",
@@ -155,6 +204,9 @@
     {#if !readOnly}
       <div class="navbar-link" title="Create folder" on:click={newFolder}>
         <IconNewFolder size={24} />
+      </div>
+      <div class="navbar-link" title="Upload file(s)" on:click={doUpload}>
+        <IconUpload size={24} />
       </div>
     {/if}
     <div class="navbar-link" title="View mode" on:click={gridOrList}>

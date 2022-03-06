@@ -25,6 +25,7 @@
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
   import { File, Mule, SORTERS } from "../Struct.svelte";
+  import { getCookie } from "../Utils.svelte";
   import IconGrid from "../SVG/IconGrid.svelte";
   import IconList from "../SVG/IconList.svelte";
   import IconSortAlphAsc from "../SVG/IconSortAlphAsc.svelte";
@@ -36,6 +37,7 @@
   import IconPaste from "../SVG/IconPaste.svelte";
   import IconUnpaste from "../SVG/IconUnpaste.svelte";
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
+  import IconUpload from "../SVG/IconUpload.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -91,7 +93,13 @@
         "?path=" +
         encodeURIComponent(toPaste.path) +
         "&destDir=" +
-        encodeURIComponent(dest)
+        encodeURIComponent(dest),
+      {
+        method: "POST",
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
+      }
     );
     if (res.status != 200) {
       await Swal.fire({
@@ -141,6 +149,24 @@
       text: "Not implemented in the demo site",
       confirmButtonColor: "#0a6bb8",
     });
+    dispatch("reload", {});
+  }
+
+  async function doUpload() {
+    const { value: files } = await Swal.fire({
+      titleText: "Select files",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      input: "file",
+    });
+
+    if (!files) return;
+
+    await Swal.fire({
+      icon: "warning",
+      text: "Not implemented in the demo site",
+      confirmButtonColor: "#0a6bb8",
+    });
   }
 </script>
 
@@ -163,6 +189,9 @@
     {#if !readOnly}
       <div class="navbar-link" title="Create folder" on:click={newFolder}>
         <IconNewFolder size={24} />
+      </div>
+      <div class="navbar-link" title="Upload file(s)" on:click={doUpload}>
+        <IconUpload size={24} />
       </div>
     {/if}
     <div class="navbar-link" title="View mode" on:click={gridOrList}>

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.0
+
+- File upload
+- CSRF protection
+
 ## v0.3.0
 
 - "Write" operations
