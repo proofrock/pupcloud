@@ -110,9 +110,11 @@ Web UI:
 - [axentix](https://useaxentix.com/) [MIT]
 - [Material Design Icons](https://materialdesignicons.com/) [Pictogrammers Free]
 - [svelte](https://svelte.dev/) [MIT]
-- [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT] License]
+- [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT]
 - yeyushengfan258's
   [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme)
   [GPLv3]
 
-...and Go, Typescript, VSCode via CodeServer.
+...and [Go](https://go.dev), [Typescript](https://www.typescriptlang.org),
+[VSCode](https://code.visualstudio.com) via 
+[CodeServer](https://github.com/coder/code-server).
