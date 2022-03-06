@@ -85,6 +85,7 @@ I am writing ).
 | Internationalization                       | ❌     |         |
 | Separate password for Read-Write           | ❌     |         |
 | Multiple file upload                       | ❌     |         |
+| Theming                                    | ❌     |         |
 
 ## Docker
 
