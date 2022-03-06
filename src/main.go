@@ -37,7 +37,9 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/utils"
 )
 
 const Version = "v0.3.0"
@@ -113,7 +115,14 @@ func main() {
 	)
 
 	app.Use(compress.New())
-	//app.Use(csrf.New())
+	// FIXME: it works, but does it do anything?
+	app.Use(csrf.New(csrf.Config{
+		KeyLookup:      "cookie:csrf_",
+		CookieName:     "csrf_",
+		CookieSameSite: "Strict",
+		Expiration:     1 * time.Hour,
+		KeyGenerator:   utils.UUID,
+	}))
 
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("pwdHash", *pwdHash)
@@ -126,12 +135,12 @@ func main() {
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
-	app.Get("/fsOps/del", fsDel)
-	app.Get("/fsOps/rename", fsRename)
-	app.Get("/fsOps/move", fsMove)
-	app.Get("/fsOps/copy", fsCopy)
-	app.Get("/fsOps/newFolder", fsNewFolder)
-	app.Post("/fsOps/upload", fsUpload)
+	app.Delete("/fsOps/del", fsDel)
+	app.Post("/fsOps/rename", fsRename)
+	app.Post("/fsOps/move", fsMove)
+	app.Post("/fsOps/copy", fsCopy)
+	app.Put("/fsOps/newFolder", fsNewFolder)
+	app.Put("/fsOps/upload", fsUpload)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{

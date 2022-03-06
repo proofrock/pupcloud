@@ -92,7 +92,10 @@
         "?path=" +
         encodeURIComponent(toPaste.path) +
         "&destDir=" +
-        encodeURIComponent(dest)
+        encodeURIComponent(dest),
+      {
+        method: "POST",
+      }
     );
     if (res.status != 200) {
       await Swal.fire({

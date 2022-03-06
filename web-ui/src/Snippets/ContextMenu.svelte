@@ -59,7 +59,10 @@
       "/fsOps/rename?path=" +
         encodeURIComponent(item.path) +
         "&name=" +
-        encodeURIComponent(nuName)
+        encodeURIComponent(nuName),
+      {
+        method: "POST",
+      }
     );
     if (res.status != 200) {
       await Swal.fire({
@@ -93,7 +96,10 @@
     }
 
     const res: Response = await fetch(
-      "/fsOps/del?path=" + encodeURIComponent(item.path)
+      "/fsOps/del?path=" + encodeURIComponent(item.path),
+      {
+        method: "DELETE",
+      }
     );
     if (res.status != 200) {
       await Swal.fire({

@@ -118,7 +118,11 @@
     }
 
     const res: Response = await fetch(
-      "/fsOps/newFolder?path=" + encodeURIComponent(path.join("/") + "/" + name)
+      "/fsOps/newFolder?path=" +
+        encodeURIComponent(path.join("/") + "/" + name),
+      {
+        method: "PUT",
+      }
     );
     if (res.status != 200) {
       await Swal.fire({
@@ -152,7 +156,7 @@
     const res: Response = await fetch(
       "/fsOps/upload?path=" + encodeURIComponent(path.join("/") + "/"),
       {
-        method: "POST",
+        method: "PUT",
         body: fd,
       }
     );
