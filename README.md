@@ -78,12 +78,13 @@ I am writing ).
 | Authentication                             | ✔️     | v0.2.0  |
 | Write operations (delete, copy, rename...) | ✔️     | v0.3.0  |
 | Read-only mode                             | ✔️     | v0.3.0  |
-| File upload                                | ❌     |         |
+| File upload                                | ✔️     | v0.4.0  |
 | File sharing                               | ❌     |         |
 | Special file modes (permissions, links...) | ❌     |         |
 | Mobile tweaks (swipe, ...)                 | ❌     |         |
 | Internationalization                       | ❌     |         |
 | Separate password for Read-Write           | ❌     |         |
+| Multiple file upload                       | ❌     |         |
 
 ## Docker
 

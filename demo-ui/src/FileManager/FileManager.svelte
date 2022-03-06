@@ -36,6 +36,7 @@
   import IconPaste from "../SVG/IconPaste.svelte";
   import IconUnpaste from "../SVG/IconUnpaste.svelte";
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
+  import IconUpload from "../SVG/IconUpload.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -142,6 +143,34 @@
       confirmButtonColor: "#0a6bb8",
     });
   }
+
+  async function doUpload() {
+    const { value: files } = await Swal.fire({
+      titleText: "Select files",
+      confirmButtonColor: "#0a6bb8",
+      showCancelButton: true,
+      input: "file",
+    });
+
+    if (!files) return;
+
+    const fd = new FormData();
+    fd.append("doc", files);
+
+    const res: Response = await fetch(
+      "/fsOps/upload?path=" + encodeURIComponent(path.join("/") + "/"),
+      {
+        method: "POST",
+        body: fd,
+      }
+    );
+
+    await Swal.fire({
+      icon: "warning",
+      text: "Not implemented in the demo site",
+      confirmButtonColor: "#0a6bb8",
+    });
+  }
 </script>
 
 <nav class="navbar" style="height: 40px;">
@@ -163,6 +192,9 @@
     {#if !readOnly}
       <div class="navbar-link" title="Create folder" on:click={newFolder}>
         <IconNewFolder size={24} />
+      </div>
+      <div class="navbar-link" title="Upload file(s)" on:click={doUpload}>
+        <IconUpload size={24} />
       </div>
     {/if}
     <div class="navbar-link" title="View mode" on:click={gridOrList}>

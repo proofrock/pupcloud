@@ -37,7 +37,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
-	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 )
 
@@ -114,7 +113,7 @@ func main() {
 	)
 
 	app.Use(compress.New())
-	app.Use(csrf.New())
+	//app.Use(csrf.New())
 
 	app.Use(func(c *fiber.Ctx) error {
 		c.Locals("pwdHash", *pwdHash)
@@ -132,6 +131,7 @@ func main() {
 	app.Get("/fsOps/move", fsMove)
 	app.Get("/fsOps/copy", fsCopy)
 	app.Get("/fsOps/newFolder", fsNewFolder)
+	app.Post("/fsOps/upload", fsUpload)
 
 	subFS, _ := fs.Sub(static, "static")
 	app.Use("/", filesystem.New(filesystem.Config{
@@ -425,4 +425,36 @@ func fsNewFolder(c *fiber.Ctx) error {
 	}
 
 	return c.SendStatus(200)
+}
+
+func fsUpload(c *fiber.Ctx) error {
+	if c.Locals("readOnly").(bool) {
+		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+	}
+
+	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
+		return err
+	}
+
+	form, err := c.MultipartForm()
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "It's not multipart")
+	}
+
+	path := c.Query("path")
+	if path == "" {
+		return fiber.ErrBadRequest
+	}
+
+	root := c.Locals("root").(string)
+
+	fullPath := filepath.Join(root, path)
+
+	files := form.File["doc"]
+	for _, file := range files {
+		if err := c.SaveFile(file, filepath.Join(fullPath, file.Filename)); err != nil {
+			return err
+		}
+	}
+	return err
 }
