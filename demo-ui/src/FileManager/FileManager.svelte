@@ -25,6 +25,7 @@
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
   import { File, Mule, SORTERS } from "../Struct.svelte";
+  import { getCookie } from "../Utils.svelte";
   import IconGrid from "../SVG/IconGrid.svelte";
   import IconList from "../SVG/IconList.svelte";
   import IconSortAlphAsc from "../SVG/IconSortAlphAsc.svelte";
@@ -95,6 +96,9 @@
         encodeURIComponent(dest),
       {
         method: "POST",
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
       }
     );
     if (res.status != 200) {
@@ -145,6 +149,7 @@
       text: "Not implemented in the demo site",
       confirmButtonColor: "#0a6bb8",
     });
+    dispatch("reload", {});
   }
 
   async function doUpload() {
@@ -156,17 +161,6 @@
     });
 
     if (!files) return;
-
-    const fd = new FormData();
-    fd.append("doc", files);
-
-    const res: Response = await fetch(
-      "/fsOps/upload?path=" + encodeURIComponent(path.join("/") + "/"),
-      {
-        method: "POST",
-        body: fd,
-      }
-    );
 
     await Swal.fire({
       icon: "warning",

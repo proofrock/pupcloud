@@ -117,7 +117,6 @@ func main() {
 	app.Use(compress.New())
 	// FIXME: it works, but does it do anything?
 	app.Use(csrf.New(csrf.Config{
-		KeyLookup:      "cookie:csrf_",
 		CookieSameSite: "Strict",
 		Expiration:     24 * time.Hour,
 		KeyGenerator:   utils.UUIDv4,

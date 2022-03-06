@@ -19,6 +19,7 @@
   import { createEventDispatcher } from "svelte";
 
   import type { File } from "../Struct.svelte";
+  import { getCookie } from "../Utils.svelte";
   import Swal from "sweetalert2";
 
   export let item: File;
@@ -62,6 +63,9 @@
         encodeURIComponent(nuName),
       {
         method: "POST",
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
       }
     );
     if (res.status != 200) {
@@ -99,6 +103,9 @@
       "/fsOps/del?path=" + encodeURIComponent(item.path),
       {
         method: "DELETE",
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
       }
     );
     if (res.status != 200) {

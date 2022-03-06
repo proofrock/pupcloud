@@ -25,6 +25,7 @@
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
   import { File, Mule, SORTERS } from "../Struct.svelte";
+  import { getCookie } from "../Utils.svelte";
   import IconGrid from "../SVG/IconGrid.svelte";
   import IconList from "../SVG/IconList.svelte";
   import IconSortAlphAsc from "../SVG/IconSortAlphAsc.svelte";
@@ -122,6 +123,9 @@
         encodeURIComponent(path.join("/") + "/" + name),
       {
         method: "PUT",
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
       }
     );
     if (res.status != 200) {
@@ -158,6 +162,9 @@
       {
         method: "PUT",
         body: fd,
+        headers: {
+          "X-Csrf-Token": getCookie("csrf_"),
+        },
       }
     );
 

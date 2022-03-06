@@ -19,6 +19,7 @@
   import { createEventDispatcher } from "svelte";
 
   import type { File } from "../Struct.svelte";
+  import { getCookie } from "../Utils.svelte";
   import Swal from "sweetalert2";
 
   export let item: File;
