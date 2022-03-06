@@ -118,10 +118,9 @@ func main() {
 	// FIXME: it works, but does it do anything?
 	app.Use(csrf.New(csrf.Config{
 		KeyLookup:      "cookie:csrf_",
-		CookieName:     "csrf_",
 		CookieSameSite: "Strict",
-		Expiration:     1 * time.Hour,
-		KeyGenerator:   utils.UUID,
+		Expiration:     24 * time.Hour,
+		KeyGenerator:   utils.UUIDv4,
 	}))
 
 	app.Use(func(c *fiber.Ctx) error {
@@ -181,7 +180,7 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 		return fiber.NewError(499, "Password required or wrong password")
 	}
 
-	rnd := commons.GenRndStr(16)
+	rnd := utils.UUIDv4()
 	cookie := new(fiber.Cookie)
 	cookie.Name = "pupcloud-session"
 	cookie.Value = rnd
