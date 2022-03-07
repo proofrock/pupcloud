@@ -38,6 +38,7 @@
   import IconUnpaste from "../SVG/IconUnpaste.svelte";
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
   import IconUpload from "../SVG/IconUpload.svelte";
+  import IconReload from "../SVG/IconReload.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -89,7 +90,7 @@
       confirmButtonColor: "#0a6bb8",
     });
     unmarkToPaste();
-    dispatch("reload", {});
+    reload();
   }
 
   function resort(_sorter: (f1: File, f2: File) => number): () => void {
@@ -140,7 +141,7 @@
         titleText: "Done!",
         confirmButtonColor: "#0a6bb8",
       });
-      dispatch("reload", {});
+      reload();
     }
   }
 
@@ -180,8 +181,12 @@
         titleText: "Done!",
         confirmButtonColor: "#0a6bb8",
       });
-      dispatch("reload", {});
+      reload();
     }
+  }
+
+  function reload() {
+    dispatch("reload", {});
   }
 </script>
 
@@ -209,6 +214,9 @@
         <IconUpload size={24} />
       </div>
     {/if}
+    <div class="navbar-link" title="Reload file list" on:click={reload}>
+      <IconReload size={24} />
+    </div>
     <div class="navbar-link" title="View mode" on:click={gridOrList}>
       {#if mode == 'GRID'}
         <IconGrid size={24} />
