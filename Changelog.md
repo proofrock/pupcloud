@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.4.1
+
+- Fix: paste didn't work
+
 ## v0.4.0
 
 - File upload
