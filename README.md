@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.2.0
+# 🐶 Pupcloud v0.4.1
 
 Put your files on the web!
 
@@ -80,8 +80,10 @@ I am writing ).
 | Read-only mode                             | ✔️     | v0.3.0  |
 | File upload                                | ✔️     | v0.4.0  |
 | File sharing                               | ❌     |         |
+| Search                                     | ❌     |         |
 | Special file modes (permissions, links...) | ❌     |         |
 | Mobile tweaks (swipe, ...)                 | ❌     |         |
+| Multiple selection                         | ❌     |         |
 | Internationalization                       | ❌     |         |
 | Separate password for Read-Write           | ❌     |         |
 | Multiple file upload                       | ❌     |         |

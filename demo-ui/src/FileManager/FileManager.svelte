@@ -38,6 +38,7 @@
   import IconUnpaste from "../SVG/IconUnpaste.svelte";
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
   import IconUpload from "../SVG/IconUpload.svelte";
+  import IconReload from "../SVG/IconReload.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -83,39 +84,13 @@
   }
 
   async function doPaste() {
-    const srv = isCut ? "move" : "copy";
-
-    const dest = path.join("/") + "/";
-
-    const res: Response = await fetch(
-      "/fsOps/" +
-        srv +
-        "?path=" +
-        encodeURIComponent(toPaste.path) +
-        "&destDir=" +
-        encodeURIComponent(dest),
-      {
-        method: "POST",
-        headers: {
-          "X-Csrf-Token": getCookie("csrf_"),
-        },
-      }
-    );
-    if (res.status != 200) {
-      await Swal.fire({
-        icon: "error",
-        text: await res.text(),
-        confirmButtonColor: "#0a6bb8",
-      });
-    } else {
-      await Swal.fire({
-        icon: "success",
-        titleText: "Done!",
-        confirmButtonColor: "#0a6bb8",
-      });
-      unmarkToPaste();
-      dispatch("reload", {});
-    }
+    await Swal.fire({
+      icon: "warning",
+      text: "Not implemented in the demo site",
+      confirmButtonColor: "#0a6bb8",
+    });
+    unmarkToPaste();
+    reload();
   }
 
   function resort(_sorter: (f1: File, f2: File) => number): () => void {
@@ -149,7 +124,7 @@
       text: "Not implemented in the demo site",
       confirmButtonColor: "#0a6bb8",
     });
-    dispatch("reload", {});
+    reload();
   }
 
   async function doUpload() {
@@ -167,6 +142,11 @@
       text: "Not implemented in the demo site",
       confirmButtonColor: "#0a6bb8",
     });
+    reload();
+  }
+
+  function reload() {
+    dispatch("reload", {});
   }
 </script>
 
@@ -194,6 +174,9 @@
         <IconUpload size={24} />
       </div>
     {/if}
+    <div class="navbar-link" title="Reload file list" on:click={reload}>
+      <IconReload size={24} />
+    </div>
     <div class="navbar-link" title="View mode" on:click={gridOrList}>
       {#if mode == 'GRID'}
         <IconGrid size={24} />
