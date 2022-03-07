@@ -3,6 +3,7 @@
 ## v0.4.1
 
 - Fix: paste didn't work
+- Reload button
 
 ## v0.4.0
 
