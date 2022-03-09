@@ -17,7 +17,12 @@
 package commons
 
 import (
+	"bytes"
+	"encoding/base64"
+	"math/big"
 	"os"
+
+	"github.com/proofrock/crypgo"
 )
 
 type ErrorRes struct {
@@ -31,4 +36,26 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+func BoolToBytes(b bool) byte {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func Int64ToBytes(number int64) []byte {
+	big := new(big.Int)
+	big.SetInt64(number)
+	return big.Bytes()
+}
+
+func EncryptSharingURL(pwd, path string, readOnly bool, date int64) (string, error) {
+	crypgo.SetVariant(base64.URLEncoding)
+	var b bytes.Buffer
+	b.Write([]byte{BoolToBytes(readOnly)})
+	b.WriteString(path)
+	b.Write(Int64ToBytes(date))
+	return crypgo.CompressAndEncryptBytes(pwd, b.Bytes(), 19)
 }
