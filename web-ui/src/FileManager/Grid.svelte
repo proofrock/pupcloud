@@ -18,7 +18,6 @@
 
   import { createEventDispatcher } from "svelte";
   import GridCell from "./GridCell.svelte";
-  import Properties from "../Snippets/Properties.svelte";
   import type { File } from "../Struct.svelte";
 
   export let itemList: File[];
@@ -44,10 +43,7 @@
       on:click={click(item.uuid)}
       title={item.name}
       style="z-index: {itemList.length + 1 - i}">
-      <GridCell {item} {readOnly} on:toPaste on:reload />
+      <GridCell {item} {readOnly} on:toPaste on:reload on:openPropsModal />
     </div>
   {/each}
 </div>
-{#each itemList as item (item.uuid)}
-  <Properties {item} />
-{/each}

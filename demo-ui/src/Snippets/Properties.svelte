@@ -16,27 +16,29 @@
    * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
    */
 
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, createEventDispatcher } from "svelte";
   import { Modal, destroy } from "axentix";
   import type { File } from "../Struct.svelte";
 
   export let item: File;
-  let id = "modal-properties-" + item.uuid;
+
+  const dispatch = createEventDispatcher();
 
   onMount(() => {
-    new Modal("#" + id);
-  });
-
-  onDestroy(() => {
-    destroy("#" + id);
+    const modal = new Modal("#modal-properties");
+    const modalQuery = document.querySelector("#modal-properties");
+    modalQuery.addEventListener("ax.modal.closed", function () {
+      destroy("#modal-properties");
+      dispatch("closePropsModal");
+    });
+    modal.open();
   });
 </script>
 
 <div
   class="modal shadow-1 white rounded-3 modal-bouncing"
   style="max-width:90vh"
-  {id}
-  data-ax="modal">
+  id="modal-properties">
   <div class="modal-header ellipsis">
     <img class="centered" alt={item.icon} src="icons/48x48/{item.icon}.svg" />&nbsp;{item.name}
   </div>
