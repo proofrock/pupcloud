@@ -37,7 +37,7 @@
   function noop() {}
 </script>
 
-<div class="card shadow-1 hoverable-1 rounded-3 overflow-visible">
+<div class="card shadow-1 hoverable-1 rounded-3 overflow-visible white">
   <!-- svelte-ignore missing-declaration -->
   <div class="card-content lh-1">
     <span class="font-w100 hide-sm-down">{item.size}</span>
@@ -45,7 +45,7 @@
       <span data-target="ddGrid-{item.uuid}" on:click|stopPropagation={noop}>
         <DotDotDot />
       </span>
-      <ContextMenu {item} {readOnly} on:toPaste on:reload />
+      <ContextMenu {item} {readOnly} on:toPaste on:reload on:openPropsModal />
     </div>
     <div style="clear: both;">&nbsp;</div>
     <div class="font-s9 text-center">
