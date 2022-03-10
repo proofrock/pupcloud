@@ -19,16 +19,12 @@
   import { createEventDispatcher } from "svelte";
 
   import type { File } from "../Struct.svelte";
-  import { getCookie } from "../Utils.svelte";
   import Swal from "sweetalert2";
 
   export let item: File;
   export let readOnly: boolean;
 
   const dispatch = createEventDispatcher();
-
-  // to be able to specify stopPropagation
-  function noop() {}
 
   async function rename() {
     const { value: nuName } = await Swal.fire({
@@ -90,6 +86,10 @@
       dispatch("toPaste", { file: item, isCut: isCut });
     };
   }
+
+  function toProperties() {
+    dispatch("openPropsModal", { file: item });
+  }
 </script>
 
 <div
@@ -97,17 +97,11 @@
   {#if item.isDir && item.name == '../'}
     <div class="dropdown-item text-grey">Special dir</div>
   {:else if readOnly}
-    <div
-      class="dropdown-item modal-trigger"
-      data-target={'modal-properties-' + item.uuid}
-      on:click|stopPropagation={noop}>
+    <div class="dropdown-item" on:click|stopPropagation={toProperties}>
       Properties
     </div>
   {:else}
-    <div
-      class="dropdown-item divider modal-trigger"
-      data-target={'modal-properties-' + item.uuid}
-      on:click|stopPropagation={noop}>
+    <div class="dropdown-item divider" on:click|stopPropagation={toProperties}>
       Properties
     </div>
     <div class="dropdown-item" on:click|stopPropagation={toPaste(true)}>

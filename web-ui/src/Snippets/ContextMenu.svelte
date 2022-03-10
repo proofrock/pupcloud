@@ -27,9 +27,6 @@
 
   const dispatch = createEventDispatcher();
 
-  // to be able to specify stopPropagation
-  function noop() {}
-
   async function rename() {
     const { value: nuName } = await Swal.fire({
       titleText: "Enter new name",
@@ -129,6 +126,10 @@
       dispatch("toPaste", { file: item, isCut: isCut });
     };
   }
+
+  function toProperties() {
+    dispatch("openPropsModal", { file: item });
+  }
 </script>
 
 <div
@@ -136,17 +137,11 @@
   {#if item.isDir && item.name == '../'}
     <div class="dropdown-item text-grey">Special dir</div>
   {:else if readOnly}
-    <div
-      class="dropdown-item modal-trigger"
-      data-target={'modal-properties-' + item.uuid}
-      on:click|stopPropagation={noop}>
+    <div class="dropdown-item" on:click|stopPropagation={toProperties}>
       Properties
     </div>
   {:else}
-    <div
-      class="dropdown-item divider modal-trigger"
-      data-target={'modal-properties-' + item.uuid}
-      on:click|stopPropagation={noop}>
+    <div class="dropdown-item divider" on:click|stopPropagation={toProperties}>
       Properties
     </div>
     <div class="dropdown-item" on:click|stopPropagation={toPaste(true)}>

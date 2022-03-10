@@ -17,7 +17,6 @@
    */
 
   import ListRow from "./ListRow.svelte";
-  import Properties from "../Snippets/Properties.svelte";
   import type { File } from "../Struct.svelte";
 
   export let itemList: File[];
@@ -33,10 +32,13 @@
       <th />
     </tr>
     {#each itemList as item (item.uuid)}
-      <ListRow {item} {readOnly} on:message on:toPaste on:reload />
+      <ListRow
+        {item}
+        {readOnly}
+        on:message
+        on:toPaste
+        on:reload
+        on:openPropsModal />
     {/each}
   </table>
 </div>
-{#each itemList as item (item.uuid)}
-  <Properties {item} />
-{/each}

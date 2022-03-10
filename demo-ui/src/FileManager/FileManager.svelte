@@ -39,6 +39,7 @@
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
   import IconUpload from "../SVG/IconUpload.svelte";
   import IconReload from "../SVG/IconReload.svelte";
+  import Properties from "../Snippets/Properties.svelte";
 
   export let path: string[];
   export let mule: Mule;
@@ -48,6 +49,8 @@
 
   $: toPaste = null;
   $: isCut = false;
+
+  $: propForFile = null;
 
   const dispatch = createEventDispatcher();
 
@@ -147,6 +150,14 @@
 
   function reload() {
     dispatch("reload", {});
+  }
+
+  function doOpenPropsModal(event) {
+    propForFile = event.detail.file;
+  }
+
+  function doClosePropsModal(event) {
+    propForFile = null;
   }
 </script>
 
@@ -257,15 +268,20 @@
     {readOnly}
     on:message={click}
     on:toPaste={markToPaste}
-    on:reload />
+    on:reload
+    on:openPropsModal={doOpenPropsModal} />
 {:else}
   <List
     itemList={mule.items}
     {readOnly}
     on:message={click}
     on:toPaste={markToPaste}
-    on:reload />
+    on:reload
+    on:openPropsModal={doOpenPropsModal} />
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>
 <div>&nbsp;</div>
+{#if propForFile != null}
+  <Properties bind:item={propForFile} on:closePropsModal={doClosePropsModal} />
+{/if}
