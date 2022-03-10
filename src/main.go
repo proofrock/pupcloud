@@ -42,7 +42,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const Version = "v0.4.1"
+const Version = "v0.4.2"
 
 //go:embed static
 var static embed.FS

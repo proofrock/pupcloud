@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.2
+
+- Fixed z-indexes
+- Improved performances when listing a huge number of items
+- Upgrade to libs
+
 ## v0.4.1
 
 - Fix: paste didn't work
