@@ -88,7 +88,7 @@
       on:reload={reload} />
     <footer
       class="footer blue dark-2 font-s1 lh-1 hide-sm-down"
-      style="position:fixed; bottom:0; z-index:11;">
+      style="position:fixed; bottom:0; z-index:65534;">
       <span><a
           class="pup-a"
           target="_blank"
