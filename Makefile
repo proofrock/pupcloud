@@ -74,3 +74,13 @@ docker-publish-arm:
 	sudo docker rmi local_pupcloud:latest
 	sudo docker rmi germanorizzo/pupcloud:latest-arm
 	sudo docker rmi germanorizzo/pupcloud:v0.4.1-arm
+
+docker-publish-arm64:
+	make docker
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:latest-arm64
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.4.1-arm64
+	sudo docker push germanorizzo/pupcloud:latest-arm64
+	sudo docker push germanorizzo/pupcloud:v0.4.1-arm64
+	sudo docker rmi local_pupcloud:latest
+	sudo docker rmi germanorizzo/pupcloud:latest-arm64
+	sudo docker rmi germanorizzo/pupcloud:v0.4.1-arm64
