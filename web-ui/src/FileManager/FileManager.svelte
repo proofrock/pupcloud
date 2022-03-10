@@ -216,7 +216,7 @@
   }
 </script>
 
-<nav class="navbar" style="height: 40px;">
+<nav class="navbar" style="height: 40px; z-index:65535;">
   <Breadcrumb {path} on:pathEvent />
   <div class="navbar-menu ml-auto" style="height: 40px;">
     {#if !!toPaste}
