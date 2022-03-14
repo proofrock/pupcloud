@@ -24,7 +24,7 @@
   import Breadcrumb from "../Snippets/Breadcrumb.svelte";
   import Grid from "./Grid.svelte";
   import List from "./List.svelte";
-  import { File, Mule, SORTERS } from "../Struct.svelte";
+  import { File, Mule, Config, SORTERS } from "../Struct.svelte";
   import { getCookie } from "../Utils.svelte";
   import IconGrid from "../SVG/IconGrid.svelte";
   import IconList from "../SVG/IconList.svelte";
@@ -39,18 +39,21 @@
   import IconNewFolder from "../SVG/IconNewFolder.svelte";
   import IconUpload from "../SVG/IconUpload.svelte";
   import IconReload from "../SVG/IconReload.svelte";
+  import IconShare from "../SVG/IconShare.svelte";
   import Properties from "../Snippets/Properties.svelte";
+  import Sharing from "../Snippets/Sharing.svelte";
 
   export let path: string[];
   export let mule: Mule;
   export let sorter: (f1: File, f2: File) => number;
   export let mode: string;
-  export let readOnly: boolean;
+  export let config: Config;
 
   $: toPaste = null;
   $: isCut = false;
 
   $: propForFile = null;
+  $: sharingOpen = false;
 
   const dispatch = createEventDispatcher();
 
@@ -159,6 +162,14 @@
   function doClosePropsModal(event) {
     propForFile = null;
   }
+
+  function doOpenSharingModal(event) {
+    sharingOpen = true;
+  }
+
+  function doCloseSharingModal(event) {
+    sharingOpen = false;
+  }
 </script>
 
 <nav class="navbar" style="height: 40px; z-index:65535;">
@@ -177,12 +188,20 @@
       </div>
     {/if}
     <div>&nbsp;</div>
-    {#if !readOnly}
+    {#if !config.readOnly}
       <div class="navbar-link" title="Create folder" on:click={newFolder}>
         <IconNewFolder size={24} />
       </div>
       <div class="navbar-link" title="Upload file(s)" on:click={doUpload}>
         <IconUpload size={24} />
+      </div>
+    {/if}
+    {#if config.sharing != null}
+      <div
+        class="navbar-link"
+        title="Share link for this folder"
+        on:click={doOpenSharingModal}>
+        <IconShare size={24} />
       </div>
     {/if}
     <div class="navbar-link" title="Reload file list" on:click={reload}>
@@ -265,7 +284,7 @@
 {#if mode == 'GRID'}
   <Grid
     itemList={mule.items}
-    {readOnly}
+    readOnly={config.readOnly}
     on:message={click}
     on:toPaste={markToPaste}
     on:reload
@@ -273,7 +292,7 @@
 {:else}
   <List
     itemList={mule.items}
-    {readOnly}
+    readOnly={config.readOnly}
     on:message={click}
     on:toPaste={markToPaste}
     on:reload
@@ -284,4 +303,10 @@
 <div>&nbsp;</div>
 {#if propForFile != null}
   <Properties bind:item={propForFile} on:closePropsModal={doClosePropsModal} />
+{/if}
+{#if sharingOpen}
+  <Sharing
+    dir={path.join('/') + '/'}
+    {config}
+    on:closeShareModal={doCloseSharingModal} />
 {/if}

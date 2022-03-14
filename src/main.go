@@ -78,10 +78,18 @@ type res struct {
 	Items []item   `json:"items"`
 }
 
+type sharing struct {
+	Allowed      bool
+	AllowRW      bool     `json:"allowRW"`
+	TokenNames   []string `json:"tokens"`
+	TokenSecrets []string
+}
+
 type featuRes struct {
-	Version  string `json:"version"`
-	Title    string `json:"title"`
-	ReadOnly bool   `json:"readonly"`
+	Version  string   `json:"version"`
+	Title    string   `json:"title"`
+	ReadOnly bool     `json:"readonly"`
+	Sharing  *sharing `json:"sharing,omitempty"`
 }
 
 func main() {
@@ -98,6 +106,8 @@ func main() {
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password")
 	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS")
+	allowRWSharing := flag.Bool("allow-rw-sharing", false, "Allow to share folders as read/write")
+	tokens := flag.StringArray("share-token", []string{}, "Token for sharing, in form name:secret, multiple allowed")
 
 	flag.Parse()
 
@@ -105,7 +115,33 @@ func main() {
 		println("ERROR: You must specify a root (-r)")
 		os.Exit(-1)
 	}
+
+	if *readOnly && *allowRWSharing {
+		println("ERROR: cannot allow R/W shares if Read Only")
+		os.Exit(-1)
+	}
+
+	sharing := sharing{}
+
+	if len(*tokens) > 0 {
+		sharing.Allowed = true
+		for i, tok := range *tokens {
+			pos := strings.Index(tok, ":")
+			if pos < 0 {
+				println(fmt.Sprintf("ERROR: malformed token #%d: it must have a ':'", i+1))
+				os.Exit(-1)
+			}
+			sharing.TokenNames = append(sharing.TokenNames, tok[0:pos])
+			sharing.TokenSecrets = append(sharing.TokenSecrets, tok[pos+1:])
+		}
+	}
+
 	println(fmt.Sprintf(" - Serving dir %s", *root))
+
+	if sharing.Allowed {
+		println(" - Sharing enabled")
+		println(fmt.Sprintf("   + With tokens %s:", strings.Join(sharing.TokenNames, ",")))
+	}
 
 	app := fiber.New(
 		fiber.Config{
@@ -127,17 +163,20 @@ func main() {
 		c.Locals("root", *root)
 		c.Locals("title", *title)
 		c.Locals("readOnly", *readOnly)
+		c.Locals("sharing", &sharing)
 		return c.Next()
 	})
 
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/shareLink", shareLink)
 	app.Delete("/fsOps/del", fsDel)
 	app.Post("/fsOps/rename", fsRename)
 	app.Post("/fsOps/move", fsMove)
 	app.Post("/fsOps/copy", fsCopy)
 	app.Put("/fsOps/newFolder", fsNewFolder)
+	app.Put("/fsOps/upload", fsUpload)
 	app.Put("/fsOps/upload", fsUpload)
 
 	subFS, _ := fs.Sub(static, "static")
@@ -197,11 +236,22 @@ func features(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.JSON(featuRes{
-		Version,
-		c.Locals("title").(string),
-		c.Locals("readOnly").(bool),
-	})
+	sharing := c.Locals("sharing").(*sharing)
+
+	if !sharing.Allowed {
+		return c.JSON(featuRes{
+			Version:  Version,
+			Title:    c.Locals("title").(string),
+			ReadOnly: c.Locals("readOnly").(bool),
+		})
+	} else {
+		return c.JSON(featuRes{
+			Version:  Version,
+			Title:    c.Locals("title").(string),
+			ReadOnly: c.Locals("readOnly").(bool),
+			Sharing:  sharing,
+		})
+	}
 }
 
 func ls(c *fiber.Ctx) error {
@@ -286,6 +336,59 @@ func file(c *fiber.Ctx) error {
 	}
 
 	return c.SendFile(fullPath)
+}
+
+func shareLink(c *fiber.Ctx) error {
+	sharing := c.Locals("sharing").(*sharing)
+
+	if !sharing.Allowed {
+		fiber.NewError(fiber.StatusBadRequest, "Sharing is not allowed")
+	}
+
+	pwd := c.Query("pwd")
+	if pwd == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "'dir' not specified")
+	}
+
+	dir := c.Query("dir")
+	if dir == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "'dir' not specified")
+	}
+
+	strReadOnly := c.Query("readOnly")
+	if strReadOnly == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "'readOnly' not specified")
+	}
+	readOnly := strReadOnly == "1"
+
+	token := c.Query("token")
+	if token == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "'token' not specified")
+	}
+
+	var expiry *uint32
+	_expiry := c.Query("expiry")
+	if _expiry == "" {
+		_expiryInt, err := strconv.Atoi(strings.ReplaceAll(_expiry, "-", ""))
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "'expiry' date not valid")
+		}
+		expiryUInt := uint32(_expiryInt)
+		expiry = &expiryUInt
+	}
+
+	tkIdx := commons.FindString(token, sharing.TokenNames)
+	if tkIdx < 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "Unknown token")
+	}
+	secret := sharing.TokenSecrets[tkIdx]
+	password := pwd + "|" + secret
+
+	ret, err := commons.EncryptSharingURL(password, dir, readOnly, expiry)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
+	}
+	return c.SendString(ret)
 }
 
 func fsDel(c *fiber.Ctx) error {

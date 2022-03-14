@@ -24,23 +24,44 @@
     return f1Dir == f2Dir ? 0 : f2Dir ? 1 : -1;
   }
 
+  export class ConfigSharing {
+    readonly allowRW: boolean;
+    readonly tokens: string[];
+
+    constructor(allowRW: boolean, tokens: string[]) {
+      this.allowRW = allowRW;
+      this.tokens = tokens;
+    }
+  }
+
   export class Config {
     readonly version: string;
     readonly title: string;
     readonly readOnly: boolean;
+    readonly sharing: ConfigSharing;
 
-    constructor(version: string, title: string, readOnly: boolean) {
+    constructor(
+      version: string,
+      title: string,
+      readOnly: boolean,
+      sharing: ConfigSharing
+    ) {
       this.version = version;
       this.title = title;
       this.readOnly = readOnly;
+      this.sharing = sharing;
     }
 
     static empty(): Config {
-      return new Config("", "", false);
+      return new Config("", "", false, null);
     }
 
     static fromAny(obj: any): Config {
-      return new Config(obj.version, obj.title, obj.readOnly);
+      const sharing: ConfigSharing =
+        obj.sharing == null
+          ? null
+          : new ConfigSharing(obj.sharing.allowRW, obj.sharing.tokens);
+      return new Config(obj.version, obj.title, obj.readOnly, sharing);
     }
   }
 

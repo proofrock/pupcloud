@@ -77,7 +77,7 @@
     </nav>
     <FileManager
       {path}
-      readOnly={config.readOnly}
+      {config}
       bind:mule
       bind:sorter
       bind:mode
