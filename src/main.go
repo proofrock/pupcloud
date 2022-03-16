@@ -21,6 +21,8 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/proofrock/pupcloud/commons"
 	"io/fs"
 	"log"
 	"net/http"
@@ -31,14 +33,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/otiai10/copy"
-	"github.com/proofrock/pupcloud/commons"
 	flag "github.com/spf13/pflag"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/csrf"
-	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/utils"
 )
 
@@ -83,13 +82,7 @@ type sharing struct {
 	AllowRW      bool     `json:"allowRW"`
 	TokenNames   []string `json:"tokens"`
 	TokenSecrets []string
-}
-
-type featuRes struct {
-	Version  string   `json:"version"`
-	Title    string   `json:"title"`
-	ReadOnly bool     `json:"readonly"`
-	Sharing  *sharing `json:"sharing,omitempty"`
+	Prefix       string
 }
 
 func main() {
@@ -108,6 +101,8 @@ func main() {
 	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS")
 	allowRWSharing := flag.Bool("allow-rw-sharing", false, "Allow to share folders as read/write")
 	tokens := flag.StringArray("share-token", []string{}, "Token for sharing, in form name:secret, multiple allowed")
+	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface")
+	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
 
 	flag.Parse()
 
@@ -123,8 +118,21 @@ func main() {
 
 	sharing := sharing{}
 
+	if (len(*tokens) > 0) != (*sharePrefix != "") {
+		println("Both '--share-token' and '--share-prefix' must be specified")
+		os.Exit(-1)
+	}
+
+	if *sharePrefix != "" {
+		if !(strings.HasPrefix(*sharePrefix, "http://") || strings.HasPrefix(*sharePrefix, "https://")) || strings.HasSuffix(*sharePrefix, "/") {
+			println("Malformed '--share-prefix': protocol must be http or https, and it must not end with a '/'")
+			os.Exit(-1)
+		}
+	}
+
 	if len(*tokens) > 0 {
 		sharing.Allowed = true
+		sharing.Prefix = *sharePrefix
 		for i, tok := range *tokens {
 			pos := strings.Index(tok, ":")
 			if pos < 0 {
@@ -140,9 +148,18 @@ func main() {
 
 	if sharing.Allowed {
 		println(" - Sharing enabled")
-		println(fmt.Sprintf("   + With tokens %s:", strings.Join(sharing.TokenNames, ",")))
+		println(fmt.Sprintf("   + With tokens: %s", strings.Join(sharing.TokenNames, ",")))
+		go launchSharingApp(*bindTo, *root, *title, *sharePort, &sharing)
+		time.Sleep(1 * time.Second)
 	}
 
+	launchMainApp(*bindTo, *root, *title, *pwdHash, *port, *readOnly, &sharing)
+}
+
+// FIXME limit growth
+var sessions sync.Map
+
+func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
@@ -158,39 +175,48 @@ func main() {
 		KeyGenerator:   utils.UUIDv4,
 	}))
 
+	subFS, _ := fs.Sub(static, "static")
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root: http.FS(subFS),
+	}))
+
 	app.Use(func(c *fiber.Ctx) error {
-		c.Locals("pwdHash", *pwdHash)
-		c.Locals("root", *root)
-		c.Locals("title", *title)
-		c.Locals("readOnly", *readOnly)
-		c.Locals("sharing", &sharing)
+		if err := doAuth4MainApp(c, pwdHash); err != nil {
+			return err
+		}
+
+		// FIXME stinky
+		if root != "/" && strings.HasSuffix(root, "/") {
+			root = root[:len(root)-2]
+		}
+		c.Locals("root", root)
+		c.Locals("title", title)
+		c.Locals("readOnly", readOnly)
+		c.Locals("sharing", sharing)
 		return c.Next()
 	})
 
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
-	app.Get("/shareLink", shareLink)
-	app.Delete("/fsOps/del", fsDel)
-	app.Post("/fsOps/rename", fsRename)
-	app.Post("/fsOps/move", fsMove)
-	app.Post("/fsOps/copy", fsCopy)
-	app.Put("/fsOps/newFolder", fsNewFolder)
-	app.Put("/fsOps/upload", fsUpload)
-	app.Put("/fsOps/upload", fsUpload)
+	if sharing != nil && sharing.Allowed {
+		app.Get("/shareLink", shareLink)
+	}
+	if !readOnly {
+		app.Delete("/fsOps/del", fsDel)
+		app.Post("/fsOps/rename", fsRename)
+		app.Post("/fsOps/move", fsMove)
+		app.Post("/fsOps/copy", fsCopy)
+		app.Put("/fsOps/newFolder", fsNewFolder)
+		app.Put("/fsOps/upload", fsUpload)
+		app.Put("/fsOps/upload", fsUpload)
+	}
 
-	subFS, _ := fs.Sub(static, "static")
-	app.Use("/", filesystem.New(filesystem.Config{
-		Root: http.FS(subFS),
-	}))
-
-	println(fmt.Sprintf(" - Server running on port %d", *port))
-	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", *bindTo, *port)))
+	println(fmt.Sprintf(" - Server running on port %d", port))
+	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
 }
 
-var sessions sync.Map
-
-func doAuth(c *fiber.Ctx, pwdHash string) error {
+func doAuth4MainApp(c *fiber.Ctx, pwdHash string) error {
 	if pwdHash == "" {
 		return nil
 	}
@@ -231,340 +257,121 @@ func doAuth(c *fiber.Ctx, pwdHash string) error {
 	return nil
 }
 
-func features(c *fiber.Ctx) error {
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	sharing := c.Locals("sharing").(*sharing)
-
-	if !sharing.Allowed {
-		return c.JSON(featuRes{
-			Version:  Version,
-			Title:    c.Locals("title").(string),
-			ReadOnly: c.Locals("readOnly").(bool),
-		})
-	} else {
-		return c.JSON(featuRes{
-			Version:  Version,
-			Title:    c.Locals("title").(string),
-			ReadOnly: c.Locals("readOnly").(bool),
-			Sharing:  sharing,
-		})
-	}
+// Stored in the session map, to recover it from the session cookie
+type sharInfo struct {
+	path     string
+	readOnly bool
 }
 
-func ls(c *fiber.Ctx) error {
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
+func launchSharingApp(bindTo, root, title string, port int, sharing *sharing) {
+	app := fiber.New(
+		fiber.Config{
+			ErrorHandler:          errHandler,
+			DisableStartupMessage: true,
+		},
+	)
 
-	root := c.Locals("root").(string)
-	path := c.Query("path", "/")
+	app.Use(compress.New())
+	// FIXME: it works, but does it do anything?
+	app.Use(csrf.New(csrf.Config{
+		CookieSameSite: "Strict",
+		Expiration:     24 * time.Hour,
+		KeyGenerator:   utils.UUIDv4,
+	}))
 
-	rootAndPath := filepath.Join(root, path)
-	file, errPath := os.Stat(rootAndPath)
-	if errPath != nil {
-		return c.Status(fiber.StatusNotFound).SendString("Path not found")
-	}
-	if !file.IsDir() {
-		return c.Download(rootAndPath)
-	}
+	subFS, _ := fs.Sub(static, "static")
+	app.Use("/", filesystem.New(filesystem.Config{
+		Root: http.FS(subFS),
+	}))
 
-	files, errPath := os.ReadDir(rootAndPath)
-	if errPath != nil {
-		return c.Status(fiber.StatusNotFound).SendString("Path not found")
-	}
+	app.Use(func(c *fiber.Ctx) error {
+		sharinfo, err := doAuth4SharingApp(c, root, sharing)
+		if err != nil {
+			return err
+		}
 
-	res := res{Path: make([]string, 0), Items: make([]item, 0)}
+		if sharinfo.path != "/" && strings.HasSuffix(sharinfo.path, "/") {
+			sharinfo.path = sharinfo.path[:len(sharinfo.path)-2]
+		}
+		c.Locals("root", sharinfo.path)
+		c.Locals("title", title)
+		c.Locals("readOnly", sharinfo.readOnly)
+		return c.Next()
+	})
 
-	for _, it := range strings.Split(path, "/") {
-		if it != "" {
-			res.Path = append(res.Path, it)
+	app.Get("/features", features)
+	app.Get("/ls", ls)
+	app.Get("/file", file)
+	app.Delete("/fsOps/del", fsDel)
+	app.Post("/fsOps/rename", fsRename)
+	app.Post("/fsOps/move", fsMove)
+	app.Post("/fsOps/copy", fsCopy)
+	app.Put("/fsOps/newFolder", fsNewFolder)
+	app.Put("/fsOps/upload", fsUpload)
+	app.Put("/fsOps/upload", fsUpload)
+
+	println(fmt.Sprintf(" - Sharing server running on port %d", port))
+	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
+}
+
+func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, error) {
+	val := c.Cookies("pupcloud-sharing-session")
+	if val != "" {
+		if si, ok := sessions.Load(val); ok {
+			return si.(*sharInfo), nil
 		}
 	}
 
-	for _, f := range files {
-		var item item
-		item.Name = f.Name()
-		finfo, finfoError := f.Info()
-		if finfoError != nil {
-			continue
-		}
-		item.ChDate = finfo.ModTime().Unix()
-		item.Permissions = finfo.Mode().String()
-		fullPath := filepath.Join(rootAndPath, f.Name())
-		item.Owner, item.Group = getUserAndGroup(fullPath)
-		if f.IsDir() {
-			item.MimeType = "directory"
-			item.Size = -1
-		} else {
-			item.MimeType = getFileContentType(fullPath)
-			item.Size = finfo.Size()
-		}
-		res.Items = append(res.Items, item)
-	}
-	return c.JSON(res)
-}
-
-// Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go
-func file(c *fiber.Ctx) error {
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	path := c.Query("path")
-	forDownload := c.Query("dl", "0") == "1"
-	if path == "" {
-		return fiber.ErrNotFound
-	}
-
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-	present, contentType, length := getFileInfoForHTTP(fullPath)
-	if !present {
-		return fiber.ErrNotFound
-	}
-
-	c.Set("Content-Type", contentType)
-	c.Set("Content-Length", fmt.Sprintf("%d", length))
-	if forDownload {
-		c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filepath.Base(fullPath)))
-	} else {
-		c.Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", filepath.Base(fullPath)))
-	}
-
-	return c.SendFile(fullPath)
-}
-
-func shareLink(c *fiber.Ctx) error {
-	sharing := c.Locals("sharing").(*sharing)
-
-	if !sharing.Allowed {
-		fiber.NewError(fiber.StatusBadRequest, "Sharing is not allowed")
+	token := c.Query("tk")
+	if token == "" {
+		return nil, fiber.NewError(499, "No token specified")
 	}
 
 	pwd := c.Query("pwd")
 	if pwd == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "'dir' not specified")
+		pwd = c.Get("x-pupcloud-pwd")
 	}
 
-	dir := c.Query("dir")
-	if dir == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "'dir' not specified")
-	}
-
-	strReadOnly := c.Query("readOnly")
-	if strReadOnly == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "'readOnly' not specified")
-	}
-	readOnly := strReadOnly == "1"
-
-	token := c.Query("token")
-	if token == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "'token' not specified")
-	}
-
-	var expiry *uint32
-	_expiry := c.Query("expiry")
-	if _expiry == "" {
-		_expiryInt, err := strconv.Atoi(strings.ReplaceAll(_expiry, "-", ""))
-		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "'expiry' date not valid")
-		}
-		expiryUInt := uint32(_expiryInt)
-		expiry = &expiryUInt
+	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
+	// prompt in the browser
+	if pwd == "" {
+		return nil, fiber.NewError(499, "Password required or wrong password")
 	}
 
 	tkIdx := commons.FindString(token, sharing.TokenNames)
 	if tkIdx < 0 {
-		return fiber.NewError(fiber.StatusBadRequest, "Unknown token")
+		return nil, fiber.NewError(fiber.StatusBadRequest, "Unknown token")
 	}
 	secret := sharing.TokenSecrets[tkIdx]
 	password := pwd + "|" + secret
 
-	ret, err := commons.EncryptSharingURL(password, dir, readOnly, expiry)
+	x := c.Query("x")
+	if x == "" {
+		return nil, fiber.NewError(499, "No sharing details specified")
+	}
+
+	partialPath, readOnly, date, err := commons.DecryptSharingURL(password, x)
 	if err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-	return c.SendString(ret)
-}
-
-func fsDel(c *fiber.Ctx) error {
-	if c.Locals("readOnly").(bool) {
-		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
+		return nil, fiber.NewError(499, err.Error())
 	}
 
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
+	sharinfo := sharInfo{filepath.Join(root, partialPath), readOnly}
+
+	now, _ := strconv.Atoi(time.Now().Format("20170907"))
+
+	if date != nil && uint32(now) > *date {
+		return nil, fiber.NewError(499, "Link expired")
 	}
 
-	path := c.Query("path")
-	if path == "" {
-		return fiber.ErrBadRequest
-	}
+	rnd := utils.UUIDv4()
+	cookie := new(fiber.Cookie)
+	cookie.Name = "pupcloud-sharing-session"
+	cookie.Value = rnd
+	cookie.Expires = time.Now().Add(24 * time.Hour)
+	cookie.SessionOnly = true
+	cookie.SameSite = "strict"
+	c.Cookie(cookie)
+	sessions.Store(rnd, &sharinfo)
 
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-	if err := os.RemoveAll(fullPath); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	return c.SendStatus(200)
-}
-
-func fsRename(c *fiber.Ctx) error {
-	if c.Locals("readOnly").(bool) {
-		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
-	}
-
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	path := c.Query("path")
-	nuName := c.Query("name")
-	if path == "" || nuName == "" {
-		return fiber.ErrBadRequest
-	}
-
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-	newPath := filepath.Join(filepath.Dir(fullPath), nuName)
-
-	if commons.FileExists(newPath) {
-		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
-	}
-
-	if err := os.Rename(fullPath, newPath); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	return c.SendStatus(200)
-}
-
-func fsMove(c *fiber.Ctx) error {
-	if c.Locals("readOnly").(bool) {
-		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
-	}
-
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	path := c.Query("path")
-	destDir := c.Query("destDir")
-	if path == "" || destDir == "" {
-		return fiber.ErrBadRequest
-	}
-
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
-
-	if commons.FileExists(newPath) {
-		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
-	}
-
-	if err := os.Rename(fullPath, newPath); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	return c.SendStatus(200)
-}
-
-func fsCopy(c *fiber.Ctx) error {
-	if c.Locals("readOnly").(bool) {
-		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
-	}
-
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	path := c.Query("path")
-	destDir := c.Query("destDir")
-	if path == "" || destDir == "" {
-		return fiber.ErrBadRequest
-	}
-
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
-
-	if commons.FileExists(newPath) {
-		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
-	}
-
-	if err := copy.Copy(fullPath, newPath); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	return c.SendStatus(200)
-}
-
-func fsNewFolder(c *fiber.Ctx) error {
-	if c.Locals("readOnly").(bool) {
-		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
-	}
-
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	path := c.Query("path")
-	if path == "" {
-		return fiber.ErrBadRequest
-	}
-
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-
-	if commons.FileExists(fullPath) {
-		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
-	}
-
-	if err := os.Mkdir(fullPath, os.FileMode(int(0755))); err != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
-	}
-
-	return c.SendStatus(200)
-}
-
-func fsUpload(c *fiber.Ctx) error {
-	if c.Locals("readOnly").(bool) {
-		return fiber.NewError(fiber.StatusForbidden, "Read-only mode enabled")
-	}
-
-	if err := doAuth(c, c.Locals("pwdHash").(string)); err != nil {
-		return err
-	}
-
-	form, err := c.MultipartForm()
-	if err != nil {
-		return fiber.NewError(fiber.StatusBadRequest, "It's not multipart")
-	}
-
-	path := c.Query("path")
-	if path == "" {
-		return fiber.ErrBadRequest
-	}
-
-	root := c.Locals("root").(string)
-
-	fullPath := filepath.Join(root, path)
-
-	files := form.File["doc"]
-	for _, file := range files {
-		if err := c.SaveFile(file, filepath.Join(fullPath, file.Filename)); err != nil {
-			return err
-		}
-	}
-	return err
+	return &sharinfo, nil
 }

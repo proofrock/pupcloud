@@ -24,7 +24,7 @@ import (
 	"strings"
 )
 
-const MIME_TYPE_TEXT_PLAIN = "text/plain"
+const MimeTypeTextPlain = "text/plain"
 
 // Adapted from https://golangcode.com/get-the-content-type-of-file/
 func getFileContentType(path string) string {
@@ -33,7 +33,7 @@ func getFileContentType(path string) string {
 	if ext != "" {
 		// IDK why, but .txt is not translated by Go :-(
 		if strings.EqualFold(ext, ".txt") {
-			return MIME_TYPE_TEXT_PLAIN
+			return MimeTypeTextPlain
 		}
 		contentType := mime.TypeByExtension(ext)
 		if contentType != "" {
@@ -44,7 +44,7 @@ func getFileContentType(path string) string {
 	// If inconclusive, look up by contents
 	file, err := os.Open(path)
 	if err != nil {
-		return MIME_TYPE_TEXT_PLAIN
+		return MimeTypeTextPlain
 	}
 	defer file.Close()
 
@@ -52,7 +52,7 @@ func getFileContentType(path string) string {
 
 	_, err = file.Read(buffer)
 	if err != nil {
-		return MIME_TYPE_TEXT_PLAIN
+		return MimeTypeTextPlain
 	}
 
 	contentType := http.DetectContentType(buffer)
@@ -63,10 +63,12 @@ func getFileContentType(path string) string {
 func getFileInfoForHTTP(path string) (present bool, contentType string, length int64) {
 	info, err := os.Stat(path)
 	if os.IsNotExist(err) || info.IsDir() {
-		return false, "", 0
+		return
 	}
 
+	present = true
+	contentType = getFileContentType(path)
 	length = info.Size()
 
-	return true, getFileContentType(path), length
+	return
 }

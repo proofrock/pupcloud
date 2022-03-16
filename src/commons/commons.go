@@ -93,7 +93,8 @@ func DecryptSharingURL(pwd, encoded string) (path string, readOnly bool, date *u
 	_readOnly, _ := b.ReadByte()
 	readOnly = _readOnly == 1
 
-	path, _ = b.ReadString(byte(0x00))
+	pathBytes, _ := b.ReadBytes(byte(0x00))
+	path = string(pathBytes[:len(pathBytes)-1])
 
 	if _hasDate, _ := b.ReadByte(); _hasDate == 1 {
 		bDate := make([]byte, 4)
