@@ -40,9 +40,17 @@
                 },
             });
             if (res.status != 499) {
-                const cfgObj = await res.json();
-                config = Config.fromAny(cfgObj);
-                break;
+                if (res.status == 200) {
+                    const cfgObj = await res.json();
+                    config = Config.fromAny(cfgObj);
+                    break;
+                }
+
+                await Swal.fire({
+                    icon: "error",
+                    text: await res.text(),
+                    confirmButtonColor: "#0a6bb8",
+                });
             }
 
             const {value: pwd} = await Swal.fire({

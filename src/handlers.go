@@ -39,24 +39,16 @@ func features(c *fiber.Ctx) error {
 	var shar *sharing
 
 	shInterface := c.Locals("sharing")
-	if shInterface != nil {
+	if shInterface != nil && shInterface.(*sharing).Allowed {
 		shar = shInterface.(*sharing)
 	}
 
-	if shar == nil || !shar.Allowed {
-		return c.JSON(featuRes{
-			Version:  Version,
-			Title:    c.Locals("title").(string),
-			ReadOnly: c.Locals("readOnly").(bool),
-		})
-	} else {
-		return c.JSON(featuRes{
-			Version:  Version,
-			Title:    c.Locals("title").(string),
-			ReadOnly: c.Locals("readOnly").(bool),
-			Sharing:  shar,
-		})
-	}
+	return c.Status(200).JSON(featuRes{
+		Version:  Version,
+		Title:    c.Locals("title").(string),
+		ReadOnly: c.Locals("readOnly").(bool),
+		Sharing:  shar,
+	})
 }
 
 func ls(c *fiber.Ctx) error {
@@ -105,7 +97,7 @@ func ls(c *fiber.Ctx) error {
 		}
 		res.Items = append(res.Items, item)
 	}
-	return c.JSON(res)
+	return c.Status(200).JSON(res)
 }
 
 // Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go

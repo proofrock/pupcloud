@@ -78,11 +78,11 @@ type res struct {
 }
 
 type sharing struct {
-	Allowed      bool
+	Allowed      bool     `json:"-"`
 	AllowRW      bool     `json:"allowRW"`
 	TokenNames   []string `json:"tokens"`
-	TokenSecrets []string
-	Prefix       string
+	TokenSecrets []string `json:"-"`
+	Prefix       string   `json:"-"`
 }
 
 func main() {
@@ -185,10 +185,6 @@ func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool,
 			return err
 		}
 
-		// FIXME stinky
-		if root != "/" && strings.HasSuffix(root, "/") {
-			root = root[:len(root)-2]
-		}
 		c.Locals("root", root)
 		c.Locals("title", title)
 		c.Locals("readOnly", readOnly)
@@ -211,6 +207,8 @@ func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool,
 		app.Put("/fsOps/upload", fsUpload)
 		app.Put("/fsOps/upload", fsUpload)
 	}
+
+	time.Sleep(1 * time.Second)
 
 	println(fmt.Sprintf(" - Server running on port %d", port))
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
