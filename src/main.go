@@ -158,6 +158,7 @@ func main() {
 
 // FIXME limit growth
 var sessions sync.Map
+var authFailureMutex sync.Mutex
 
 func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool, sharing *sharing) {
 	app := fiber.New(
@@ -234,12 +235,15 @@ func doAuth4MainApp(c *fiber.Ctx, pwdHash string) error {
 	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
 	if pwd == "" {
-		return fiber.NewError(499, "Password required or wrong password")
+		return fiber.NewError(499, "Password required")
 	}
 
 	hash := sha256.Sum256([]byte(pwd))
 	if !strings.HasPrefix(hex.EncodeToString(hash[:]), strings.ToLower(pwdHash)) {
-		return fiber.NewError(499, "Password required or wrong password")
+		authFailureMutex.Lock()
+		defer authFailureMutex.Unlock()
+		time.Sleep(1 * time.Second)
+		return fiber.NewError(499, "Wrong password")
 	}
 
 	rnd := utils.UUIDv4()
@@ -333,7 +337,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, 
 	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
 	if pwd == "" {
-		return nil, fiber.NewError(499, "Password required or wrong password")
+		return nil, fiber.NewError(499, "Password required")
 	}
 
 	tkIdx := commons.FindString(token, sharing.TokenNames)
@@ -350,7 +354,10 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, 
 
 	partialPath, readOnly, date, err := commons.DecryptSharingURL(password, x)
 	if err != nil {
-		return nil, fiber.NewError(499, err.Error())
+		authFailureMutex.Lock()
+		defer authFailureMutex.Unlock()
+		time.Sleep(1 * time.Second)
+		return nil, fiber.NewError(499, "Wrong password or invalid address")
 	}
 
 	sharinfo := sharInfo{filepath.Join(root, partialPath), readOnly}

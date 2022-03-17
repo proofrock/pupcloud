@@ -28,22 +28,33 @@
 
         const params = new URLSearchParams(window.location.search);
 
-        let url = "/features";
+        let url = "/mocks/features.json";
         if (params.has("x")) {
             url += "?x=" + encodeURIComponent(params.get("x")) + "&tk=" + encodeURIComponent(params.get("tk"));
         }
 
+        let first = true;
         while (true) {
             const res: Response = await fetch(url, {
                 headers: {
                     "x-pupcloud-pwd": password,
                 },
             });
-            if (res.status != 499) {
+
+            if (res.status == 200) {
                 const cfgObj = await res.json();
                 config = Config.fromAny(cfgObj);
                 break;
             }
+
+            if (first)
+                await Swal.fire({
+                    icon: "error",
+                    text: await res.text(),
+                    confirmButtonColor: "#0a6bb8",
+                });
+            else
+                first = false;
 
             const {value: pwd} = await Swal.fire({
                 titleText: "Enter password",
@@ -59,4 +70,8 @@
     });
 </script>
 
-<App {config}/>
+{#if config != null}
+    <App {config}/>
+{:else}
+    <div class="blanket"/>
+{/if}
