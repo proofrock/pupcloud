@@ -16,25 +16,15 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import ContextMenu from "../Snippets/ContextMenu.svelte";
     import type {File} from "../Struct.svelte";
-    import {onMount, onDestroy} from "svelte";
-    import {Dropdown, destroy} from "axentix";
-    import DotDotDot from "../Snippets/DotDotDot.svelte";
+    import {createEventDispatcher} from "svelte";
 
     export let item: File;
-    export let readOnly: boolean;
 
-    onMount(() => {
-        new Dropdown("#ddGrid-" + item.uuid);
-    });
+    const dispatch = createEventDispatcher();
 
-    onDestroy(() => {
-        destroy("#ddGrid-" + item.uuid);
-    });
-
-    // to be able to specify stopPropagation
-    function noop() {
+    function toProperties() {
+        dispatch("openPropsModal", {file: item});
     }
 </script>
 
@@ -42,17 +32,14 @@
     <!-- svelte-ignore missing-declaration -->
     <div class="card-content lh-1">
         <span class="font-w100 hide-sm-down">{item.size}</span>
-        <div class="dropdown dd-fix" id="ddGrid-{item.uuid}" style="float: right;">
-      <span data-target="ddGrid-{item.uuid}" on:click|stopPropagation={noop}>
-        <DotDotDot/>
-      </span>
-            <ContextMenu {item} {readOnly} on:toPaste on:reload on:openPropsModal/>
+        <div class="dropdown dd-fix" style="float: right;">
+            <span on:click|stopPropagation={toProperties} class="cursor-pointer menu mr-1">️</span>
         </div>
         <div style="clear: both;">&nbsp;</div>
         <div class="font-s9 text-center">
             <img alt={item.icon} src="icons/48x48/{item.icon}.svg"/>
         </div>
         <div>&nbsp;</div>
-        <div class="text-center ellipsis">{item.name}</div>
+        <div class="text-center ellipsis pb-3">{item.name}</div>
     </div>
 </div>

@@ -238,7 +238,7 @@
     }
 </script>
 
-<nav class="navbar" style="height: 40px; z-index:799;">
+<nav class="navbar" style="height: 40px;">
     <Breadcrumb {path} on:pathEvent/>
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
@@ -319,10 +319,10 @@
     </div>
 </nav>
 {#if mode == 'GRID'}
-    <Grid itemList={mule.items} readOnly={config.readOnly} on:message={click} on:toPaste={markToPaste} on:reload
+    <Grid itemList={mule.items} on:message={click} on:toPaste={markToPaste} on:reload
           on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List itemList={mule.items} readOnly={config.readOnly} on:message={click} on:toPaste={markToPaste} on:reload
+    <List itemList={mule.items} on:message={click} on:toPaste={markToPaste} on:reload
           on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>

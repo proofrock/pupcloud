@@ -77,8 +77,7 @@
         </nav>
         <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:message={openSlideshow}
                      on:reload={reload}/>
-        <footer class="footer blue dark-2 font-s1 lh-1 hide-sm-down"
-                style="position:fixed; bottom:0; z-index:798;"><span>
+        <footer class="footer blue dark-2 font-s1 lh-1 hide-sm-down"><span>
           <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
             {config.version} - Made with <a class="pup-a" target="_blank" href="https://gofiber.io/">Fiber</a>,
           <a class="pup-a" target="_blank" href="https://useaxentix.com/">Axentix</a>,

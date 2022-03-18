@@ -20,7 +20,6 @@
     import type {File} from "../Struct.svelte";
 
     export let itemList: File[];
-    export let readOnly: boolean;
 </script>
 
 <div class="table-responsive w100">
@@ -32,7 +31,7 @@
             <th/>
         </tr>
         {#each itemList as item (item.uuid)}
-            <ListRow {item} {readOnly} on:message on:toPaste on:reload on:openPropsModal/>
+            <ListRow {item} on:message on:toPaste on:reload on:openPropsModal/>
         {/each}
     </table>
 </div>

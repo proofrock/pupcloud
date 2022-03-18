@@ -15,6 +15,22 @@
  * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
+Demo-5 in
+ https://stackoverflow.com/questions/26150963/how-to-make-this-css-hamburger-menu-entirely-clickable/26151061#26151061
+*/
+.menu {
+  width: 16px;
+  height: 14px;
+  position: relative;
+  display: inline-block;
+  top: 3px;
+  background-size: 5px 5px;
+  background-image: -webkit-linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+  background-image: -moz-linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+  background-image: linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+}
+
 .blanket {
   position: fixed;
   width: 100%;
@@ -24,6 +40,28 @@
   background: slategray;
   z-index: 0;
   padding: 0px;
+}
+
+footer {
+  position:fixed;
+  bottom:0;
+  z-index: 65532 !important;
+}
+
+nav {
+  z-index: 65532 !important;
+}
+
+.ax-overlay {
+  z-index: 65533 !important;
+}
+
+.modal {
+  z-index: 65534 !important;
+}
+
+.swal2-container {
+  z-index: 65535 !important;
 }
 
 .pup-a {
