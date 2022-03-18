@@ -81,56 +81,44 @@
     <div class="modal-header text-center">Sharing</div>
     <div class="modal-content container">
         <form>
-            <div class="grix xs-1 md-3">
-                <div class="hide-sm-down">&nbsp;</div>
-                <div>
-                    <div class="form-field">
-                        <label for="shPassword">Password</label>
-                        <input
-                                type="password"
-                                id="shPassword"
-                                class="form-control rounded-1"
-                                bind:value={shPassword}/>
-                    </div>
+            <div class="grix xs1 lg2 gutter-lg2">
+                <div class="form-field">
+                    <label for="shPassword">Password</label>
+                    <input type="password" id="shPassword" class="form-control rounded-1" bind:value={shPassword}/>
                     <div>&nbsp;</div>
-                    <div>&nbsp;</div>
-                    <div class="form-field">
-                        <label class="form-switch mx-auto">
-                            <input type="checkbox" bind:checked={readOnly}/>
-                            <span class="form-slider"/> Read Only
-                        </label>
-                    </div>
-                    <div>&nbsp;</div>
-                    <div>&nbsp;</div>
-                    <div class="form-field">
-                        <label for="token">Token</label>
-                        <select
-                                class="form-control rounded-1"
-                                id="token"
-                                bind:value={token}>
-                            {#each config.sharing.tokens as tk}
-                                <option>{tk}</option>
-                            {/each}
-                        </select>
-                    </div>
-                    <div>&nbsp;</div>
-                    <div>&nbsp;</div>
-                    <div class="form-field">
-                        <label class="form-switch mx-auto">
-                            <input type="checkbox" bind:checked={expires}/>
-                            <span class="form-slider"/> Expiry date
-                        </label>
-                    </div>
-                    {#if expires}
-                        <div class="form-field">
-                            <input
-                                    type="date"
-                                    class="form-control rounded-1"
-                                    bind:value={expiryDate}/>
-                        </div>
-                    {/if}
                 </div>
-                <div class="hide-sm-down">&nbsp;</div>
+                <div class="form-field">
+                    <label for="token">Token</label>
+                    <select class="form-control rounded-1" id="token" bind:value={token}>
+                        {#each config.sharing.tokens as tk}
+                            <option>{tk}</option>
+                        {/each}
+                    </select>
+                </div>
+            </div>
+            <div class="grix xs1 lg3 gutter-lg2">
+                <div class="form-field">
+                    <label for="ro">&nbsp;</label>
+                    <label class="form-switch mx-auto">
+                        <input type="checkbox" id="ro" bind:checked={readOnly}/>
+                        <span class="form-slider"/> Read Only
+                    </label>
+                    <div>&nbsp;</div>
+                </div>
+                <div class="form-field">
+                    <label for="exp">&nbsp;</label>
+                    <label class="form-switch mx-auto">
+                        <input type="checkbox" id="exp" bind:checked={expires}/>
+                        <span class="form-slider"/> Expires
+                    </label>
+                </div>
+                {#if expires}
+                    <div class="form-field">
+                        <label for="date">&nbsp;</label>
+                        <input type="date" id="date" class="form-control rounded-1" bind:value={expiryDate}
+                               style="margin-top: -8px;"/>
+                    </div>
+                {/if}
             </div>
         </form>
     </div>
@@ -139,9 +127,7 @@
             Copy link
         </div>
         {#if !!error}
-            <div
-                    class="p-3 my-2 rounded-2 red light-3 text-red text-dark-4"
-                    transition:fade>
+            <div class="p-3 my-2 rounded-2 red light-3 text-red text-dark-4" transition:fade>
                 {error}
             </div>
         {/if}

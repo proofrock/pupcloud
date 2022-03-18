@@ -238,18 +238,14 @@
     }
 </script>
 
-<nav class="navbar" style="height: 40px; z-index:65535;">
+<nav class="navbar" style="height: 40px; z-index:799;">
     <Breadcrumb {path} on:pathEvent/>
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
             <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
                 <IconPaste color="#BBBBBB" size={24}/>
             </div>
-            <div
-                    class="navbar-link"
-                    title="Abort paste"
-                    transition:fade
-                    on:click={unmarkToPaste}>
+            <div class="navbar-link" title="Abort paste" transition:fade on:click={unmarkToPaste}>
                 <IconUnpaste color="#BBBBBB" size={24}/>
             </div>
         {/if}
@@ -263,10 +259,7 @@
             </div>
         {/if}
         {#if config.sharing != null}
-            <div
-                    class="navbar-link"
-                    title="Share link for this folder"
-                    on:click={doOpenSharingModal}>
+            <div class="navbar-link" title="Share link for this folder" on:click={doOpenSharingModal}>
                 <IconShare size={24}/>
             </div>
         {/if}
@@ -281,11 +274,7 @@
             {/if}
         </div>
         <div class="dropdown dd-fix" id="SortBy">
-            <div
-                    class="navbar-link"
-                    data-target="SortBy"
-                    title="Sort by"
-                    style="height: 40px;">
+            <div class="navbar-link" data-target="SortBy" title="Sort by" style="height: 40px;">
                 {#if sorter == SORTERS.ABC}
                     <IconSortAlphAsc size={24}/>
                 {:else if sorter == SORTERS.CBA}
@@ -301,46 +290,28 @@
                 {/if}
             </div>
             <div class="dropdown-content dd-cnt-fix dropdown-right white shadow-1">
-                <div
-                        class="dropdown-item"
-                        on:click={resort(SORTERS.ABC)}
-                        class:active={sorter == SORTERS.ABC}
-                        title="Sort alphabetically, ascending">
+                <div class="dropdown-item" on:click={resort(SORTERS.ABC)} class:active={sorter == SORTERS.ABC}
+                     title="Sort alphabetically, ascending">
                     <IconSortAlphAsc size={24}/>
                 </div>
-                <div
-                        class="dropdown-item"
-                        on:click={resort(SORTERS.CBA)}
-                        class:active={sorter == SORTERS.CBA}
-                        title="Sort alphabetically, descending">
+                <div class="dropdown-item" on:click={resort(SORTERS.CBA)} class:active={sorter == SORTERS.CBA}
+                     title="Sort alphabetically, descending">
                     <IconSortAlphDesc size={24}/>
                 </div>
-                <div
-                        class="dropdown-item"
-                        on:click={resort(SORTERS.OldFirst)}
-                        class:active={sorter == SORTERS.OldFirst}
-                        title="Sort by date, ascending">
+                <div class="dropdown-item" on:click={resort(SORTERS.OldFirst)} class:active={sorter == SORTERS.OldFirst}
+                     title="Sort by date, ascending">
                     <IconSortDateAsc size={24}/>
                 </div>
-                <div
-                        class="dropdown-item"
-                        on:click={resort(SORTERS.OldLast)}
-                        class:active={sorter == SORTERS.OldLast}
-                        title="Sort by date, descending">
+                <div class="dropdown-item" on:click={resort(SORTERS.OldLast)} class:active={sorter == SORTERS.OldLast}
+                     title="Sort by date, descending">
                     <IconSortDateDesc size={24}/>
                 </div>
-                <div
-                        class="dropdown-item"
-                        on:click={resort(SORTERS.SmallFirst)}
-                        class:active={sorter == SORTERS.SmallFirst}
-                        title="Sort by size, ascending">
+                <div class="dropdown-item" on:click={resort(SORTERS.SmallFirst)}
+                     class:active={sorter == SORTERS.SmallFirst} title="Sort by size, ascending">
                     <IconSortSizeAsc size={24}/>
                 </div>
-                <div
-                        class="dropdown-item"
-                        on:click={resort(SORTERS.SmallLast)}
-                        class:active={sorter == SORTERS.SmallLast}
-                        title="Sort by size, descending">
+                <div class="dropdown-item" on:click={resort(SORTERS.SmallLast)}
+                     class:active={sorter == SORTERS.SmallLast} title="Sort by size, descending">
                     <IconSortSizeDesc size={24}/>
                 </div>
             </div>
@@ -348,21 +319,11 @@
     </div>
 </nav>
 {#if mode == 'GRID'}
-    <Grid
-            itemList={mule.items}
-            readOnly={config.readOnly}
-            on:message={click}
-            on:toPaste={markToPaste}
-            on:reload
-            on:openPropsModal={doOpenPropsModal}/>
+    <Grid itemList={mule.items} readOnly={config.readOnly} on:message={click} on:toPaste={markToPaste} on:reload
+          on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List
-            itemList={mule.items}
-            readOnly={config.readOnly}
-            on:message={click}
-            on:toPaste={markToPaste}
-            on:reload
-            on:openPropsModal={doOpenPropsModal}/>
+    <List itemList={mule.items} readOnly={config.readOnly} on:message={click} on:toPaste={markToPaste} on:reload
+          on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>
@@ -371,8 +332,5 @@
     <Properties bind:item={propForFile} on:closePropsModal={doClosePropsModal}/>
 {/if}
 {#if sharingOpen}
-    <Sharing
-            dir={path.join('/') + '/'}
-            {config}
-            on:closeShareModal={doCloseSharingModal}/>
+    <Sharing dir={path.join('/') + '/'} {config} on:closeShareModal={doCloseSharingModal}/>
 {/if}

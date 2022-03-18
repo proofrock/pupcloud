@@ -17,6 +17,4 @@
      */
 </script>
 
-<span
-        class="font-w600 cursor-pointer bd-1 bd-solid bd-grey bd-light-3 grey light-4
-    rounded-1">&nbsp;&middot;&middot;&middot;&nbsp;</span>
+<span class="font-w600 cursor-pointer bd-1 bd-solid bd-grey bd-light-3 grey light-4 rounded-1">&nbsp;&middot;&middot;&middot;&nbsp;</span>

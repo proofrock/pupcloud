@@ -132,8 +132,7 @@
     }
 </script>
 
-<div
-        class="dropdown-content dd-cnt-fix dropdown-right white shadow-1 rounded-3">
+<div class="dropdown-content dd-cnt-fix dropdown-right white shadow-1 rounded-3">
     {#if item.isDir && item.name == '../'}
         <div class="dropdown-item text-grey">Special dir</div>
     {:else if readOnly}
@@ -147,9 +146,7 @@
         <div class="dropdown-item" on:click|stopPropagation={toPaste(true)}>
             Cut
         </div>
-        <div
-                class="dropdown-item divider"
-                on:click|stopPropagation={toPaste(false)}>
+        <div class="dropdown-item divider" on:click|stopPropagation={toPaste(false)}>
             Copy
         </div>
         <div class="dropdown-item" on:click|stopPropagation={rename}>Rename</div>

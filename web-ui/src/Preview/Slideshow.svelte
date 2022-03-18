@@ -169,13 +169,8 @@
 <!-- svelte-ignore missing-declaration -->
 {#if fullscreen}
     <div class="blanket cursor-pointer" transition:fade/>
-    <img
-            alt={files[fileIdx].name}
-            title={files[fileIdx].name}
-            class="centered cursor-pointer"
-            src={getWS(files[fileIdx])}
-            on:click={closeFullscreen}
-            transition:fade/>
+    <img alt={files[fileIdx].name} title={files[fileIdx].name} class="centered cursor-pointer"
+         src={getWS(files[fileIdx])} on:click={closeFullscreen} transition:fade/>
 {:else}
     <div class="blanket" transition:fade>
         <div class="x-top-right cursor-pointer" on:click={close}/>
@@ -189,12 +184,8 @@
                                 <TextShower url={getWS(file)} {file}/>
                             </div>
                         {:else if isMimeTypeImage(file.mimeType)}
-                            <img
-                                    alt={file.name}
-                                    title={file.name}
-                                    class="centered centered-maxscreen cursor-pointer"
-                                    src={getWS(file)}
-                                    on:click={openFullscreen}/>
+                            <img alt={file.name} title={file.name} class="centered centered-maxscreen cursor-pointer"
+                                 src={getWS(file)} on:click={openFullscreen}/>
                         {:else if isMimeTypeVideo(file.mimeType)}
                             <div class="centered">
                                 <video controls>
@@ -210,16 +201,11 @@
                                 </audio>
                             </div>
                         {:else if isMimeTypePDF(file.mimeType)}
-                            <embed
-                                    class="centered centered-maxscreen w100 h100"
-                                    type={file.mimeType}
-                                    src={getWS(file)}/>
+                            <embed class="centered centered-maxscreen w100 h100" type={file.mimeType}
+                                   src={getWS(file)}/>
                         {/if}
                     {:else}
-                        <img
-                                class="centered"
-                                alt={file.icon}
-                                src="icons/48x48/{file.icon}.svg"/>
+                        <img class="centered" alt={file.icon} src="icons/48x48/{file.icon}.svg"/>
                     {/if}
                     <div class="caption">{file.name}</div>
                 </div>

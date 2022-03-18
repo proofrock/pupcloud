@@ -35,10 +35,7 @@
     });
 </script>
 
-<div
-        class="modal shadow-1 white rounded-3 modal-bouncing"
-        style="max-width:90vh"
-        id="modal-properties">
+<div class="modal shadow-1 white rounded-3 modal-bouncing" style="max-width:90vh" id="modal-properties">
     <div class="modal-header ellipsis">
         <img class="centered" alt={item.icon} src="icons/48x48/{item.icon}.svg"/>&nbsp;{item.name}
     </div>

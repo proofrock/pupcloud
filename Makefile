@@ -44,7 +44,7 @@ run:
 	make build
 #	bin/pupcloud -r demo-ui/public/testFs/
 #	bin/pupcloud -r demo-ui/public/testFs/ -P b133a0c0e9bee3be20163d2ad31d6248
-	bin/pupcloud -r demo-ui/public/testFs/ --share-prefix "http://localhost:17179" --share-token John:Cena
+	bin/pupcloud -r demo-ui/public/testFs/ --share-prefix "http://localhost:17179" --share-token John:Cena -P b133a0c0e9bee3be20163d2ad31d6248
 
 run-ui:
 	cd web-ui && npm install && npm run dev

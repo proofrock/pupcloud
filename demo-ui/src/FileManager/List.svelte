@@ -32,13 +32,7 @@
             <th/>
         </tr>
         {#each itemList as item (item.uuid)}
-            <ListRow
-                    {item}
-                    {readOnly}
-                    on:message
-                    on:toPaste
-                    on:reload
-                    on:openPropsModal/>
+            <ListRow {item} {readOnly} on:message on:toPaste on:reload on:openPropsModal/>
         {/each}
     </table>
 </div>

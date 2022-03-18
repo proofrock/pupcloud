@@ -35,16 +35,12 @@
     <!-- svelte-ignore a11y-missing-attribute -->
     📍
     {#if path.length > 0}
-        <a
-                on:click={goto(-1)}
-                class="font-w300 cursor-pointer"><u><i>root</i></u></a>
+        <a on:click={goto(-1)} class="font-w300 cursor-pointer"><u><i>root</i></u></a>
     {/if}&nbsp;/&nbsp;
     {#each path as pItem, idx}
         {#if idx < path.length - 1}
             <!-- svelte-ignore a11y-missing-attribute -->
-            <a
-                    on:click={goto(idx)}
-                    class="font-w300 cursor-pointer"><u>{pItem.replace('/', '')}</u></a>
+            <a on:click={goto(idx)} class="font-w300 cursor-pointer"><u>{pItem.replace('/', '')}</u></a>
         {:else}
             <span class="font-w600">{pItem.replace('/', '')}</span>
         {/if}&nbsp;/&nbsp;
