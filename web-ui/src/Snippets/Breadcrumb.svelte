@@ -16,11 +16,20 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import {createEventDispatcher} from "svelte";
+    import {onMount, onDestroy, createEventDispatcher} from "svelte";
+    import {Dropdown, destroy} from "axentix";
 
     export let path: string[] = [];
 
     const dispatch = createEventDispatcher();
+
+    onMount(() => {
+        new Dropdown("#Breadcrumb");
+    });
+
+    onDestroy(() => {
+        destroy("#Breadcrumb");
+    });
 
     function goto(idx: number) {
         return () => {
@@ -31,18 +40,30 @@
     }
 </script>
 
-<p class="font-w100" style="float: left;">
-    <!-- svelte-ignore a11y-missing-attribute -->
-    📍
-    {#if path.length > 0}
-        <a on:click={goto(-1)} class="font-w300 cursor-pointer"><u><i>root</i></u></a>
-    {/if}&nbsp;/&nbsp;
-    {#each path as pItem, idx}
-        {#if idx < path.length - 1}
-            <!-- svelte-ignore a11y-missing-attribute -->
-            <a on:click={goto(idx)} class="font-w300 cursor-pointer"><u>{pItem.replace('/', '')}</u></a>
+<div class="dropdown dd-fix" id="Breadcrumb">
+    <div class="navbar-link" data-target="Breadcrumb" title="Folder stack" style="height: 40px;">
+        📍&nbsp;<span class="triangle"></span>
+    </div>
+    <div class="dropdown-content dd-cnt-fix white shadow-1 rounded-1">
+        {#if path.length > 0}
+            <div class="dropdown-item pup-a-nobold cursor-pointer" on:click={goto(-1)}>
+                <i>root</i>
+            </div>
         {:else}
-            <span class="font-w600">{pItem.replace('/', '')}</span>
-        {/if}&nbsp;/&nbsp;
-    {/each}
-</p>
+            <div class="dropdown-item">
+                <i>root</i>
+            </div>
+        {/if}
+        {#each path as pItem, idx}
+            {#if idx < path.length - 1}
+                <div class="dropdown-item">
+                    &nbsp;/<span class="pup-a-nobold cursor-pointer" on:click={goto(idx)}>{pItem.replace('/', '')}</span>
+                </div>
+            {:else}
+                <div class="dropdown-item">
+                    &nbsp;/{pItem.replace('/', '')}
+                </div>
+            {/if}
+        {/each}
+    </div>
+</div>

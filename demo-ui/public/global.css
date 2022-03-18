@@ -20,69 +20,81 @@ Demo-5 in
  https://stackoverflow.com/questions/26150963/how-to-make-this-css-hamburger-menu-entirely-clickable/26151061#26151061
 */
 .menu {
-  width: 16px;
-  height: 14px;
-  position: relative;
-  display: inline-block;
-  top: 3px;
-  background-size: 5px 5px;
-  background-image: -webkit-linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
-  background-image: -moz-linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
-  background-image: linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+    width: 16px;
+    height: 14px;
+    position: relative;
+    display: inline-block;
+    top: 3px;
+    background-size: 5px 5px;
+    background-image: -webkit-linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+    background-image: -moz-linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+    background-image: linear-gradient(rgba(0, 0, 0, 1) 50%, transparent 50%, transparent);
+}
+
+.triangle {
+    position: relative;
+    top: 15px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid black;
 }
 
 .blanket {
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  left: 0px;
-  top: 0px;
-  background: slategray;
-  z-index: 0;
-  padding: 0px;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    background: slategray;
+    z-index: 0;
+    padding: 0px;
 }
 
 footer {
-  position:fixed;
-  bottom:0;
-  z-index: 65532 !important;
+    position: fixed;
+    bottom: 0;
+    z-index: 65532 !important;
 }
 
 nav {
-  z-index: 65532 !important;
+    z-index: 65532 !important;
 }
 
 .ax-overlay {
-  z-index: 65533 !important;
+    z-index: 65533 !important;
 }
 
 .modal {
-  z-index: 65534 !important;
+    z-index: 65534 !important;
 }
 
 .swal2-container {
-  z-index: 65535 !important;
+    z-index: 65535 !important;
 }
 
 .pup-a {
-  font-weight: bold;
-  text-decoration: underline dotted;
+    font-weight: bold;
+    text-decoration: underline dotted;
+}
+
+.pup-a-nobold {
+    text-decoration: underline dotted;
 }
 
 .ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .wid220 {
-  width: 220px;
+    width: 220px;
 }
 
 .dd-fix {
-  z-index: unset!important;
+    z-index: unset !important;
 }
 
 .dd-cnt-fix {
-  z-index: var(--ax-dropdown-z-index)!important;
+    z-index: var(--ax-dropdown-z-index) !important;
 }
