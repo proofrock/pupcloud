@@ -1,5 +1,13 @@
 {
     "version": "v0.4.2",
     "title": "🐶 Pupcloud Demo",
-    "readOnly": false
+    "readOnly": false,
+    "sharing": {
+        "allowRW": true,
+        "tokens": [
+            "John",
+            "Mary",
+            "Loreena"
+        ]
+    }
 }

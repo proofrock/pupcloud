@@ -3,11 +3,11 @@ list:
 	@LC_ALL=C $(MAKE) -pRrq -f $(lastword $(MAKEFILE_LIST)) : 2>/dev/null | awk -v RS= -F: '/^# File/,/^# Finished Make data base/ {if ($$1 !~ "^[#.]") {print $$1}}' | sort | egrep -v -e '^[^[:alnum:]]' -e '^$@$$'
 
 cleanup:
-	rm -rf bin
-	rm -rf web-ui/node_modules
-	rm -rf web-ui/public/build
-	rm -rf demo-ui/node_modules
-	rm -f src/pupcloud
+	- rm -r bin
+	- rm -r web-ui/node_modules
+	- rm -r web-ui/public/build
+	- rm -r demo-ui/node_modules
+	- rm src/pupcloud
 
 build-prepare:
 	make cleanup
@@ -16,12 +16,12 @@ build-prepare:
 build-ui:
 	make build-prepare
 	cd web-ui && npm install && npm run build
-	rm -rf src/static/*
+	- rm -r src/static/*
 	cp -r web-ui/public/* src/static/
 
 build-demo-ui:
-	rm -rf demo-ui/node_modules
-	rm -rf demo-ui/public/build
+	- rm -r demo-ui/node_modules
+	- rm -r demo-ui/public/build
 	cd demo-ui && npm install && npm run build
 
 build-static:
@@ -42,14 +42,16 @@ zbuild:
 
 run:
 	make build
-	bin/pupcloud -r demo-ui/public/testFs/
+#	bin/pupcloud -r demo-ui/public/testFs/
+#	bin/pupcloud -r demo-ui/public/testFs/ -P b133a0c0e9bee3be20163d2ad31d6248
+	bin/pupcloud -r demo-ui/public/testFs/ --share-prefix "http://localhost:17179" --share-token John:Cena -P b133a0c0e9bee3be20163d2ad31d6248
 
 run-ui:
 	cd web-ui && npm install && npm run dev
 
 run-demo-ui:
-	rm -rf demo-ui/node_modules
-	rm -rf demo-ui/public/build
+	- rm -r demo-ui/node_modules
+	- rm -r demo-ui/public/build
 	cd demo-ui && npm install && npm run dev
 
 docker:

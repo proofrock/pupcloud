@@ -10,7 +10,6 @@ would like it to have. It doesn't need a database, or a particular installation
 procedure. Just execute it and be done. In due time, it will have:
 
 - File sharing;
-- File operations (delete/copy/move...);
 - Everything that fits in a pup-sized cloud ;-)
 
 [Demo here](https://pupcloud-8a4ymrr0t-me-germanorizzo.vercel.app/)
@@ -41,14 +40,12 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 In the file system view, you can click on a file to open it. Currently pupcloud
 supports:
 
-- Images
-- Audio
-- Video
+- Images, Audio, Video (when supported by the browser)
 - PDF documents (for desktop browsers)
 - Text-like files (txt, html, sources...)
 
 Detection of file types is done by mime type, and viewing relies on the
-browser's capabilities... that are fairly complete, truth to be told.
+browser's capabilities.
 
 ## <a name="auth"></a>Authentication
 
