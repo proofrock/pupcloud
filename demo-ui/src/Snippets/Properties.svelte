@@ -113,7 +113,7 @@
             <div class="text-left col-md2">
                 <table>
                     <tr>
-                        <td>File name:</td>
+                        <th>File name:</th>
                         <td>{item.name}</td>
                     </tr>
                     <tr>
