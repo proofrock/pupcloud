@@ -18,6 +18,7 @@
 
     import {onMount, createEventDispatcher} from "svelte";
     import {Modal, destroy} from "axentix";
+    import {getCookie} from "../Utils.svelte";
     import type {File} from "../Struct.svelte";
     import Swal from "sweetalert2";
 

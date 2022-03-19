@@ -79,7 +79,6 @@
     }
 
     function markToPaste(event) {
-        console;
         toPaste = event.detail.file;
         isCut = event.detail.isCut;
     }
@@ -92,7 +91,7 @@
     async function doPaste() {
         const srv = isCut ? "move" : "copy";
 
-        const dest = path.join("/") + "/";
+        const dest = path.join("") + "/";
 
         const res: Response = await fetch(
             "/fsOps/" +
@@ -153,7 +152,7 @@
 
         const res: Response = await fetch(
             "/fsOps/newFolder?path=" +
-            encodeURIComponent(path.join("/") + "/" + name),
+            encodeURIComponent(path.join("") + "/" + name),
             {
                 method: "PUT",
                 headers: {
@@ -202,7 +201,7 @@
 
         try {
             const res: Response = await fetch(
-                "/fsOps/upload?path=" + encodeURIComponent(path.join("/") + "/"),
+                "/fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
                 {
                     method: "PUT",
                     body: fd,
@@ -248,6 +247,7 @@
 
     function doClosePropsModal(event) {
         propForFile = null;
+        reload();
     }
 
     function doOpenSharingModal(event) {
@@ -264,10 +264,10 @@
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
             <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
-                <IconPaste color="#BBBBBB" size={24}/>
+                <IconPaste color="#AA0000" size={24}/>
             </div>
             <div class="navbar-link" title="Abort paste" transition:fade on:click={unmarkToPaste}>
-                <IconUnpaste color="#BBBBBB" size={24}/>
+                <IconUnpaste color="#AA0000" size={24}/>
             </div>
         {/if}
         <div>&nbsp;</div>
@@ -340,18 +340,17 @@
     </div>
 </nav>
 {#if mode == 'GRID'}
-    <Grid itemList={mule.items} on:message={click} on:toPaste={markToPaste} on:reload
-          on:openPropsModal={doOpenPropsModal}/>
+    <Grid itemList={mule.items} on:message={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List itemList={mule.items} on:message={click} on:toPaste={markToPaste} on:reload
-          on:openPropsModal={doOpenPropsModal}/>
+    <List itemList={mule.items} on:message={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>
 <div>&nbsp;</div>
 {#if propForFile != null}
-    <Properties bind:item={propForFile} on:closePropsModal={doClosePropsModal}/>
+    <Properties bind:item={propForFile} readOnly={config.readOnly} on:toPaste={markToPaste}
+                on:closePropsModal={doClosePropsModal}/>
 {/if}
 {#if sharingOpen}
-    <Sharing dir={path.join('/') + '/'} {config} on:closeShareModal={doCloseSharingModal}/>
+    <Sharing dir={path.join("") + "/"} {config} on:closeShareModal={doCloseSharingModal}/>
 {/if}

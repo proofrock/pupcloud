@@ -39,7 +39,7 @@
              would be rendered "behind" the card under it -->
         <div class="m-3 cursor-pointer" on:click={click(item.uuid)} title={item.name}
              style="z-index: {itemList.length + 1 - i}">
-            <GridCell {item} on:toPaste on:reload on:openPropsModal/>
+            <GridCell {item} on:reload on:openPropsModal/>
         </div>
     {/each}
 </div>

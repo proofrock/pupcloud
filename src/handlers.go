@@ -126,7 +126,7 @@ func file(c *fiber.Ctx) error {
 		c.Set("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", filepath.Base(fullPath)))
 	}
 
-	return c.SendFile(fullPath)
+	return c.Status(200).SendFile(fullPath)
 }
 
 func shareLink(c *fiber.Ctx) error {

@@ -18,6 +18,7 @@
 
     import {onMount, createEventDispatcher} from "svelte";
     import {Modal, destroy} from "axentix";
+    import {getCookie} from "../Utils.svelte";
     import type {File} from "../Struct.svelte";
     import Swal from "sweetalert2";
 
@@ -128,8 +129,8 @@
                 titleText: "Done!",
                 confirmButtonColor: "#0a6bb8",
             });
+
             modal.close();
-            dispatch("reload", {});
         }
     }
 

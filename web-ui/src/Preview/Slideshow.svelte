@@ -42,7 +42,7 @@
     }
 
     function getWS(f: File, forDl: boolean = false): string {
-        return "/file?path=" + f.path + (forDl ? "&dl=1" : "");
+        return "/file?path=" + encodeURIComponent(f.path) + (forDl ? "&dl=1" : "");
     }
 
     function openFullscreen() {

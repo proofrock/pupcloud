@@ -57,11 +57,11 @@
         {#each path as pItem, idx}
             {#if idx < path.length - 1}
                 <div class="dropdown-item">
-                    &nbsp;/<span class="pup-a-nobold cursor-pointer" on:click={goto(idx)}>{pItem.replace('/', '')}</span>
+                    &nbsp;/<span class="pup-a-nobold cursor-pointer" on:click={goto(idx)}>{pItem.replace("/", "")}</span>
                 </div>
             {:else}
                 <div class="dropdown-item">
-                    &nbsp;/{pItem.replace('/', '')}
+                    &nbsp;/{pItem.replace("/", "")}
                 </div>
             {/if}
         {/each}

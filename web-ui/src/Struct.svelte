@@ -107,7 +107,7 @@
             this.owner = owner;
             this.group = group;
             this.permissions = permissions;
-            this.path = path.join("/") + this.name;
+            this.path = path.join("") + this.name;
 
             // Adapted from
             // https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript

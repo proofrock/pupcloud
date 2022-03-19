@@ -44,7 +44,7 @@
     async function loadPath(path: string[]) {
         mule = Mule.fromAny(
             await (
-                await fetch("/ls?path=" + encodeURIComponent(path.join("/")))
+                await fetch("/ls?path=" + encodeURIComponent(path.join("")))
             ).json(),
             path
         ).sort(sorter);

@@ -79,7 +79,6 @@
     }
 
     function markToPaste(event) {
-        console;
         toPaste = event.detail.file;
         isCut = event.detail.isCut;
     }
@@ -161,6 +160,7 @@
 
     function doClosePropsModal(event) {
         propForFile = null;
+        reload();
     }
 
     function doOpenSharingModal(event) {
@@ -177,10 +177,10 @@
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
             <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
-                <IconPaste color="#BBBBBB" size={24}/>
+                <IconPaste color="#AA0000" size={24}/>
             </div>
             <div class="navbar-link" title="Abort paste" transition:fade on:click={unmarkToPaste}>
-                <IconUnpaste color="#BBBBBB" size={24}/>
+                <IconUnpaste color="#AA0000" size={24}/>
             </div>
         {/if}
         <div>&nbsp;</div>
@@ -253,11 +253,9 @@
     </div>
 </nav>
 {#if mode == 'GRID'}
-    <Grid itemList={mule.items} on:message={click} on:toPaste={markToPaste} on:reload
-          on:openPropsModal={doOpenPropsModal}/>
+    <Grid itemList={mule.items} on:message={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List itemList={mule.items} on:message={click} on:toPaste={markToPaste} on:reload
-          on:openPropsModal={doOpenPropsModal}/>
+    <List itemList={mule.items} on:message={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>
@@ -267,5 +265,5 @@
                 on:closePropsModal={doClosePropsModal}/>
 {/if}
 {#if sharingOpen}
-    <Sharing dir={path.join('/') + '/'} {config} on:closeShareModal={doCloseSharingModal}/>
+    <Sharing dir={path.join("") + "/"} {config} on:closeShareModal={doCloseSharingModal}/>
 {/if}
