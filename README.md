@@ -29,7 +29,8 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 - setup authentication (see [below](#auth));
 - specify a title/brand for the window (`--title`);
 - use a different port (`-p`);
-- bind to a network interface (`--bind-to`).
+- bind to a network interface (`--bind-to`);
+- specify a maximum size for upload (`--max-upload-size`).
 
 ### Supported file types for viewing
 
