@@ -54,7 +54,7 @@ run-demo-ui:
 	cd demo-ui && npm install && npm run dev
 
 docker:
-	sudo docker build -t local_pupcloud:latest .
+	sudo docker build --no-cache -t local_pupcloud:latest .
 
 docker-publish:
 	make docker
