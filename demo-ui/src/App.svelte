@@ -68,7 +68,7 @@
 </script>
 
 <svelte:head>
-    <title>Pupcloud {config.version}</title>
+    <title>{config.title}</title>
 </svelte:head>
 <main>
     {#if slideshowIndex < 0}
