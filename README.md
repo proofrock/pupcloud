@@ -68,23 +68,24 @@ I am writing ).
 
 ## Roadmap
 
-| Feature                                    | Status | Version |
-| ------------------------------------------ | ------ |---------|
-| Basic navigation                           | ✔️     | v0.1.0  |
-| File preview/gallery                       | ✔️     | v0.1.0  |
-| Authentication                             | ✔️     | v0.2.0  |
-| Write operations (delete, copy, rename...) | ✔️     | v0.3.0  |
-| Read-only mode                             | ✔️     | v0.3.0  |
-| File upload                                | ✔️     | v0.4.0  |
-| File sharing                               | ✔️     | v0.5.0  |
-| Search                                     | ❌     |         |
-| Special file modes (permissions, links...) | ❌     |         |
-| Mobile tweaks (swipe, ...)                 | ❌     |         |
-| Multiple selection                         | ❌     |         |
-| Internationalization                       | ❌     |         |
-| Separate password for Read-Write           | ❌     |         |
-| Multiple file upload                       | ❌     |         |
-| Theming                                    | ❌     |         |
+| Feature                                    | St. | Version |
+|--------------------------------------------|-----|---------|
+| Basic navigation                           | ✔️  | v0.1.0  |
+| File preview/gallery                       | ✔️  | v0.1.0  |
+| Authentication                             | ✔️  | v0.2.0  |
+| Write operations (delete, copy, rename...) | ✔️  | v0.3.0  |
+| Read-only mode                             | ✔️  | v0.3.0  |
+| File upload                                | ✔️  | v0.4.0  |
+| Folder sharing                             | ✔️  | v0.5.0  |
+| Search                                     | ❌   |         |
+| Special file modes (permissions, links...) | ❌   |         |
+| Mobile tweaks (swipe, ...) & optimizations | ❌   |         |
+| Multiple selection                         | ❌   |         |
+| Internationalization                       | ❌   |         |
+| Separate password for Read-Write           | ❌   |         |
+| Multiple file upload                       | ❌   |         |
+| File-level sharing                         | ❌   |         |
+| Theming                                    | ❌   |         |
 
 ## Docker
 
