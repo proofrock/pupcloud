@@ -70,7 +70,7 @@
 </script>
 
 <svelte:head>
-    <title>{config.title}</title>
+    <title>{config.title.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').trim()}</title>
 </svelte:head>
 <main>
     {#if slideshowIndex < 0}
