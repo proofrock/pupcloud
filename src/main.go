@@ -43,6 +43,8 @@ import (
 
 const Version = "v0.4.2"
 
+const MiB = 1024 * 1024
+
 //go:embed static
 var static embed.FS
 
@@ -103,6 +105,7 @@ func main() {
 	tokens := flag.StringArray("share-token", []string{}, "Token for sharing, in form name:secret, multiple allowed")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface")
 	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
+	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB (default = 32 MiB)")
 
 	flag.Parse()
 
@@ -149,22 +152,23 @@ func main() {
 	if sharing.Allowed {
 		println(" - Sharing enabled")
 		println(fmt.Sprintf("   + With tokens: %s", strings.Join(sharing.TokenNames, ",")))
-		go launchSharingApp(*bindTo, *root, *title, *sharePort, &sharing)
+		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, &sharing)
 		time.Sleep(1 * time.Second)
 	}
 
-	launchMainApp(*bindTo, *root, *title, *pwdHash, *port, *readOnly, &sharing)
+	launchMainApp(*bindTo, *root, *title, *pwdHash, *port, *uploadSize, *readOnly, &sharing)
 }
 
 // FIXME limit growth
 var sessions sync.Map
 var authFailureMutex sync.Mutex
 
-func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool, sharing *sharing) {
+func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, readOnly bool, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
 			DisableStartupMessage: true,
+			BodyLimit:             uploadSize * MiB,
 		},
 	)
 
@@ -190,6 +194,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool,
 		c.Locals("title", title)
 		c.Locals("readOnly", readOnly)
 		c.Locals("sharing", sharing)
+		c.Locals("maxRequestSize", uploadSize*MiB)
 		return c.Next()
 	})
 
@@ -205,7 +210,6 @@ func launchMainApp(bindTo, root, title, pwdHash string, port int, readOnly bool,
 		app.Post("/fsOps/move", fsMove)
 		app.Post("/fsOps/copy", fsCopy)
 		app.Put("/fsOps/newFolder", fsNewFolder)
-		app.Put("/fsOps/upload", fsUpload)
 		app.Put("/fsOps/upload", fsUpload)
 	}
 
@@ -265,11 +269,12 @@ type sharInfo struct {
 	readOnly bool
 }
 
-func launchSharingApp(bindTo, root, title string, port int, sharing *sharing) {
+func launchSharingApp(bindTo, root, title string, port, uploadSize int, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
 			DisableStartupMessage: true,
+			BodyLimit:             uploadSize * MiB,
 		},
 	)
 
@@ -298,6 +303,7 @@ func launchSharingApp(bindTo, root, title string, port int, sharing *sharing) {
 		c.Locals("root", sharinfo.path)
 		c.Locals("title", title)
 		c.Locals("readOnly", sharinfo.readOnly)
+		c.Locals("maxRequestSize", uploadSize*MiB)
 		return c.Next()
 	})
 
@@ -309,7 +315,6 @@ func launchSharingApp(bindTo, root, title string, port int, sharing *sharing) {
 	app.Post("/fsOps/move", fsMove)
 	app.Post("/fsOps/copy", fsCopy)
 	app.Put("/fsOps/newFolder", fsNewFolder)
-	app.Put("/fsOps/upload", fsUpload)
 	app.Put("/fsOps/upload", fsUpload)
 
 	println(fmt.Sprintf(" - Sharing server running on port %d", port))

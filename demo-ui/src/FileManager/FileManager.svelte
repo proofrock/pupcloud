@@ -16,15 +16,15 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import {onMount, onDestroy, createEventDispatcher} from "svelte";
+    import {createEventDispatcher, onDestroy, onMount} from "svelte";
     import {fade} from "svelte/transition";
-    import {Dropdown, destroy} from "axentix";
+    import {destroy, Dropdown} from "axentix";
     import Swal from "sweetalert2";
 
     import Breadcrumb from "../Snippets/Breadcrumb.svelte";
     import Grid from "./Grid.svelte";
     import List from "./List.svelte";
-    import {File, Mule, Config, SORTERS} from "../Struct.svelte";
+    import {Config, File, Mule, SORTERS} from "../Struct.svelte";
     import {getCookie} from "../Utils.svelte";
     import IconGrid from "../SVG/IconGrid.svelte";
     import IconList from "../SVG/IconList.svelte";
@@ -134,14 +134,14 @@
     }
 
     async function doUpload() {
-        const {value: files} = await Swal.fire({
+        const {value: file} = await Swal.fire({
             titleText: "Select files",
             confirmButtonColor: "#0a6bb8",
             showCancelButton: true,
             input: "file",
         });
 
-        if (!files) return;
+        if (!file) return;
 
         await Swal.fire({
             icon: "warning",

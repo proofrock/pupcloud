@@ -1,13 +1,14 @@
 {
-    "version": "v0.4.2",
-    "title": "🐶 Pupcloud Demo",
-    "readOnly": false,
-    "sharing": {
-        "allowRW": true,
-        "tokens": [
-            "John",
-            "Mary",
-            "Loreena"
-        ]
-    }
+  "version": "v0.4.2",
+  "title": "🐶 Pupcloud Demo",
+  "readOnly": false,
+  "maxReqSize": 1048576,
+  "sharing": {
+    "allowRW": true,
+    "tokens": [
+      "John",
+      "Mary",
+      "Loreena"
+    ]
+  }
 }

@@ -38,22 +38,25 @@
         readonly version: string;
         readonly title: string;
         readonly readOnly: boolean;
+        readonly maxReqSize: number;
         readonly sharing: ConfigSharing;
 
         constructor(
             version: string,
             title: string,
             readOnly: boolean,
+            maxReqSize: number,
             sharing: ConfigSharing
         ) {
             this.version = version;
             this.title = title;
             this.readOnly = readOnly;
+            this.maxReqSize = maxReqSize;
             this.sharing = sharing;
         }
 
         static empty(): Config {
-            return new Config("", "", false, null);
+            return new Config("", "", false, -1, null);
         }
 
         static fromAny(obj: any): Config {
@@ -61,7 +64,7 @@
                 obj.sharing == null
                     ? null
                     : new ConfigSharing(obj.sharing.allowRW, obj.sharing.tokens);
-            return new Config(obj.version, obj.title, obj.readOnly, sharing);
+            return new Config(obj.version, obj.title, obj.readOnly, obj.maxReqSize, sharing);
         }
     }
 

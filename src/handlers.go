@@ -29,10 +29,11 @@ import (
 )
 
 type featuRes struct {
-	Version  string   `json:"version"`
-	Title    string   `json:"title"`
-	ReadOnly bool     `json:"readonly"`
-	Sharing  *sharing `json:"sharing,omitempty"`
+	Version        string   `json:"version"`
+	Title          string   `json:"title"`
+	ReadOnly       bool     `json:"readonly"`
+	MaxRequestSize int      `json:"maxReqSize"`
+	Sharing        *sharing `json:"sharing,omitempty"`
 }
 
 func features(c *fiber.Ctx) error {
@@ -44,10 +45,11 @@ func features(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(featuRes{
-		Version:  Version,
-		Title:    c.Locals("title").(string),
-		ReadOnly: c.Locals("readOnly").(bool),
-		Sharing:  shar,
+		Version:        Version,
+		Title:          c.Locals("title").(string),
+		ReadOnly:       c.Locals("readOnly").(bool),
+		MaxRequestSize: c.Locals("maxRequestSize").(int),
+		Sharing:        shar,
 	})
 }
 
