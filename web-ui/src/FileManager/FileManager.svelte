@@ -211,6 +211,21 @@
                     },
                 }
             );
+
+            if (res.status != 200) {
+                await Swal.fire({
+                    icon: "error",
+                    text: await res.text(),
+                    confirmButtonColor: "#0a6bb8",
+                });
+            } else {
+                await Swal.fire({
+                    icon: "success",
+                    titleText: "Done!",
+                    confirmButtonColor: "#0a6bb8",
+                });
+                reload();
+            }
         } catch (e: Error) {
             // in Firefox, some network errors (e.g. request too large)
             // are rendered as TypeError's, without further details. NOT NICE
@@ -220,21 +235,6 @@
                 confirmButtonColor: "#0a6bb8",
             });
             return;
-        }
-
-        if (res.status != 200) {
-            await Swal.fire({
-                icon: "error",
-                text: await res.text(),
-                confirmButtonColor: "#0a6bb8",
-            });
-        } else {
-            await Swal.fire({
-                icon: "success",
-                titleText: "Done!",
-                confirmButtonColor: "#0a6bb8",
-            });
-            reload();
         }
     }
 
