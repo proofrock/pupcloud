@@ -90,9 +90,9 @@ type sharing struct {
 func main() {
 	year := time.Now().Year()
 	if year == 2022 {
-		println(fmt.Sprintf("Pupcloud %s (c) 2022 Germano Rizzo", Version))
+		fmt.Println(fmt.Sprintf("Pupcloud %s (c) 2022 Germano Rizzo", Version))
 	} else {
-		println(fmt.Sprintf("Pupcloud %s (c) 2022-%d Germano Rizzo", Version, year))
+		fmt.Println(fmt.Sprintf("Pupcloud %s (c) 2022-%d Germano Rizzo", Version, year))
 	}
 
 	root := flag.StringP("root", "r", "", "The document root to serve")
@@ -110,7 +110,7 @@ func main() {
 	flag.Parse()
 
 	if *root == "" {
-		println("ERROR: You must specify a root (-r)")
+		println("ERROR: you must specify a root (-r)")
 		os.Exit(-1)
 	}
 
@@ -122,13 +122,13 @@ func main() {
 	sharing := sharing{}
 
 	if (len(*tokens) > 0) != (*sharePrefix != "") {
-		println("Both '--share-token' and '--share-prefix' must be specified")
+		println("ERROR: both '--share-token' and '--share-prefix' must be specified")
 		os.Exit(-1)
 	}
 
 	if *sharePrefix != "" {
 		if !(strings.HasPrefix(*sharePrefix, "http://") || strings.HasPrefix(*sharePrefix, "https://")) || strings.HasSuffix(*sharePrefix, "/") {
-			println("Malformed '--share-prefix': protocol must be http or https, and it must not end with a '/'")
+			println("ERROR: malformed '--share-prefix': protocol must be http or https, and it must not end with a '/'")
 			os.Exit(-1)
 		}
 	}
@@ -147,11 +147,24 @@ func main() {
 		}
 	}
 
-	println(fmt.Sprintf(" - Serving dir %s", *root))
+	fmt.Println(fmt.Sprintf(" - Serving dir %s", *root))
+	if *readOnly {
+		fmt.Println("   + Read Only")
+	}
+	if *pwdHash != "" {
+		fmt.Println("   + With password")
+	}
+	fmt.Println("   + With max upload size:", *uploadSize, "MiB")
 
 	if sharing.Allowed {
-		println(" - Sharing enabled")
-		println(fmt.Sprintf("   + With tokens: %s", strings.Join(sharing.TokenNames, ",")))
+		fmt.Println(" - Sharing enabled")
+		fmt.Println("   + With tokens: ", strings.Join(sharing.TokenNames, ","))
+		if sharing.AllowRW {
+			fmt.Println("   + Read/write")
+		} else {
+			fmt.Println("   + Read Only")
+		}
+		fmt.Println("   + At ", sharing.Prefix)
 		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, &sharing)
 		time.Sleep(1 * time.Second)
 	}
@@ -215,7 +228,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 
 	time.Sleep(1 * time.Second)
 
-	println(fmt.Sprintf(" - Server running on port %d", port))
+	fmt.Println(fmt.Sprintf(" - Server running on port %d", port))
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
 }
 
@@ -317,7 +330,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, sharing 
 	app.Put("/fsOps/newFolder", fsNewFolder)
 	app.Put("/fsOps/upload", fsUpload)
 
-	println(fmt.Sprintf(" - Sharing server running on port %d", port))
+	fmt.Println(fmt.Sprintf(" - Sharing server running on port %d", port))
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
 }
 
