@@ -89,13 +89,13 @@ See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for instr
 
 ## Credits
 
-Server:
+#### Server
 
 - [fiber](https://gofiber.io/) [MIT]
 - otiai10's [copy](https://github.com/otiai10/copy) [MIT]
 - spf13's [pflag](https://github.com/spf13/pflag) [BSD 3-Clause]
 
-Web UI:
+#### Web UI
 
 - [axentix](https://useaxentix.com/) [MIT]
 - [Material Design Icons](https://materialdesignicons.com/) [Pictogrammers Free]
@@ -105,10 +105,15 @@ Web UI:
   [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme)
   [GPLv3]
 
-Deploy:
+#### Deploy
 
 - tianon's [gosu](https://github.com/tianon/gosu/) [Apache 2]
 
-...and [Go](https://go.dev), [Typescript](https://www.typescriptlang.org),
-[VSCode](https://code.visualstudio.com) via
-[CodeServer](https://github.com/coder/code-server).
+#### Languages
+
+- [Go](https://go.dev)
+- [Typescript](https://www.typescriptlang.org)
+
+#### Tooling
+
+- Kindly supported by [JetBrains for Open Source development](https://jb.gg/OpenSourceSupport)
