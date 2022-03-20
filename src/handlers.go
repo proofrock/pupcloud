@@ -31,7 +31,7 @@ import (
 type featuRes struct {
 	Version        string   `json:"version"`
 	Title          string   `json:"title"`
-	ReadOnly       bool     `json:"readonly"`
+	ReadOnly       bool     `json:"readOnly"`
 	MaxRequestSize int      `json:"maxReqSize"`
 	Sharing        *sharing `json:"sharing,omitempty"`
 }
