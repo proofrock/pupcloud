@@ -30,7 +30,7 @@ build-static:
 
 zbuild-static:
 	make build-static
-	cd bin; 7zr a -mx9 -t7z pupcloud-v0.4.2-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
+	cd bin; 7zr a -mx9 -t7z pupcloud-v0.5.0-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
 build:
 	make build-ui
@@ -38,7 +38,7 @@ build:
 
 zbuild:
 	make build
-	cd bin; 7zr a -mx9 -t7z pupcloud-v0.4.2-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
+	cd bin; 7zr a -mx9 -t7z pupcloud-v0.5.0-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
 run:
 	make build
@@ -59,29 +59,29 @@ docker:
 docker-publish:
 	make docker
 	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:latest
-	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.4.2
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.5.0
 	sudo docker push germanorizzo/pupcloud:latest
-	sudo docker push germanorizzo/pupcloud:v0.4.2
+	sudo docker push germanorizzo/pupcloud:v0.5.0
 	sudo docker rmi local_pupcloud:latest
 	sudo docker rmi germanorizzo/pupcloud:latest
-	sudo docker rmi germanorizzo/pupcloud:v0.4.2
+	sudo docker rmi germanorizzo/pupcloud:v0.5.0
 
 docker-publish-arm:
 	make docker
 	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:latest-arm
-	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.4.2-arm
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.5.0-arm
 	sudo docker push germanorizzo/pupcloud:latest-arm
-	sudo docker push germanorizzo/pupcloud:v0.4.2-arm
+	sudo docker push germanorizzo/pupcloud:v0.5.0-arm
 	sudo docker rmi local_pupcloud:latest
 	sudo docker rmi germanorizzo/pupcloud:latest-arm
-	sudo docker rmi germanorizzo/pupcloud:v0.4.2-arm
+	sudo docker rmi germanorizzo/pupcloud:v0.5.0-arm
 
 docker-publish-arm64:
 	make docker
 	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:latest-arm64
-	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.4.2-arm64
+	sudo docker image tag local_pupcloud:latest germanorizzo/pupcloud:v0.5.0-arm64
 	sudo docker push germanorizzo/pupcloud:latest-arm64
-	sudo docker push germanorizzo/pupcloud:v0.4.2-arm64
+	sudo docker push germanorizzo/pupcloud:v0.5.0-arm64
 	sudo docker rmi local_pupcloud:latest
 	sudo docker rmi germanorizzo/pupcloud:latest-arm64
-	sudo docker rmi germanorizzo/pupcloud:v0.4.2-arm64
+	sudo docker rmi germanorizzo/pupcloud:v0.5.0-arm64
