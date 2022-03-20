@@ -6,10 +6,26 @@ Point pupcloud to a local folder and instantly get its contents exposed as a web
 files... _without a database_!
 
 Pupcloud aims to be as simple as possible, while retaining all the features you would like it to have. It doesn't need a
-database, config files or a particular installation procedure. Just execute it and be done. It has everything that fits
-in a pup-sized cloud ;-)
+database, config files or a particular installation procedure. Just run it! It has everything that fits in a pup-sized
+cloud ;-)
 
 [Demo here](https://pupcloud-8a4ymrr0t-me-germanorizzo.vercel.app/)
+
+## Features
+
+- Nothing is saved on disk (no database, no dotfiles...);
+- Authentication;
+- Read-only mode for avoiding fs writes;
+- File previews (see [below](#auth));
+- (Revokable) folder sharing, on a separate URL:
+    - Optionally read only;
+    - Authentication mandatory;
+    - Expiry date for sharing link;
+- "Branding" (you can specify the title of the app screen).
+
+It doesn't include HTTPS, as this can be done easily (and much more securely) with a reverse proxy.
+
+See the [ROADMAP](ROADMAP.md) file for a glimpse of what's in store!
 
 ## Basic usage
 
@@ -26,7 +42,7 @@ Then, open `http://localhost:17178` with a browser. As simple as that!
 Execute `pupcloud -h` to see the other configuration options. For now you can:
 
 - disable all the write operations (`--readonly`);
-- setup authentication (see [below](#auth));
+- setup authentication (`-P`, see [below](#auth));
 - specify a title/brand for the window (`--title`);
 - use a different port (`-p`);
 - bind to a network interface (`--bind-to`);
@@ -56,38 +72,21 @@ pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
 ```
 
 You can use [this site](https://emn178.github.io/online-tools/sha256.html) to hash the password, it doesn't send the
-password on the net (at least at the time I am writing ).
-
-## Roadmap
-
-| Feature                                    | St. | Version |
-|--------------------------------------------|-----|---------|
-| Basic navigation                           | ✔️  | v0.1.0  |
-| File preview/gallery                       | ✔️  | v0.1.0  |
-| Authentication                             | ✔️  | v0.2.0  |
-| Write operations (delete, copy, rename...) | ✔️  | v0.3.0  |
-| Read-only mode                             | ✔️  | v0.3.0  |
-| File upload                                | ✔️  | v0.4.0  |
-| Folder sharing                             | ✔️  | v0.5.0  |
-| Search                                     | ❌   |         |
-| Special file modes (permissions, links...) | ❌   |         |
-| Mobile tweaks (swipe, ...) & optimizations | ❌   |         |
-| Multiple selection                         | ❌   |         |
-| Internationalization                       | ❌   |         |
-| Separate password for Read-Write           | ❌   |         |
-| Multiple file upload                       | ❌   |         |
-| File-level sharing                         | ❌   |         |
-| Theming                                    | ❌   |         |
+password on the net (at least at the time I am writing, you may want to check).
 
 ## Docker
 
-See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for instructions.
+Official docker image available. See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for
+instructions.
 
 ## Known bugs
 
 - In rare cases, MIME type detection is wrong. It relies on Go builtin functions, so it needs to be investigated more.
+- On mobile, some glitches may be present. Please report them in the issue tracker!
 
 ## Credits
+
+Kindly supported by [JetBrains for Open Source development](https://jb.gg/OpenSourceSupport).
 
 #### Server
 
@@ -102,8 +101,7 @@ See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for instr
 - [svelte](https://svelte.dev/) [MIT]
 - [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT]
 - yeyushengfan258's
-  [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme)
-  [GPLv3]
+  [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme) [GPLv3]
 
 #### Deploy
 
@@ -113,7 +111,3 @@ See [DockerHub's page](https://hub.docker.com/r/germanorizzo/pupcloud) for instr
 
 - [Go](https://go.dev)
 - [Typescript](https://www.typescriptlang.org)
-
-#### Tooling
-
-- Kindly supported by [JetBrains for Open Source development](https://jb.gg/OpenSourceSupport)
