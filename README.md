@@ -105,6 +105,10 @@ Web UI:
   [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme)
   [GPLv3]
 
+Deploy:
+
+- tianon's [gosu](https://github.com/tianon/gosu/) [Apache 2]
+
 ...and [Go](https://go.dev), [Typescript](https://www.typescriptlang.org),
 [VSCode](https://code.visualstudio.com) via
 [CodeServer](https://github.com/coder/code-server).

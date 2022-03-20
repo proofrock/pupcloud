@@ -13,9 +13,14 @@ RUN go build
 
 FROM alpine:latest
 
-COPY --from=build /app/pupcloud/src/pupcloud /
-
+ENV PUID=0
+ENV PGID=0
 EXPOSE 12321
 VOLUME /data
 
-ENTRYPOINT ["/pupcloud", "-r", "/data"]
+COPY --from=build /app/pupcloud/src/pupcloud /
+COPY --from=build /app/pupcloud/docker/lib/gosu-1.14/gosu-amd64 /gosu
+RUN chmod +x /gosu
+RUN echo "Running as $PUID:$PGID"
+
+ENTRYPOINT /gosu $PUID:$PGID /pupcloud -r /data
