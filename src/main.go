@@ -95,15 +95,15 @@ func main() {
 	}
 
 	root := flag.StringP("root", "r", "", "The document root to serve")
-	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to")
-	port := flag.IntP("port", "p", 17178, "The port to run on")
-	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
-	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password")
-	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS")
-	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in form name:secret, multiple allowed")
-	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface")
-	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
-	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB (default = 32 MiB)")
+	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to (default: 0.0.0.0)")
+	port := flag.IntP("port", "p", 17178, "The port to run on (default: 17178)")
+	title := flag.String("title", "🐶 Pupcloud", "Title of the window (default: '🐶 Pupcloud')")
+	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password, if desired")
+	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: no)")
+	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in form name:secret, multiple profiles allowed")
+	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
+	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface (default: 17179)")
+	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB (default: 32 MiB)")
 
 	flag.Parse()
 
@@ -114,16 +114,14 @@ func main() {
 
 	sharing := sharing{}
 
-	if (len(*shareProfiles) > 0) != (*sharePrefix != "") {
-		println("ERROR: both '--share-profile' and '--share-prefix' must be specified")
-		os.Exit(-1)
-	}
-
 	if *sharePrefix != "" {
-		if !(strings.HasPrefix(*sharePrefix, "http://") || strings.HasPrefix(*sharePrefix, "https://")) || strings.HasSuffix(*sharePrefix, "/") {
+		if !(strings.HasPrefix(*sharePrefix, "http://") || strings.HasPrefix(*sharePrefix, "https://")) ||
+			strings.HasSuffix(*sharePrefix, "/") {
 			println("ERROR: malformed '--share-prefix': protocol must be http or https, and it must not end with a '/'")
 			os.Exit(-1)
 		}
+	} else {
+		*sharePrefix = fmt.Sprintf("http://localhost:%d", *sharePort)
 	}
 
 	if len(*shareProfiles) > 0 {
@@ -151,8 +149,8 @@ func main() {
 
 	if sharing.Allowed {
 		fmt.Println(" - Sharing enabled")
-		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ","))
-		fmt.Println("   + At ", sharing.Prefix)
+		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ", "))
+		fmt.Println("   + At", sharing.Prefix)
 		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, *readOnly, &sharing)
 		time.Sleep(1 * time.Second)
 	}
