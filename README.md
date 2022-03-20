@@ -9,7 +9,7 @@ Pupcloud aims to be as simple as possible, while retaining all the features you 
 database, config files or a particular installation procedure. Just run it! It has everything that fits in a pup-sized
 cloud ;-)
 
-[Demo here](https://pupcloud-8a4ymrr0t-me-germanorizzo.vercel.app/)
+[Demo here](https://pupcloud.vercel.app/)
 
 ## Features
 
