@@ -10,6 +10,13 @@
 | File upload                                | v0.4.0  |
 | Folder sharing                             | v0.5.0  |
 
+## v0.5.0
+
+- Folder sharing
+- UserID/GroupID support in docker
+- Ability to specify max upload size on the CLI
+- Many fixes, refactorings and performance improvements
+
 ## v0.4.2
 
 - Fixed z-indexes
