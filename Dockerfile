@@ -5,7 +5,7 @@ RUN apk upgrade
 RUN apk add --update go gcc g++ git nodejs npm
 WORKDIR /app
 ENV GOPATH /app
-RUN git clone -b develop https://github.com/proofrock/pupcloud
+RUN git clone https://github.com/proofrock/pupcloud
 WORKDIR /app/pupcloud/src
 RUN go build
 
