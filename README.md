@@ -17,7 +17,7 @@ cloud ;-)
 - Authentication;
 - Read-only mode for avoiding fs writes;
 - File previews (see [below](#auth));
-- (Revokable) folder sharing, on a separate URL:
+- (Revokable) folder sharing, on a separate URL (instructions [below](#sharing)):
     - Optionally read only;
     - Authentication mandatory;
     - Expiry date for sharing link;
@@ -73,6 +73,35 @@ pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
 
 You can use [this site](https://emn178.github.io/online-tools/sha256.html) to hash the password, it doesn't send the
 password on the net (at least at the time I am writing, you may want to check).
+
+## <a name="sharing"></a>Folder sharing
+
+Sharing a folder is possible. Pupcloud will launch a separate server, on another port, to allow to remap it on a reverse
+proxy.
+
+In order to set up a share, one or more *profiles* must be specified. Each profile is in the form *name*:*secret*, where
+the secret must not be shared with the recipient, and it's used to protect the confidentiality of the share.
+
+In the Web interface, the sharing URL can be obtained using the "share" button, and specifying:
+
+- the profile;
+- a password (mandatory);
+- an expiry date (optional);
+- if the share must be read-only.
+
+The share can be "revoked" by relaunching pupcloud without a particular profile, or changing the secret of a profile.
+All the links tied to that profile will be invalidated. Also, if the main app is launched as read-only, all its share
+links will be read-only.
+
+Relevant CLI parameters are:
+
+- `--share-profile`: a share profile, in the form *name*:*secret* (e.g. `Family:abc0123`). Can be repeated for more
+  profiles.
+- `--share-port`: the port for the share server; by default `17179`;
+- `--share-prefix`: useful when using a reverse proxy, it's the base URL of the share link. By
+  default, `http://localhost:17179`.
+
+Sharing is enabled if at least one profile is defined.
 
 ## Docker
 

@@ -95,15 +95,15 @@ func main() {
 	}
 
 	root := flag.StringP("root", "r", "", "The document root to serve")
-	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to (default: 0.0.0.0)")
-	port := flag.IntP("port", "p", 17178, "The port to run on (default: 17178)")
-	title := flag.String("title", "🐶 Pupcloud", "Title of the window (default: '🐶 Pupcloud')")
+	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to")
+	port := flag.IntP("port", "p", 17178, "The port to run on")
+	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password, if desired")
-	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: no)")
-	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in form name:secret, multiple profiles allowed")
+	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: don't)")
+	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in the form name:secret, multiple profiles allowed")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
-	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface (default: 17179)")
-	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB (default: 32 MiB)")
+	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
+	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB")
 
 	flag.Parse()
 
