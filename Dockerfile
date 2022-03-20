@@ -1,5 +1,3 @@
-# docker build -t pupcloud .
-
 FROM alpine:edge AS build
 
 RUN apk update
@@ -13,9 +11,15 @@ RUN go build
 
 FROM alpine:latest
 
-COPY --from=build /app/pupcloud/src/pupcloud /
+ARG arch
 
+ENV PUID=0
+ENV PGID=0
 EXPOSE 12321
 VOLUME /data
 
-ENTRYPOINT ["/pupcloud", "-r", "/data"]
+COPY --from=build /app/pupcloud/src/pupcloud /
+COPY --from=build /app/pupcloud/docker/lib/gosu-1.14/gosu-$arch /gosu
+RUN chmod +x /gosu
+
+ENTRYPOINT /gosu $PUID:$PGID /pupcloud -r /data

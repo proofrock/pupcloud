@@ -17,7 +17,12 @@
 package commons
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/binary"
 	"os"
+
+	"github.com/proofrock/crypgo"
 )
 
 type ErrorRes struct {
@@ -31,4 +36,72 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+// TODO generics here, see https://stackoverflow.com/questions/38654383/how-to-search-for-an-element-in-a-golang-slice
+func FindString(str string, slice []string) int {
+	for i, v := range slice {
+		if v == str {
+			return i
+		}
+	}
+	return -1
+}
+
+func boolToBytes(b bool) byte {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func intToBytes(number uint32) []byte {
+	var arr [4]byte
+	binary.BigEndian.PutUint32(arr[0:4], number)
+	return arr[:]
+}
+
+func bytesToInt(data []byte) uint32 {
+	return binary.BigEndian.Uint32(data)
+}
+
+func EncryptSharingURL(pwd, path string, readOnly bool, date *uint32) (string, error) {
+	crypgo.SetVariant(base64.URLEncoding)
+	defer crypgo.SetVariant(base64.StdEncoding)
+	var b bytes.Buffer
+	b.Write([]byte{boolToBytes(readOnly)})
+	b.WriteString(path)
+	b.Write([]byte{byte(0x00)})
+	b.Write([]byte{boolToBytes(date != nil)})
+	if date != nil {
+		b.Write(intToBytes(*date))
+	}
+	return crypgo.CompressAndEncryptBytes(pwd, b.Bytes(), 19)
+}
+
+func DecryptSharingURL(pwd, encoded string) (path string, readOnly bool, date *uint32, err error) {
+	crypgo.SetVariant(base64.URLEncoding)
+	defer crypgo.SetVariant(base64.StdEncoding)
+
+	plain, err := crypgo.DecryptBytes(pwd, encoded)
+	if err != nil {
+		return
+	}
+
+	b := bytes.NewBuffer(plain)
+
+	_readOnly, _ := b.ReadByte()
+	readOnly = _readOnly == 1
+
+	pathBytes, _ := b.ReadBytes(byte(0x00))
+	path = string(pathBytes[:len(pathBytes)-1])
+
+	if _hasDate, _ := b.ReadByte(); _hasDate == 1 {
+		bDate := make([]byte, 4)
+		b.Read(bDate)
+		_date := bytesToInt(bDate)
+		date = &_date
+	}
+
+	return
 }

@@ -1,5 +1,21 @@
 # Changelog
 
+| Feature                                    | Version |
+|--------------------------------------------|---------|
+| Basic navigation                           | v0.1.0  |
+| File preview/gallery                       | v0.1.0  |
+| Authentication                             | v0.2.0  |
+| Write operations (delete, copy, rename...) | v0.3.0  |
+| Read-only mode                             | v0.3.0  |
+| File upload                                | v0.4.0  |
+| Folder sharing                             | v0.5.0  |
+
+## v0.4.2
+
+- Fixed z-indexes
+- Improved performances when listing a huge number of items
+- Upgrade to libs
+
 ## v0.4.1
 
 - Fix: paste didn't work

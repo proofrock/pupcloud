@@ -4,6 +4,7 @@ pupcloud
 /bin
 /testFs
 /.vscode
+/.idea
 
 /web-ui/node_modules/
 /web-ui/public/build/
