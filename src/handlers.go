@@ -148,9 +148,9 @@ func shareLink(c *fiber.Ctx) error {
 	}
 	readOnly := strReadOnly == "1"
 
-	token := c.Query("token")
-	if token == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "'token' not specified")
+	profile := c.Query("profile")
+	if profile == "" {
+		return fiber.NewError(fiber.StatusBadRequest, "'profile' not specified")
 	}
 
 	var expiry *uint32
@@ -164,11 +164,11 @@ func shareLink(c *fiber.Ctx) error {
 		expiry = &expiryUInt
 	}
 
-	tkIdx := commons.FindString(token, sharing.TokenNames)
-	if tkIdx < 0 {
-		return fiber.NewError(fiber.StatusBadRequest, "Unknown token")
+	prfIdx := commons.FindString(profile, sharing.ProfileNames)
+	if prfIdx < 0 {
+		return fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
 	}
-	secret := sharing.TokenSecrets[tkIdx]
+	secret := sharing.ProfileSecrets[prfIdx]
 	password := pwd + "|" + secret
 
 	ret, err := commons.EncryptSharingURL(password, dir, readOnly, expiry)
@@ -176,7 +176,7 @@ func shareLink(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 
-	return c.Status(200).SendString(fmt.Sprintf("%s/?x=%s&tk=%s", sharing.Prefix, ret, token))
+	return c.Status(200).SendString(fmt.Sprintf("%s/?p=%s&x=%s", sharing.Prefix, profile, ret))
 }
 
 func fsDel(c *fiber.Ctx) error {

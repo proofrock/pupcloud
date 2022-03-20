@@ -24,28 +24,31 @@
     $: config = null;
 
     onMount(async () => {
-        let password: string = null;
-
         const params = new URLSearchParams(window.location.search);
 
         let url = "/features";
         if (params.has("x")) {
-            url += "?x=" + encodeURIComponent(params.get("x")) + "&tk=" + encodeURIComponent(params.get("tk"));
+            url += "?x=" + encodeURIComponent(params.get("x")) + "&p=" + encodeURIComponent(params.get("p"));
         }
 
+        let password: string = "";
+        let first = true;
         while (true) {
             const res: Response = await fetch(url, {
                 headers: {
                     "x-pupcloud-pwd": password,
                 },
             });
-            if (res.status != 499) {
-                if (res.status == 200) {
-                    const cfgObj = await res.json();
-                    config = Config.fromAny(cfgObj);
-                    break;
-                }
 
+            if (res.status == 200) {
+                const cfgObj = await res.json();
+                config = Config.fromAny(cfgObj);
+                break;
+            }
+
+            if (first)
+                first = false;
+            else {
                 await Swal.fire({
                     icon: "error",
                     text: await res.text(),

@@ -80,11 +80,10 @@ type res struct {
 }
 
 type sharing struct {
-	Allowed      bool     `json:"-"`
-	AllowRW      bool     `json:"allowRW"`
-	TokenNames   []string `json:"tokens"`
-	TokenSecrets []string `json:"-"`
-	Prefix       string   `json:"-"`
+	Allowed        bool     `json:"-"`
+	ProfileNames   []string `json:"profiles"`
+	ProfileSecrets []string `json:"-"`
+	Prefix         string   `json:"-"`
 }
 
 func main() {
@@ -101,8 +100,7 @@ func main() {
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password")
 	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS")
-	allowRWSharing := flag.Bool("allow-rw-sharing", false, "Allow to share folders as read/write")
-	tokens := flag.StringArray("share-token", []string{}, "Token for sharing, in form name:secret, multiple allowed")
+	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in form name:secret, multiple allowed")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface")
 	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
 	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB (default = 32 MiB)")
@@ -114,15 +112,10 @@ func main() {
 		os.Exit(-1)
 	}
 
-	if *readOnly && *allowRWSharing {
-		println("ERROR: cannot allow R/W shares if Read Only")
-		os.Exit(-1)
-	}
-
 	sharing := sharing{}
 
-	if (len(*tokens) > 0) != (*sharePrefix != "") {
-		println("ERROR: both '--share-token' and '--share-prefix' must be specified")
+	if (len(*shareProfiles) > 0) != (*sharePrefix != "") {
+		println("ERROR: both '--share-profile' and '--share-prefix' must be specified")
 		os.Exit(-1)
 	}
 
@@ -133,17 +126,17 @@ func main() {
 		}
 	}
 
-	if len(*tokens) > 0 {
+	if len(*shareProfiles) > 0 {
 		sharing.Allowed = true
 		sharing.Prefix = *sharePrefix
-		for i, tok := range *tokens {
+		for i, tok := range *shareProfiles {
 			pos := strings.Index(tok, ":")
 			if pos < 0 {
-				println(fmt.Sprintf("ERROR: malformed token #%d: it must have a ':'", i+1))
+				println(fmt.Sprintf("ERROR: malformed profile #%d: it must have a ':'", i+1))
 				os.Exit(-1)
 			}
-			sharing.TokenNames = append(sharing.TokenNames, tok[0:pos])
-			sharing.TokenSecrets = append(sharing.TokenSecrets, tok[pos+1:])
+			sharing.ProfileNames = append(sharing.ProfileNames, tok[0:pos])
+			sharing.ProfileSecrets = append(sharing.ProfileSecrets, tok[pos+1:])
 		}
 	}
 
@@ -158,14 +151,9 @@ func main() {
 
 	if sharing.Allowed {
 		fmt.Println(" - Sharing enabled")
-		fmt.Println("   + With tokens: ", strings.Join(sharing.TokenNames, ","))
-		if sharing.AllowRW {
-			fmt.Println("   + Read/write")
-		} else {
-			fmt.Println("   + Read Only")
-		}
+		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ","))
 		fmt.Println("   + At ", sharing.Prefix)
-		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, &sharing)
+		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, *readOnly, &sharing)
 		time.Sleep(1 * time.Second)
 	}
 
@@ -282,7 +270,7 @@ type sharInfo struct {
 	readOnly bool
 }
 
-func launchSharingApp(bindTo, root, title string, port, uploadSize int, sharing *sharing) {
+func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalReadOnly bool, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
@@ -305,7 +293,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, sharing 
 	}))
 
 	app.Use(func(c *fiber.Ctx) error {
-		sharinfo, err := doAuth4SharingApp(c, root, sharing)
+		sharinfo, err := doAuth4SharingApp(c, root, globalReadOnly, sharing)
 		if err != nil {
 			return err
 		}
@@ -334,7 +322,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, sharing 
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
 }
 
-func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, error) {
+func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *sharing) (*sharInfo, error) {
 	val := c.Cookies("pupcloud-sharing-session")
 	if val != "" {
 		if si, ok := sessions.Load(val); ok {
@@ -342,9 +330,9 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, 
 		}
 	}
 
-	token := c.Query("tk")
-	if token == "" {
-		return nil, fiber.NewError(499, "No token specified")
+	profile := c.Query("p")
+	if profile == "" {
+		return nil, fiber.NewError(499, "No profile specified")
 	}
 
 	pwd := c.Query("pwd")
@@ -358,11 +346,11 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, 
 		return nil, fiber.NewError(499, "Password required")
 	}
 
-	tkIdx := commons.FindString(token, sharing.TokenNames)
-	if tkIdx < 0 {
-		return nil, fiber.NewError(fiber.StatusBadRequest, "Unknown token")
+	prfIdx := commons.FindString(profile, sharing.ProfileNames)
+	if prfIdx < 0 {
+		return nil, fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
 	}
-	secret := sharing.TokenSecrets[tkIdx]
+	secret := sharing.ProfileSecrets[prfIdx]
 	password := pwd + "|" + secret
 
 	x := c.Query("x")
@@ -371,6 +359,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, sharing *sharing) (*sharInfo, 
 	}
 
 	partialPath, readOnly, date, err := commons.DecryptSharingURL(password, x)
+	readOnly = readOnly || globalReadOnly
 	if err != nil {
 		authFailureMutex.Lock()
 		defer authFailureMutex.Unlock()

@@ -5,7 +5,7 @@
   "maxReqSize": 1048576,
   "sharing": {
     "allowRW": true,
-    "tokens": [
+    "profiles": [
       "John",
       "Mary",
       "Loreena"

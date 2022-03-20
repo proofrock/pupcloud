@@ -26,11 +26,11 @@
 
     export class ConfigSharing {
         readonly allowRW: boolean;
-        readonly tokens: string[];
+        readonly profiles: string[];
 
-        constructor(allowRW: boolean, tokens: string[]) {
+        constructor(allowRW: boolean, profiles: string[]) {
             this.allowRW = allowRW;
-            this.tokens = tokens;
+            this.profiles = profiles;
         }
     }
 
@@ -63,7 +63,7 @@
             const sharing: ConfigSharing =
                 obj.sharing == null
                     ? null
-                    : new ConfigSharing(obj.sharing.allowRW, obj.sharing.tokens);
+                    : new ConfigSharing(obj.sharing.allowRW, obj.sharing.profiles);
             return new Config(obj.version, obj.title, obj.readOnly, obj.maxReqSize, sharing);
         }
     }

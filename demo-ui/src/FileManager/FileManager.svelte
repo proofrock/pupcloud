@@ -95,7 +95,6 @@
             confirmButtonColor: "#0a6bb8",
         });
         unmarkToPaste();
-        reload();
     }
 
     function resort(_sorter: (f1: File, f2: File) => number): () => void {
@@ -129,7 +128,6 @@
             text: "Not implemented in the demo site",
             confirmButtonColor: "#0a6bb8",
         });
-        reload();
     }
 
     async function doUpload() {
@@ -147,7 +145,6 @@
             text: "Not implemented in the demo site",
             confirmButtonColor: "#0a6bb8",
         });
-        reload();
     }
 
     function reload() {

@@ -28,7 +28,7 @@
 
     $: shPassword = "";
     $: readOnly = true;
-    $: token = config.sharing.tokens[0];
+    $: profile = config.sharing.profiles[0];
     $: expires = false;
     $: expiryDate = "";
     $: error = "";
@@ -59,8 +59,8 @@
             encodeURIComponent(dir) +
             "&readOnly=" +
             (readOnly ? "1" : "0") +
-            "&token=" +
-            encodeURIComponent(token) +
+            "&profile=" +
+            encodeURIComponent(profile) +
             (expires ? "&expiry=" + encodeURIComponent(expiryDate) : "");
 
         const res: Response = await fetch(url);
@@ -88,10 +88,10 @@
                     <div>&nbsp;</div>
                 </div>
                 <div class="form-field">
-                    <label for="token">Token</label>
-                    <select class="form-control rounded-1" id="token" bind:value={token}>
-                        {#each config.sharing.tokens as tk}
-                            <option>{tk}</option>
+                    <label for="profile">Profile</label>
+                    <select class="form-control rounded-1" id="profile" bind:value={profile}>
+                        {#each config.sharing.profiles as prf}
+                            <option>{prf}</option>
                         {/each}
                     </select>
                 </div>

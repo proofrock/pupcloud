@@ -73,7 +73,7 @@
             {#if idx < path.length - 1}
                 <div class="dropdown-item">
                     &nbsp;/&nbsp;<span class="pup-a-nobold cursor-pointer"
-                                 on:click={goto(idx)}>{pItem.replace("/", "")}</span>
+                                       on:click={goto(idx)}>{pItem.replace("/", "")}</span>
                 </div>
             {:else}
                 <div class="dropdown-item">

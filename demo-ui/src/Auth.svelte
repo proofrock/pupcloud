@@ -24,15 +24,14 @@
     $: config = null;
 
     onMount(async () => {
-        let password: string = null;
-
         const params = new URLSearchParams(window.location.search);
 
         let url = "/mocks/features.json";
         if (params.has("x")) {
-            url += "?x=" + encodeURIComponent(params.get("x")) + "&tk=" + encodeURIComponent(params.get("tk"));
+            url += "?x=" + encodeURIComponent(params.get("x")) + "&p=" + encodeURIComponent(params.get("p"));
         }
 
+        let password: string = "";
         let first = true;
         while (true) {
             const res: Response = await fetch(url, {
@@ -48,13 +47,14 @@
             }
 
             if (first)
+                first = false;
+            else {
                 await Swal.fire({
                     icon: "error",
                     text: await res.text(),
                     confirmButtonColor: "#0a6bb8",
                 });
-            else
-                first = false;
+            }
 
             const {value: pwd} = await Swal.fire({
                 titleText: "Enter password",
