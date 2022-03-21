@@ -126,6 +126,10 @@
                 );
             }
         }
+
+        getWS(forDl: boolean = false): string {
+            return "/testFs/" + this.path;
+        }
     }
 
     export const SORTERS: { [key: string]: (f1: File, f2: File) => number } = {

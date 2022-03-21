@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "axentix": "^2.0.0",
+    "hammerjs": "^2.0.8",
     "sirv-cli": "^2.0.0",
     "sweetalert2": "^11.4.4"
   }

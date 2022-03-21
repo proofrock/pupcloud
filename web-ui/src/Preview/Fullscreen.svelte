@@ -16,35 +16,94 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import {createEventDispatcher} from "svelte";
+    import {createEventDispatcher, onDestroy, onMount} from "svelte";
     import {fade} from "svelte/transition";
+    import * as Hammer from 'hammerjs';
 
     import type {File} from "../Struct.svelte";
+    import {isMimeTypeImage} from "../MimeTypes.svelte";
 
-    export let file: File;
+    export let files: File[];
+    export let fileIdx: number;
 
     const dispatch = createEventDispatcher();
 
-    async function closeFullscreen() {
-        dispatch("toggleFullscreen", {});
+    let manager;
+
+    onMount(() => {
+        document.addEventListener('keydown', handleKeyboardEvent);
+
+        manager = new Hammer.Manager(document.getElementById("img-container"));
+        manager.add(new Hammer.Swipe());
+        manager.on('swipeleft', next);
+        manager.on('swiperight', prev);
+    });
+
+    onDestroy(() => {
+        document.removeEventListener('keydown', handleKeyboardEvent);
+        manager.destroy();
+    });
+
+    // adapted from https://siongui.github.io/2012/06/25/javascript-keyboard-event-arrow-key-example/
+    function handleKeyboardEvent(evt) {
+        const keycode = evt.keyCode || evt.which;
+        switch (keycode) {
+            case 37: // Left
+                prev();
+                break;
+            case 39: // Right
+                next();
+                break;
+        }
     }
 
-    // TODO unify
-    function getWS(f: File, forDl: boolean = false): string {
-        return "/testFs/" + f.path;
+    function stepMode() {
+        dispatch("stepMode", {});
+    }
+
+    function next() {
+        const next = files.findIndex((f, i) => {
+            return i > fileIdx && isMimeTypeImage(f.mimeType)
+        });
+        if (next < 0)
+            fileIdx = files.findIndex((f) => {
+                return isMimeTypeImage(f.mimeType)
+            });
+        else
+            fileIdx = next;
+    }
+
+    function prev() {
+        function findLastIndex<T>(array: Array<T>, predicate: (value: T, index: number, obj: T[]) => boolean): number {
+            let l = array.length;
+            while (l--) {
+                if (predicate(array[l], l, array))
+                    return l;
+            }
+            return -1;
+        }
+
+        const prev = findLastIndex(files, (f, i) => {
+            return i < fileIdx && isMimeTypeImage(f.mimeType)
+        });
+        if (prev < 0)
+            fileIdx = findLastIndex(files, (f) => {
+                return isMimeTypeImage(f.mimeType)
+            });
+        else
+            fileIdx = prev;
     }
 </script>
 
 <style>
-    /* TODO unify */
-    .centered {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
+    .full-screen {
+        max-width: 100%;
+        max-height: 100%
     }
 </style>
 
-<div class="blanket cursor-pointer"></div>
-<img alt={file.name} title={file.name} class="centered cursor-pointer shadow-5" draggable="false"
-     ondragstart="return false;" src={getWS(file, false)} on:click={closeFullscreen} transition:fade/>
+<div id="img-container" class="blanket blanket-clear" transition:fade>
+    <img alt={files[fileIdx].name} title={files[fileIdx].name} draggable="false" ondragstart="return false;"
+         class="centered-slide cursor-zoom-in shadow-5 full-screen" src={files[fileIdx].getWS(false)}
+         on:click={stepMode}/>
+</div>

@@ -44,12 +44,8 @@
 
         manager = new Hammer.Manager(document.getElementById("slide-container"));
         manager.add(new Hammer.Swipe());
-        manager.on('swipeleft', function (e) {
-            next();
-        });
-        manager.on('swiperight', function (e) {
-            prev();
-        });
+        manager.on('swipeleft', next);
+        manager.on('swiperight', prev);
     });
 
     onDestroy(() => {
@@ -60,19 +56,12 @@
     // adapted from https://siongui.github.io/2012/06/25/javascript-keyboard-event-arrow-key-example/
     function handleKeyboardEvent(evt) {
         const keycode = evt.keyCode || evt.which;
-        const info = document.getElementById("info");
         switch (keycode) {
             case 37: // Left
                 prev();
                 break;
-            case 38: // Up
-                fileIdx = 0;
-                break;
             case 39: // Right
                 next();
-                break;
-            case 40: // Down
-                fileIdx = files.length - 1;
                 break;
         }
     }
@@ -81,12 +70,8 @@
         dispatch("closePreview", {});
     }
 
-    function getWS(f: File, forDl: boolean = false): string {
-        return "/testFs/" + f.path;
-    }
-
-    function openFullscreen() {
-        dispatch("toggleFullscreen", {});
+    function stepMode() {
+        dispatch("stepMode", {});
     }
 
     function next() {
@@ -110,13 +95,6 @@
         color: white;
         content: "×";
         font-size: 32px;
-    }
-
-    .centered {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
     }
 
     .centered-maxscreen {
@@ -204,45 +182,45 @@
 </style>
 
 <!-- svelte-ignore a11y-media-has-caption -->
-<div class="blanket" id="slide-container" transition:fade>
-    <div class="x-top-right cursor-pointer" on:click={close}/>
-    <div class="slideshow-container" transition:fade>
+<div id="slide-container" class="blanket" transition:fade>
+    <div class="x-top-right cursor-pointer" on:click={close}></div>
+    <div class="slideshow-container">
         <div class="numbertext">{fileIdx + 1} / {files.length}</div>
         {#if isMimeTypeSupported(files[fileIdx].mimeType)}
             {#if isMimeTypeText(files[fileIdx].mimeType)}
-                <div class="centered centered-maxscreen text-pane">
-                    <TextShower url={getWS(files[fileIdx])} file={files[fileIdx]}/>
+                <div class="centered-slide centered-maxscreen text-pane">
+                    <TextShower url={files[fileIdx].getWS(false)} file={files[fileIdx]}/>
                 </div>
             {:else if isMimeTypeImage(files[fileIdx].mimeType)}
                 <img alt={files[fileIdx].name} title={files[fileIdx].name} draggable="false"
-                     ondragstart="return false;" class="centered centered-maxscreen cursor-pointer"
-                     src={getWS(files[fileIdx])} on:click={openFullscreen}/>
+                     ondragstart="return false;" class="centered-slide centered-maxscreen cursor-zoom-in"
+                     src={files[fileIdx].getWS(false)} on:click={stepMode}/>
             {:else if isMimeTypeVideo(files[fileIdx].mimeType)}
-                <div class="centered">
+                <div class="centered-slide">
                     <video controls>
-                        <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
+                        <source src={files[fileIdx].getWS(false)} type={files[fileIdx].mimeType}/>
                         Your browser does not support the video tag.
                     </video>
                 </div>
             {:else if isMimeTypeAudio(files[fileIdx].mimeType)}
-                <div class="centered">
+                <div class="centered-slide">
                     <audio controls>
-                        <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
+                        <source src={files[fileIdx].getWS(false)} type={files[fileIdx].mimeType}/>
                         Your browser does not support the audio tag.
                     </audio>
                 </div>
             {:else if isMimeTypePDF(files[fileIdx].mimeType)}
-                <embed class="centered centered-maxscreen w100 h100" type={files[fileIdx].mimeType}
-                       src={getWS(files[fileIdx])}/>
+                <embed class="centered-slide centered-maxscreen w100 h100" type={files[fileIdx].mimeType}
+                       src={files[fileIdx].getWS(false)}/>
             {/if}
         {:else}
-            <img class="centered" alt={files[fileIdx].icon} draggable="false" ondragstart="return false;"
+            <img class="centered-slide" alt={files[fileIdx].icon} draggable="false" ondragstart="return false;"
                  src="icons/48x48/{files[fileIdx].icon}.svg"/>
         {/if}
         <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
     </div>
     <div class="download" title="Download">
-        <a target="_blank" href={getWS(files[fileIdx], true)}>
+        <a target="_blank" href={files[fileIdx].getWS(true)}>
             <IconDownload size={24} color="white"/>
         </a>
     </div>

@@ -126,6 +126,10 @@
                 );
             }
         }
+
+        getWS(forDl: boolean = false): string {
+            return "/file?path=" + encodeURIComponent(this.path) + (forDl ? "&dl=1" : "");
+        }
     }
 
     export const SORTERS: { [key: string]: (f1: File, f2: File) => number } = {
