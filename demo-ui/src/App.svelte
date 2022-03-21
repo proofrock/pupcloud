@@ -21,7 +21,7 @@
     import "./global.css";
 
     import {Config, File, Mule, SORTERS} from "./Struct.svelte";
-    import Slideshow from "./Preview/Slideshow.svelte";
+    import Preview from "./Preview/Preview.svelte";
     import FileManager from "./FileManager/FileManager.svelte";
 
     export let config: Config;
@@ -86,6 +86,6 @@
           <a class="pup-a" target="_blank" href="https://go.dev/">Go</a> and ❤️
         </span></footer>
     {:else}
-        <Slideshow files={mule.files} fileIdx={slideshowIndex} on:message={closeSlideshow}/>
+        <Preview files={mule.files} fileIdx={slideshowIndex} on:closePreview={closeSlideshow}/>
     {/if}
 </main>

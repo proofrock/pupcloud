@@ -18,6 +18,8 @@
 
     import {onMount, onDestroy, createEventDispatcher} from "svelte";
     import {fade} from "svelte/transition";
+    import * as Hammer from 'hammerjs';
+
     import type {File} from "../Struct.svelte";
     import {
         isMimeTypeText,
@@ -30,20 +32,29 @@
     import TextShower from "../Snippets/TextShower.svelte";
     import IconDownload from "../SVG/IconDownload.svelte";
 
-    export let files: File[] = [];
-    export let fileIdx: number = 0;
-
-    $: fullscreen = false;
+    export let files: File[];
+    export let fileIdx: number;
 
     const dispatch = createEventDispatcher();
 
+    let manager;
+
     onMount(() => {
         document.addEventListener('keydown', handleKeyboardEvent);
+
+        manager = new Hammer.Manager(document.getElementById("slide-container"));
+        manager.add(new Hammer.Swipe());
+        manager.on('swipeleft', function (e) {
+            next();
+        });
+        manager.on('swiperight', function (e) {
+            prev();
+        });
     });
 
     onDestroy(() => {
         document.removeEventListener('keydown', handleKeyboardEvent);
-
+        manager.destroy();
     });
 
     // adapted from https://siongui.github.io/2012/06/25/javascript-keyboard-event-arrow-key-example/
@@ -67,7 +78,7 @@
     }
 
     function close(e: Event) {
-        dispatch("message", {});
+        dispatch("closePreview", {});
     }
 
     function getWS(f: File, forDl: boolean = false): string {
@@ -75,11 +86,7 @@
     }
 
     function openFullscreen() {
-        fullscreen = true;
-    }
-
-    async function closeFullscreen() {
-        fullscreen = false;
+        dispatch("toggleFullscreen", {});
     }
 
     function next() {
@@ -197,55 +204,48 @@
 </style>
 
 <!-- svelte-ignore a11y-media-has-caption -->
-<!-- svelte-ignore missing-declaration -->
-{#if fullscreen}
-    <div class="blanket cursor-pointer" transition:fade/>
-    <img alt={files[fileIdx].name} title={files[fileIdx].name} class="centered cursor-pointer"
-         src={getWS(files[fileIdx])} on:click={closeFullscreen} transition:fade/>
-{:else}
-    <div class="blanket" transition:fade>
-        <div class="x-top-right cursor-pointer" on:click={close}/>
-        <div class="slideshow-container" transition:fade>
-            <div class="numbertext">{fileIdx + 1} / {files.length}</div>
-            {#if isMimeTypeSupported(files[fileIdx].mimeType)}
-                {#if isMimeTypeText(files[fileIdx].mimeType)}
-                    <div class="centered centered-maxscreen text-pane">
-                        <TextShower url={getWS(files[fileIdx])} file={files[fileIdx]}/>
-                    </div>
-                {:else if isMimeTypeImage(files[fileIdx].mimeType)}
-                    <img alt={files[fileIdx].name} title={files[fileIdx].name} draggable="false"
-                         ondragstart="return false;" class="centered centered-maxscreen cursor-pointer"
-                         src={getWS(files[fileIdx])} on:click={openFullscreen}/>
-                {:else if isMimeTypeVideo(files[fileIdx].mimeType)}
-                    <div class="centered">
-                        <video controls>
-                            <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
-                            Your browser does not support the video tag.
-                        </video>
-                    </div>
-                {:else if isMimeTypeAudio(files[fileIdx].mimeType)}
-                    <div class="centered">
-                        <audio controls>
-                            <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
-                            Your browser does not support the audio tag.
-                        </audio>
-                    </div>
-                {:else if isMimeTypePDF(files[fileIdx].mimeType)}
-                    <embed class="centered centered-maxscreen w100 h100" type={files[fileIdx].mimeType}
-                           src={getWS(files[fileIdx])}/>
-                {/if}
-            {:else}
-                <img class="centered" alt={files[fileIdx].icon} draggable="false" ondragstart="return false;"
-                     src="icons/48x48/{files[fileIdx].icon}.svg"/>
+<div class="blanket" id="slide-container" transition:fade>
+    <div class="x-top-right cursor-pointer" on:click={close}/>
+    <div class="slideshow-container" transition:fade>
+        <div class="numbertext">{fileIdx + 1} / {files.length}</div>
+        {#if isMimeTypeSupported(files[fileIdx].mimeType)}
+            {#if isMimeTypeText(files[fileIdx].mimeType)}
+                <div class="centered centered-maxscreen text-pane">
+                    <TextShower url={getWS(files[fileIdx])} file={files[fileIdx]}/>
+                </div>
+            {:else if isMimeTypeImage(files[fileIdx].mimeType)}
+                <img alt={files[fileIdx].name} title={files[fileIdx].name} draggable="false"
+                     ondragstart="return false;" class="centered centered-maxscreen cursor-pointer"
+                     src={getWS(files[fileIdx])} on:click={openFullscreen}/>
+            {:else if isMimeTypeVideo(files[fileIdx].mimeType)}
+                <div class="centered">
+                    <video controls>
+                        <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            {:else if isMimeTypeAudio(files[fileIdx].mimeType)}
+                <div class="centered">
+                    <audio controls>
+                        <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
+                        Your browser does not support the audio tag.
+                    </audio>
+                </div>
+            {:else if isMimeTypePDF(files[fileIdx].mimeType)}
+                <embed class="centered centered-maxscreen w100 h100" type={files[fileIdx].mimeType}
+                       src={getWS(files[fileIdx])}/>
             {/if}
-            <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
-        </div>
-        <div class="download" title="Download">
-            <a target="_blank" href={getWS(files[fileIdx], true)}>
-                <IconDownload size={24} color="white"/>
-            </a>
-        </div>
-        <div class="prev" on:click={prev}>&#10094;</div>
-        <div class="next" on:click={next}>&#10095;</div>
+        {:else}
+            <img class="centered" alt={files[fileIdx].icon} draggable="false" ondragstart="return false;"
+                 src="icons/48x48/{files[fileIdx].icon}.svg"/>
+        {/if}
+        <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
     </div>
-{/if}
+    <div class="download" title="Download">
+        <a target="_blank" href={getWS(files[fileIdx], true)}>
+            <IconDownload size={24} color="white"/>
+        </a>
+    </div>
+    <div class="prev" on:click={prev}>&#10094;</div>
+    <div class="next" on:click={next}>&#10095;</div>
+</div>
