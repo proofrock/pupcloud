@@ -16,7 +16,7 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import {createEventDispatcher} from "svelte";
+    import {onMount, onDestroy, createEventDispatcher} from "svelte";
     import {fade} from "svelte/transition";
     import type {File} from "../Struct.svelte";
     import {
@@ -36,6 +36,35 @@
     $: fullscreen = false;
 
     const dispatch = createEventDispatcher();
+
+    onMount(() => {
+        document.addEventListener('keydown', handleKeyboardEvent);
+    });
+
+    onDestroy(() => {
+        document.removeEventListener('keydown', handleKeyboardEvent);
+
+    });
+
+    // adapted from https://siongui.github.io/2012/06/25/javascript-keyboard-event-arrow-key-example/
+    function handleKeyboardEvent(evt) {
+        const keycode = evt.keyCode || evt.which;
+        const info = document.getElementById("info");
+        switch (keycode) {
+            case 37: // Left
+                prev();
+                break;
+            case 38: // Up
+                fileIdx = 0;
+                break;
+            case 39: // Right
+                next();
+                break;
+            case 40: // Down
+                fileIdx = files.length - 1;
+                break;
+        }
+    }
 
     function close(e: Event) {
         dispatch("message", {});
@@ -131,8 +160,10 @@
         color: white;
         font-weight: bold;
         font-size: 16px;
-        top: 48vh;
+        top: 50px;
+        bottom: 0px;
         padding: 16px;
+        padding-top: 48vh;
         user-select: none;
     }
 
@@ -182,7 +213,8 @@
                         <TextShower url={getWS(files[fileIdx])} file={files[fileIdx]}/>
                     </div>
                 {:else if isMimeTypeImage(files[fileIdx].mimeType)}
-                    <img alt={files[fileIdx].name} title={files[fileIdx].name} class="centered centered-maxscreen cursor-pointer"
+                    <img alt={files[fileIdx].name} title={files[fileIdx].name} draggable="false"
+                         class="centered centered-maxscreen cursor-pointer"
                          src={getWS(files[fileIdx])} on:click={openFullscreen}/>
                 {:else if isMimeTypeVideo(files[fileIdx].mimeType)}
                     <div class="centered">
@@ -203,7 +235,8 @@
                            src={getWS(files[fileIdx])}/>
                 {/if}
             {:else}
-                <img class="centered" alt={files[fileIdx].icon} src="icons/48x48/{files[fileIdx].icon}.svg"/>
+                <img class="centered" alt={files[fileIdx].icon} draggable="false"
+                     src="icons/48x48/{files[fileIdx].icon}.svg"/>
             {/if}
             <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
         </div>
