@@ -29,7 +29,7 @@
     let modal = null;
 
     onMount(() => {
-        modal = new Modal("#modal-properties");
+        modal = new Modal("#modal-properties", {bodyScrolling: true});
         const modalQuery = document.querySelector("#modal-properties");
         modalQuery.addEventListener("ax.modal.closed", function () {
             destroy("#modal-properties");

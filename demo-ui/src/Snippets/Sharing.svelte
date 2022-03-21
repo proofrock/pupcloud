@@ -36,7 +36,7 @@
     const dispatch = createEventDispatcher();
 
     onMount(() => {
-        const modal = new Modal("#modal-share");
+        const modal = new Modal("#modal-share", {bodyScrolling: true});
         const modalQuery = document.querySelector("#modal-share");
         modalQuery.addEventListener("ax.modal.closed", function () {
             destroy("#modal-share");
