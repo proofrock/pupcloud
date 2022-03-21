@@ -150,8 +150,8 @@
         font-size: 16px;
         padding: 8px 12px;
         top: 12px;
-        left: 30px;
-        right: 30px;
+        left: 50px;
+        right: 50px;
         text-align: center;
     }
 
@@ -174,43 +174,39 @@
 {:else}
     <div class="blanket" transition:fade>
         <div class="x-top-right cursor-pointer" on:click={close}/>
-        {#each files as file, idx (file.uuid)}
-            {#if fileIdx == idx}
-                <div class="slideshow-container" transition:fade>
-                    <div class="numbertext">{idx + 1} / {files.length}</div>
-                    {#if isMimeTypeSupported(file.mimeType)}
-                        {#if isMimeTypeText(file.mimeType)}
-                            <div class="centered centered-maxscreen text-pane">
-                                <TextShower url={getWS(file)} {file}/>
-                            </div>
-                        {:else if isMimeTypeImage(file.mimeType)}
-                            <img alt={file.name} title={file.name} class="centered centered-maxscreen cursor-pointer"
-                                 src={getWS(file)} on:click={openFullscreen}/>
-                        {:else if isMimeTypeVideo(file.mimeType)}
-                            <div class="centered">
-                                <video controls>
-                                    <source src={getWS(file)} type={file.mimeType}/>
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
-                        {:else if isMimeTypeAudio(file.mimeType)}
-                            <div class="centered">
-                                <audio controls>
-                                    <source src={getWS(file)} type={file.mimeType}/>
-                                    Your browser does not support the audio tag.
-                                </audio>
-                            </div>
-                        {:else if isMimeTypePDF(file.mimeType)}
-                            <embed class="centered centered-maxscreen w100 h100" type={file.mimeType}
-                                   src={getWS(file)}/>
-                        {/if}
-                    {:else}
-                        <img class="centered" alt={file.icon} src="icons/48x48/{file.icon}.svg"/>
-                    {/if}
-                    <div class="caption">{file.name}</div>
-                </div>
+        <div class="slideshow-container" transition:fade>
+            <div class="numbertext">{fileIdx + 1} / {files.length}</div>
+            {#if isMimeTypeSupported(files[fileIdx].mimeType)}
+                {#if isMimeTypeText(files[fileIdx].mimeType)}
+                    <div class="centered centered-maxscreen text-pane">
+                        <TextShower url={getWS(files[fileIdx])} file={files[fileIdx]}/>
+                    </div>
+                {:else if isMimeTypeImage(files[fileIdx].mimeType)}
+                    <img alt={files[fileIdx].name} title={files[fileIdx].name} class="centered centered-maxscreen cursor-pointer"
+                         src={getWS(files[fileIdx])} on:click={openFullscreen}/>
+                {:else if isMimeTypeVideo(files[fileIdx].mimeType)}
+                    <div class="centered">
+                        <video controls>
+                            <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                {:else if isMimeTypeAudio(files[fileIdx].mimeType)}
+                    <div class="centered">
+                        <audio controls>
+                            <source src={getWS(files[fileIdx])} type={files[fileIdx].mimeType}/>
+                            Your browser does not support the audio tag.
+                        </audio>
+                    </div>
+                {:else if isMimeTypePDF(files[fileIdx].mimeType)}
+                    <embed class="centered centered-maxscreen w100 h100" type={files[fileIdx].mimeType}
+                           src={getWS(files[fileIdx])}/>
+                {/if}
+            {:else}
+                <img class="centered" alt={files[fileIdx].icon} src="icons/48x48/{files[fileIdx].icon}.svg"/>
             {/if}
-        {/each}
+            <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
+        </div>
         <div class="download" title="Download">
             <a target="_blank" href={getWS(files[fileIdx], true)}>
                 <IconDownload size={24} color="white"/>
