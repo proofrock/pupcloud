@@ -18,6 +18,7 @@
 
     // https://stackoverflow.com/questions/56483209/import-css-in-node-modules-to-svelte
     import "../node_modules/axentix/dist/axentix.min.css";
+    import "./global.css";
 
     import {Config, File, Mule, SORTERS} from "./Struct.svelte";
     import Slideshow from "./Preview/Slideshow.svelte";
