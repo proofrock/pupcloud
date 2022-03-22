@@ -105,8 +105,14 @@ func main() {
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
 	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
 	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB")
+	allowRoot := flag.Bool("allow-root", false, "Allow launching as root (default: don't)")
 
 	flag.Parse()
+
+	if os.Geteuid() == 0 && !*allowRoot {
+		println("ERROR: running as root is forbidden; use --allow-root if you are really sure")
+		os.Exit(-1)
+	}
 
 	if *root == "" {
 		println("ERROR: you must specify a root (-r)")
