@@ -113,6 +113,11 @@ func main() {
 		os.Exit(-1)
 	}
 
+	if !commons.DirExists(*root) {
+		println("ERROR: root must exist")
+		os.Exit(-1)
+	}
+
 	sharing := sharing{}
 
 	if *sharePrefix != "" {

@@ -32,10 +32,12 @@ type ErrorRes struct {
 
 func FileExists(filename string) bool {
 	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
+	return !os.IsNotExist(err) && !info.IsDir()
+}
+
+func DirExists(filename string) bool {
+	info, err := os.Stat(filename)
+	return !os.IsNotExist(err) && info.IsDir()
 }
 
 func boolToBytes(b bool) byte {
