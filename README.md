@@ -48,6 +48,8 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 - bind to a network interface (`--bind-to`);
 - specify a maximum size for upload (`--max-upload-size`).
 
+By default, it's forbidden to run it as root. Use `--allow-root` if you (really) want to.
+
 ### Supported file types for viewing
 
 In the file system view, you can click on a file to open it. Currently pupcloud supports:
@@ -126,6 +128,7 @@ Kindly supported by [JetBrains for Open Source development](https://jb.gg/OpenSo
 #### Web UI
 
 - [axentix](https://useaxentix.com/) [MIT]
+- [hammer.js](https://github.com/hammerjs/hammer.js) [MIT]
 - [Material Design Icons](https://materialdesignicons.com/) [Pictogrammers Free]
 - [svelte](https://svelte.dev/) [MIT]
 - [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT]
