@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/proofrock/pupcloud/commons"
+	"golang.org/x/exp/slices"
 	"io/fs"
 	"log"
 	"net/http"
@@ -344,7 +345,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(499, "Password required")
 	}
 
-	prfIdx := commons.FindString(profile, sharing.ProfileNames)
+	prfIdx := slices.Index(sharing.ProfileNames, profile)
 	if prfIdx < 0 {
 		return nil, fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
 	}

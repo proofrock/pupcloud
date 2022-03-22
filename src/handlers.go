@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/proofrock/pupcloud/commons"
+	"golang.org/x/exp/slices"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -164,7 +165,7 @@ func shareLink(c *fiber.Ctx) error {
 		expiry = &expiryUInt
 	}
 
-	prfIdx := commons.FindString(profile, sharing.ProfileNames)
+	prfIdx := slices.Index(sharing.ProfileNames, profile)
 	if prfIdx < 0 {
 		return fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
 	}
