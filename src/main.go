@@ -379,6 +379,10 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(499, "Link expired")
 	}
 
+	if !commons.DirExists(sharinfo.path) {
+		return nil, fiber.NewError(499, "Shared folder doesn't exist anymore")
+	}
+
 	rnd := utils.UUIDv4()
 	cookie := new(fiber.Cookie)
 	cookie.Name = "pupcloud-sharing-session"
