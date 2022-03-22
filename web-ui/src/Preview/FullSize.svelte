@@ -16,7 +16,7 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import {createEventDispatcher} from "svelte";
+    import {createEventDispatcher, onMount} from "svelte";
     import {fade} from "svelte/transition";
 
     import type {File} from "../Struct.svelte";
@@ -28,6 +28,20 @@
     async function stepMode() {
         dispatch("stepMode", {});
     }
+
+    let img;
+
+    onMount(() => {
+        const img = document.getElementById("image");
+        const ww = window.innerWidth;
+        const wh = window.innerHeight;
+        const iw = img.clientWidth;
+        const ih = img.clientHeight;
+        if (ww > iw)
+            img.style.left = (ww - iw) / 2 + "px";
+        if (wh > ih)
+            img.style.top = (wh - ih) / 2 + "px";
+    });
 </script>
 
 <style>
@@ -39,6 +53,5 @@
 </style>
 
 <div class="blanket blanket-very-clear" transition:fade></div>
-<img alt={file.name} title={file.name} class="top-left cursor-zoom-out shadow-5" draggable="false"
+<img id="image" alt={file.name} title={file.name} class="top-left cursor-zoom-out shadow-5" draggable="false"
      ondragstart="return false;" src={file.getWS(false)} on:click={stepMode}/>
-
