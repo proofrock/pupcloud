@@ -3,6 +3,7 @@
   "title": "🐶 Pupcloud Demo",
   "readOnly": false,
   "maxReqSize": 1048576,
+  "hasPassword": false,
   "sharing": {
     "allowRW": true,
     "profiles": [

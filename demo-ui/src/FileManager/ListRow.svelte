@@ -25,9 +25,7 @@
 
     function click(uuid: string): (e: Event) => void {
         return (e: Event) => {
-            dispatch("message", {
-                uuid: uuid,
-            });
+            dispatch("openItem", {uuid: uuid,});
         };
     }
 

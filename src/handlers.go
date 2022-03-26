@@ -34,6 +34,7 @@ type featuRes struct {
 	Title          string   `json:"title"`
 	ReadOnly       bool     `json:"readOnly"`
 	MaxRequestSize int      `json:"maxReqSize"`
+	HasPassword    bool     `json:"hasPassword"`
 	Sharing        *sharing `json:"sharing,omitempty"`
 }
 
@@ -50,6 +51,7 @@ func features(c *fiber.Ctx) error {
 		Title:          c.Locals("title").(string),
 		ReadOnly:       c.Locals("readOnly").(bool),
 		MaxRequestSize: c.Locals("maxRequestSize").(int),
+		HasPassword:    c.Locals("hasPassword").(bool),
 		Sharing:        shar,
 	})
 }

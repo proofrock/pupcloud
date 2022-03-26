@@ -31,7 +31,7 @@
             <th/>
         </tr>
         {#each itemList as item (item.uuid)}
-            <ListRow {item} on:message on:reload on:openPropsModal/>
+            <ListRow {item} on:openItem on:reload on:openPropsModal/>
         {/each}
     </table>
 </div>

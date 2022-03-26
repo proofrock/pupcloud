@@ -78,8 +78,8 @@
         <nav class="navbar blue dark-2">
             <p class="navbar-brand">{config.title}</p>
         </nav>
-        <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:message={openSlideshow}
-                     on:reload={reload}/>
+        <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:openItem={openSlideshow}
+                     on:reload={reload} on:logout/>
         <footer class="footer blue dark-2 font-s1 lh-1 hide-sm-down"><span>
           <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
             {config.version} - Made with <a class="pup-a" target="_blank" href="https://gofiber.io/">Fiber</a>,

@@ -197,7 +197,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 	}))
 
 	app.Use(func(c *fiber.Ctx) error {
-		if err := doAuth4MainApp(c, pwdHash); err != nil {
+		if err := doAuth4MainApp(c, root, pwdHash); err != nil {
 			return err
 		}
 
@@ -206,6 +206,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 		c.Locals("readOnly", readOnly)
 		c.Locals("sharing", sharing)
 		c.Locals("maxRequestSize", uploadSize*MiB)
+		c.Locals("hasPassword", pwdHash != "")
 		return c.Next()
 	})
 
@@ -230,7 +231,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
 }
 
-func doAuth4MainApp(c *fiber.Ctx, pwdHash string) error {
+func doAuth4MainApp(c *fiber.Ctx, root, pwdHash string) error {
 	if pwdHash == "" {
 		return nil
 	}
@@ -239,6 +240,10 @@ func doAuth4MainApp(c *fiber.Ctx, pwdHash string) error {
 	if val != "" {
 		if _, ok := sessions.Load(val); ok {
 			return nil
+		}
+
+		if !commons.DirExists(root) {
+			return fiber.NewError(499, "Folder doesn't exist anymore")
 		}
 	}
 
@@ -278,6 +283,7 @@ func doAuth4MainApp(c *fiber.Ctx, pwdHash string) error {
 type sharInfo struct {
 	path     string
 	readOnly bool
+	expiry   *uint32
 }
 
 func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalReadOnly bool, sharing *sharing) {
@@ -315,6 +321,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 		c.Locals("title", title)
 		c.Locals("readOnly", sharinfo.readOnly)
 		c.Locals("maxRequestSize", uploadSize*MiB)
+		c.Locals("hasPassword", true)
 		return c.Next()
 	})
 
@@ -333,9 +340,20 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 }
 
 func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *sharing) (*sharInfo, error) {
+	now, _ := strconv.Atoi(time.Now().Format("20170907"))
+
 	val := c.Cookies("pupcloud-sharing-session")
 	if val != "" {
 		if si, ok := sessions.Load(val); ok {
+			sinfo := si.(*sharInfo)
+			if sinfo.expiry != nil && uint32(now) > *sinfo.expiry {
+				return nil, fiber.NewError(499, "Link expired")
+			}
+
+			if !commons.DirExists(sinfo.path) {
+				return nil, fiber.NewError(499, "Shared folder doesn't exist anymore")
+			}
+
 			return si.(*sharInfo), nil
 		}
 	}
@@ -377,9 +395,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(499, "Wrong password or invalid address")
 	}
 
-	sharinfo := sharInfo{filepath.Join(root, partialPath), readOnly}
-
-	now, _ := strconv.Atoi(time.Now().Format("20170907"))
+	sharinfo := sharInfo{filepath.Join(root, partialPath), readOnly, date}
 
 	if date != nil && uint32(now) > *date {
 		return nil, fiber.NewError(499, "Link expired")

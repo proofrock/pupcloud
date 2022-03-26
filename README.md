@@ -76,6 +76,9 @@ pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
 You can use [this site](https://emn178.github.io/online-tools/sha256.html) to hash the password, it doesn't send the
 password on the net (at least at the time I am writing, you may want to check).
 
+**BEWARE**: The password is sent in clear text over the net, so *always use a HTTPS-capable reverse proxy* if you plan
+to serve over the public internet.
+
 ## <a name="sharing"></a>Folder sharing
 
 Sharing a folder is possible. Pupcloud will launch a separate server, on another port, to allow to remap it on a reverse
