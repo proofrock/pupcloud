@@ -9,6 +9,18 @@
 | Read-only mode                             | v0.3.0  |
 | File upload                                | v0.4.0  |
 | Folder sharing                             | v0.5.0  |
+| Follow symlinks                            | v0.6.0  |
+
+## v0.6.0
+
+- Ability to follow symbolic links (`--follow-symlinks`)
+- Preview now switches between slideshow, full-screen and full size
+- Swipe support in slideshow screen, on mobile
+- It's now forbidden to run as root (unless `--allow-root`)
+- Logout (if password is required)
+- Session invalidation when preconditions fail after login (root deletion, expiration...)
+- Go 1.18
+- Minor fixes and improvements
 
 ## v0.5.0
 

@@ -4,7 +4,7 @@
     ],
     "items": [
         {
-            "mimeType": "directory",
+            "mimeType": "#directory",
             "name": "anotherDir",
             "size": -1,
             "chDate": 1645859613,

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/proofrock/pupcloud/commons"
+	filess "github.com/proofrock/pupcloud/files"
 	"golang.org/x/exp/slices"
 	"os"
 	"path/filepath"
@@ -58,55 +59,30 @@ func features(c *fiber.Ctx) error {
 
 func ls(c *fiber.Ctx) error {
 	root := c.Locals("root").(string)
+	followLinks := c.Locals("followLinks").(bool)
+
 	path := c.Query("path", "/")
 
 	rootAndPath := filepath.Join(root, path)
-	file, errPath := os.Stat(rootAndPath)
-	if errPath != nil {
-		return c.Status(fiber.StatusNotFound).SendString("Path not found")
-	}
-	if !file.IsDir() {
-		return c.Download(rootAndPath)
+
+	contents, err := filess.LsDir(rootAndPath, followLinks)
+	if err != nil {
+		return c.Status(err.Code).SendString(err.Message)
 	}
 
-	files, errPath := os.ReadDir(rootAndPath)
-	if errPath != nil {
-		return c.Status(fiber.StatusNotFound).SendString("Path not found")
-	}
-
-	res := res{Path: make([]string, 0), Items: make([]item, 0)}
-
+	var pathToReturn []string
 	for _, it := range strings.Split(path, "/") {
 		if it != "" {
-			res.Path = append(res.Path, it)
+			pathToReturn = append(pathToReturn, it)
 		}
 	}
 
-	for _, f := range files {
-		var item item
-		item.Name = f.Name()
-		finfo, finfoError := f.Info()
-		if finfoError != nil {
-			continue
-		}
-		item.ChDate = finfo.ModTime().Unix()
-		item.Permissions = finfo.Mode().String()
-		fullPath := filepath.Join(rootAndPath, f.Name())
-		item.Owner, item.Group = getUserAndGroup(fullPath)
-		if f.IsDir() {
-			item.MimeType = "directory"
-			item.Size = -1
-		} else {
-			item.MimeType = getFileContentType(fullPath)
-			item.Size = finfo.Size()
-		}
-		res.Items = append(res.Items, item)
-	}
-	return c.Status(200).JSON(res)
+	return c.Status(200).JSON(res{Path: pathToReturn, Items: contents})
 }
 
 // Adapted from https://github.com/gofiber/fiber/blob/master/middleware/filesystem/filesystem.go
 func file(c *fiber.Ctx) error {
+	followLinks := c.Locals("followLinks").(bool)
 	path := c.Query("path")
 	forDownload := c.Query("dl", "0") == "1"
 	if path == "" {
@@ -116,13 +92,13 @@ func file(c *fiber.Ctx) error {
 	root := c.Locals("root").(string)
 
 	fullPath := filepath.Join(root, path)
-	present, contentType, length := getFileInfoForHTTP(fullPath)
-	if !present {
+	item := filess.LsFile(fullPath, followLinks)
+	if item == nil {
 		return fiber.ErrNotFound
 	}
 
-	c.Set("Content-Type", contentType)
-	c.Set("Content-Length", fmt.Sprintf("%d", length))
+	c.Set("Content-Type", item.MimeType)
+	c.Set("Content-Length", fmt.Sprintf("%d", item.Size))
 	if forDownload {
 		c.Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filepath.Base(fullPath)))
 	} else {
@@ -218,7 +194,7 @@ func fsRename(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(filepath.Dir(fullPath), nuName)
 
-	if commons.FileExists(newPath) {
+	if filess.FileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
@@ -245,7 +221,7 @@ func fsMove(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
 
-	if commons.FileExists(newPath) {
+	if filess.FileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
@@ -272,7 +248,7 @@ func fsCopy(c *fiber.Ctx) error {
 	fullPath := filepath.Join(root, path)
 	newPath := filepath.Join(root, destDir, filepath.Base(fullPath))
 
-	if commons.FileExists(newPath) {
+	if filess.FileExists(newPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 
@@ -297,7 +273,7 @@ func fsNewFolder(c *fiber.Ctx) error {
 
 	fullPath := filepath.Join(root, path)
 
-	if commons.FileExists(fullPath) {
+	if filess.FileExists(fullPath) {
 		return fiber.NewError(fiber.StatusBadRequest, "File already exists")
 	}
 

@@ -44,12 +44,12 @@
 <tr>
     <td on:click={click(item.uuid)}>
         <div class="cursor-pointer wid220 ellipsis hide-md-up">
-            <img alt={item.icon} class="txt-mid" src="icons/16x16/{item.icon}.svg"/>&nbsp;<span
-                class="txt-mid">{item.name}</span>
+            <img alt={item.icon[0]} class="txt-mid" src="icons/16x16/{item.icon[0]}.svg"/>&nbsp;<span
+                class="txt-mid">{item.icon[2]}{item.name}</span>
         </div>
         <div class="cursor-pointer hide-sm-down">
-            <img alt={item.icon} class="txt-mid" src="icons/16x16/{item.icon}.svg"/>&nbsp;<span
-                class="txt-mid">{item.name}</span>
+            <img alt={item.icon[0]} class="txt-mid" src="icons/16x16/{item.icon[0]}.svg"/>&nbsp;<span
+                class="txt-mid">{item.icon[2]}{item.name}</span>
         </div>
     </td>
     <td>{item.size}</td>

@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/proofrock/pupcloud/commons"
+	filess "github.com/proofrock/pupcloud/files"
 	"golang.org/x/exp/slices"
 	"io/fs"
 	"log"
@@ -65,19 +66,9 @@ func errHandler(ctx *fiber.Ctx, err error) error {
 	return ctx.Status(code).SendString(msg)
 }
 
-type item struct {
-	MimeType    string `json:"mimeType"`
-	Name        string `json:"name"`
-	Size        int64  `json:"size"`
-	ChDate      int64  `json:"chDate"`
-	Owner       string `json:"owner"`
-	Group       string `json:"group"`
-	Permissions string `json:"permissions"`
-}
-
 type res struct {
-	Path  []string `json:"path"`
-	Items []item   `json:"items"`
+	Path  []string      `json:"path"`
+	Items []filess.Item `json:"items"`
 }
 
 type sharing struct {
@@ -106,6 +97,7 @@ func main() {
 	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
 	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB")
 	allowRoot := flag.Bool("allow-root", false, "Allow launching as root (default: don't)")
+	followLinks := flag.Bool("follow-symlinks", false, "Follow symlinks when traversing directories (default: don't)")
 
 	flag.Parse()
 
@@ -163,18 +155,18 @@ func main() {
 		fmt.Println(" - Sharing enabled")
 		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ", "))
 		fmt.Println("   + At", sharing.Prefix)
-		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, *readOnly, &sharing)
+		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, *readOnly, *followLinks, &sharing)
 		time.Sleep(1 * time.Second)
 	}
 
-	launchMainApp(*bindTo, *root, *title, *pwdHash, *port, *uploadSize, *readOnly, &sharing)
+	launchMainApp(*bindTo, *root, *title, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
 }
 
 // FIXME limit growth
 var sessions sync.Map
 var authFailureMutex sync.Mutex
 
-func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, readOnly bool, sharing *sharing) {
+func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, readOnly, followLinks bool, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
@@ -207,6 +199,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 		c.Locals("sharing", sharing)
 		c.Locals("maxRequestSize", uploadSize*MiB)
 		c.Locals("hasPassword", pwdHash != "")
+		c.Locals("followLinks", followLinks)
 		return c.Next()
 	})
 
@@ -286,7 +279,7 @@ type sharInfo struct {
 	expiry   *uint32
 }
 
-func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalReadOnly bool, sharing *sharing) {
+func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalReadOnly, followLinks bool, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
@@ -322,6 +315,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 		c.Locals("readOnly", sharinfo.readOnly)
 		c.Locals("maxRequestSize", uploadSize*MiB)
 		c.Locals("hasPassword", true)
+		c.Locals("followLinks", followLinks)
 		return c.Next()
 	})
 

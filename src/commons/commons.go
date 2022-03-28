@@ -30,11 +30,6 @@ type ErrorRes struct {
 	Message string `json:"msg"`
 }
 
-func FileExists(filename string) bool {
-	info, err := os.Stat(filename)
-	return !os.IsNotExist(err) && !info.IsDir()
-}
-
 func DirExists(filename string) bool {
 	info, err := os.Stat(filename)
 	return !os.IsNotExist(err) && info.IsDir()

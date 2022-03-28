@@ -2,7 +2,7 @@
     "path": [],
     "items": [
         {
-            "mimeType": "directory",
+            "mimeType": "#directory",
             "name": "thisIsADir",
             "size": -1,
             "chDate": 1645859590,

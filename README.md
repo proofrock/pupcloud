@@ -46,6 +46,7 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 - specify a title/brand for the window (`--title`);
 - use a different port (`-p`);
 - bind to a network interface (`--bind-to`);
+- instruct pupcloud to follow symlinks (`--follow-symlinks`);
 - specify a maximum size for upload (`--max-upload-size`).
 
 By default, it's forbidden to run it as root. Use `--allow-root` if you (really) want to.

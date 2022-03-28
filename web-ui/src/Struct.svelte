@@ -19,8 +19,8 @@
     import {getIcon} from "./MimeTypes.svelte";
 
     function sortDirs(f1: File, f2: File): number {
-        const f1Dir = f1.mimeType === "directory";
-        const f2Dir = f2.mimeType === "directory";
+        const f1Dir = f1.mimeType === "#directory";
+        const f2Dir = f2.mimeType === "#directory";
         return f1Dir == f2Dir ? 0 : f2Dir ? 1 : -1;
     }
 
@@ -76,7 +76,8 @@
         readonly mimeType: string;
         readonly isDir: boolean;
         readonly isRoot: boolean;
-        readonly icon: string;
+        readonly isLink: boolean;
+        readonly icon: string[];
         readonly name: string;
         readonly path: string;
         readonly size: string;
@@ -88,6 +89,7 @@
         readonly permissions: string;
 
         constructor(
+            isLink: boolean,
             mimeType: string,
             name: string,
             size: number,
@@ -99,9 +101,10 @@
         ) {
             this.uuid = Math.random().toString().substring(2);
             this.mimeType = mimeType;
-            this.isDir = mimeType == "directory";
+            this.isDir = mimeType == "#directory";
             this.isRoot = this.isDir && this.name == "..";
-            this.icon = getIcon(mimeType);
+            this.isLink = isLink;
+            this.icon = getIcon(this);
             this.name = name + (this.isDir ? "/" : "");
             this.size = formatBytes(size);
             this.numSize = size;
@@ -168,6 +171,7 @@
         constructor(items: any[], path: string[]) {
             for (let i = 0; i < items.length; i++) {
                 const nf = new File(
+                    items[i].isLink,
                     items[i].mimeType,
                     items[i].name,
                     items[i].size,
@@ -185,7 +189,7 @@
             if (path.length > 0) {
                 // Is not root
                 this.items.unshift(
-                    new File("directory", "..", -1, 0, "--", "--", "--", path)
+                    new File(false, "#directory", "..", -1, 0, "--", "--", "--", path)
                 );
             }
         }
