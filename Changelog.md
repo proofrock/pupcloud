@@ -11,7 +11,7 @@
 | Folder sharing                             | v0.5.0  |
 | Follow symlinks                            | v0.6.0  |
 
-## v0.6.0
+## v0.6.1
 
 - Ability to follow symbolic links (`--follow-symlinks`)
 - Preview now switches between slideshow, full-screen and full size

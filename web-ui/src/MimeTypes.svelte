@@ -1,7 +1,6 @@
 <script lang="ts" context="module">
     /*
-    // Is there a good source of *supported* formats? If not,
-    // limiting to a partial list could be worse than just
+    // Is there a good source of *supported* formats? If not, limiting to a partial list could be worse than just
     // allowing everything.
     const imgMimeTypes = new Set([
       "image/apng",
@@ -16,8 +15,6 @@
       "image/tiff",
     ]);
     */
-
-    import {File} from "./Struct.svelte";
 
     export function isMimeTypeImage(mt: string) {
         return mt.startsWith("image/");
@@ -49,17 +46,17 @@
         );
     }
 
-    export function getIcon(f: File): string[] {
+    export function getIcon(mimeType: string, isLink: boolean): string[] {
         const icon: string =
-            f.mimeType == "#directory" ? "file-manager"
-                : isMimeTypeImage(f.mimeType) ? "image-x-generic"
-                    : isMimeTypeVideo(f.mimeType) ? "video-x-generic"
-                        : isMimeTypeAudio(f.mimeType) ? "audio-x-generic"
-                            : isMimeTypeText(f.mimeType) ? "text-x-generic"
-                                : isMimeTypePDF(f.mimeType) ? "application-pdf"
+            mimeType == "#directory" ? "file-manager"
+                : isMimeTypeImage(mimeType) ? "image-x-generic"
+                    : isMimeTypeVideo(mimeType) ? "video-x-generic"
+                        : isMimeTypeAudio(mimeType) ? "audio-x-generic"
+                            : isMimeTypeText(mimeType) ? "text-x-generic"
+                                : isMimeTypePDF(mimeType) ? "application-pdf"
                                     : "application-octet-stream"; // this is also for links
-        return f.mimeType == "#unresolved" ? [icon, "invalidLink", "🔗 "]
-            : f.isLink ? [icon, "link", "🔗 "]
+        return mimeType == "#unresolved" ? [icon, "invalidLink", "🔗 "]
+            : isLink ? [icon, "link", "🔗 "]
                 : [icon, null, ""];
     }
 </script>
