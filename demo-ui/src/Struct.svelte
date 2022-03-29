@@ -104,7 +104,7 @@
             this.isDir = mimeType == "#directory";
             this.isRoot = this.isDir && this.name == "..";
             this.isLink = isLink;
-            this.icon = getIcon(this);
+            this.icon = getIcon(this.mimeType, this.isLink);
             this.name = name + (this.isDir ? "/" : "");
             this.size = formatBytes(size);
             this.numSize = size;

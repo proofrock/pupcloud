@@ -43,7 +43,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const Version = "v0.6.1"
+const Version = "v0.6.2"
 
 const MiB = 1024 * 1024
 

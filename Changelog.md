@@ -2,16 +2,16 @@
 
 | Feature                                    | Version |
 |--------------------------------------------|---------|
-| Basic navigation                           | v0.1.0  |
-| File preview/gallery                       | v0.1.0  |
-| Authentication                             | v0.2.0  |
-| Write operations (delete, copy, rename...) | v0.3.0  |
-| Read-only mode                             | v0.3.0  |
-| File upload                                | v0.4.0  |
-| Folder sharing                             | v0.5.0  |
-| Follow symlinks                            | v0.6.0  |
+| Basic navigation                           | v0.1.x  |
+| File preview/gallery                       | v0.1.x  |
+| Authentication                             | v0.2.x  |
+| Write operations (delete, copy, rename...) | v0.3.x  |
+| Read-only mode                             | v0.3.x  |
+| File upload                                | v0.4.x  |
+| Folder sharing                             | v0.5.x  |
+| Follow symlinks                            | v0.6.x  |
 
-## v0.6.1
+## v0.6.2
 
 - Ability to follow symbolic links (`--follow-symlinks`)
 - Preview now switches between slideshow, full-screen and full size
