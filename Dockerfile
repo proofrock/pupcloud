@@ -11,15 +11,16 @@ RUN go build
 
 FROM alpine:latest
 
-ARG arch
-
-ENV PUID=0
-ENV PGID=0
+ENV PUID=1000
+ENV PGID=1000
 EXPOSE 12321
 VOLUME /data
 
 COPY --from=build /app/pupcloud/src/pupcloud /
-COPY --from=build /app/pupcloud/docker/lib/gosu-1.14/gosu-$arch /gosu
-RUN chmod +x /gosu
 
-ENTRYPOINT /gosu $PUID:$PGID /pupcloud -r /data
+RUN addgroup -g $PGID pup
+RUN adduser -u $PUID -G pup -D pup
+
+USER pup:pup
+
+ENTRYPOINT ["/pupcloud", "-r", "/data"]
