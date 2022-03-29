@@ -45,9 +45,24 @@ Demo-5 in
     height: 100%;
     left: 0px;
     top: 0px;
-    background: slategray;
+    background: #444444;
     z-index: 0;
     padding: 0px;
+}
+
+.blanket-clear {
+    background: #888888;
+}
+
+.blanket-very-clear {
+    background: #CCCCCC;
+}
+
+.centered-slide {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 footer {

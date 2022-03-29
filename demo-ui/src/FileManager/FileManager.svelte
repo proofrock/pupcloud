@@ -42,6 +42,7 @@
     import IconShare from "../SVG/IconShare.svelte";
     import Properties from "../Snippets/Properties.svelte";
     import Sharing from "../Snippets/Sharing.svelte";
+    import IconLogout from "../SVG/IconLogout.svelte";
 
     export let path: string[];
     export let mule: Mule;
@@ -74,7 +75,7 @@
             else path = [...path, file.name];
             dispatch("pathEvent", {path: path});
         } else {
-            dispatch("message", event.detail);
+            dispatch("openItem", event.detail);
         }
     }
 
@@ -167,6 +168,10 @@
     function doCloseSharingModal(event) {
         sharingOpen = false;
     }
+
+    function logout() {
+        dispatch("logout", {});
+    }
 </script>
 
 <nav class="navbar" style="height: 40px;">
@@ -247,12 +252,17 @@
                 </div>
             </div>
         </div>
+        {#if config.hasPassword}
+            <div class="navbar-link" title="Log out" on:click={logout}>
+                <IconLogout size={24}/>
+            </div>
+        {/if}
     </div>
 </nav>
 {#if mode == 'GRID'}
-    <Grid itemList={mule.items} on:message={click} on:reload on:openPropsModal={doOpenPropsModal}/>
+    <Grid itemList={mule.items} on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List itemList={mule.items} on:message={click} on:reload on:openPropsModal={doOpenPropsModal}/>
+    <List itemList={mule.items} on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>

@@ -18,6 +18,8 @@
 
     import type {File} from "../Struct.svelte";
     import {createEventDispatcher} from "svelte";
+    import IconLink from "../SVG/IconLink.svelte";
+    import IconInvalidLink from "../SVG/IconInvalidLink.svelte";
 
     export let item: File;
 
@@ -36,8 +38,17 @@
             <span on:click|stopPropagation={toProperties} class="cursor-pointer menu mr-1">️</span>
         </div>
         <div style="clear: both;">&nbsp;</div>
-        <div class="font-s9 text-center">
-            <img alt={item.icon} src="icons/48x48/{item.icon}.svg"/>
+        <div class="text-center">
+            {#if !!item.icon[1]}
+                <img alt={item.icon[0]} src="icons/48x48/{item.icon[0]}.svg" style="position: relative; left: 12px"/>
+                {#if item.icon[1] == "link"}
+                    <IconLink size="22"/>
+                {:else }
+                    <IconInvalidLink size="22"/>
+                {/if}
+            {:else}
+                <img alt={item.icon[0]} src="icons/48x48/{item.icon[0]}.svg"/>
+            {/if}
         </div>
         <div>&nbsp;</div>
         <div class="text-center ellipsis pb-3">{item.name}</div>

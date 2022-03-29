@@ -21,9 +21,16 @@
     import {onMount} from "svelte";
     import Swal from "sweetalert2";
 
+    let cycleHandler: number = -1;
+    let firstAuth: boolean = true;
+
     $: config = null;
 
     onMount(async () => {
+        await auth();
+    });
+
+    async function auth() {
         const params = new URLSearchParams(window.location.search);
 
         let url = "/mocks/features.json";
@@ -32,22 +39,33 @@
         }
 
         let password: string = "";
-        let first = true;
         while (true) {
-            const res: Response = await fetch(url, {
-                headers: {
-                    "x-pupcloud-pwd": password,
-                },
-            });
+            let res: Response | any = null;
+            try {
+                res = await fetch(url, {
+                    headers: {
+                        "x-pupcloud-pwd": password,
+                    },
+                });
+            } catch (e) {
+                res = {
+                    status: 500,
+                    text: () => "Server is down"
+                }
+            }
 
             if (res.status == 200) {
                 const cfgObj = await res.json();
                 config = Config.fromAny(cfgObj);
+                if (config.hasPassword)
+                    cycleHandler = setTimeout(auth, 2000);
                 break;
             }
 
-            if (first)
-                first = false;
+            config = null;
+
+            if (firstAuth)
+                firstAuth = false;
             else {
                 await Swal.fire({
                     icon: "error",
@@ -67,11 +85,27 @@
             });
             password = pwd;
         }
-    });
+    }
+
+    // adapted from https://www.geeksforgeeks.org/how-to-clear-all-cookies-using-javascript/
+    function deleteCookies() {
+        const allCookies = document.cookie.split(';');
+        for (let i = 0; i < allCookies.length; i++)
+            document.cookie = allCookies[i] + "=;expires=" + new Date(0).toUTCString();
+    }
+
+    async function logout() {
+        deleteCookies();
+        config = null;
+        firstAuth = true;
+        if (cycleHandler >= 0)
+            clearTimeout(cycleHandler);
+        await auth();
+    }
 </script>
 
 {#if config != null}
-    <App {config}/>
+    <App {config} on:logout={logout}/>
 {:else}
     <div class="blanket"/>
 {/if}

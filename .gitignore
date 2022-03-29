@@ -5,6 +5,7 @@ pupcloud
 /testFs
 /.vscode
 /.idea
+/TODO.md
 
 /web-ui/node_modules/
 /web-ui/public/build/

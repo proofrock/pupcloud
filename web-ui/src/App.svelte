@@ -18,9 +18,10 @@
 
     // https://stackoverflow.com/questions/56483209/import-css-in-node-modules-to-svelte
     import "../node_modules/axentix/dist/axentix.min.css";
+    import "./global.css";
 
     import {Config, File, Mule, SORTERS} from "./Struct.svelte";
-    import Slideshow from "./Preview/Slideshow.svelte";
+    import Preview from "./Preview/Preview.svelte";
     import FileManager from "./FileManager/FileManager.svelte";
 
     export let config: Config;
@@ -77,8 +78,8 @@
         <nav class="navbar blue dark-2">
             <p class="navbar-brand">{config.title}</p>
         </nav>
-        <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:message={openSlideshow}
-                     on:reload={reload}/>
+        <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:openItem={openSlideshow}
+                     on:reload={reload} on:logout/>
         <footer class="footer blue dark-2 font-s1 lh-1 hide-sm-down"><span>
           <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
             {config.version} - Made with <a class="pup-a" target="_blank" href="https://gofiber.io/">Fiber</a>,
@@ -87,6 +88,6 @@
           <a class="pup-a" target="_blank" href="https://go.dev/">Go</a> and ❤️
         </span></footer>
     {:else}
-        <Slideshow files={mule.files} fileIdx={slideshowIndex} on:message={closeSlideshow}/>
+        <Preview files={mule.files} fileIdx={slideshowIndex} on:closePreview={closeSlideshow}/>
     {/if}
 </main>

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
  */
-package main
+package files
 
 // Windows doesn't have this concept
 func getUserAndGroup(path string) (string, string) {

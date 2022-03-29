@@ -30,22 +30,9 @@ type ErrorRes struct {
 	Message string `json:"msg"`
 }
 
-func FileExists(filename string) bool {
+func DirExists(filename string) bool {
 	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
-		return false
-	}
-	return !info.IsDir()
-}
-
-// TODO generics here, see https://stackoverflow.com/questions/38654383/how-to-search-for-an-element-in-a-golang-slice
-func FindString(str string, slice []string) int {
-	for i, v := range slice {
-		if v == str {
-			return i
-		}
-	}
-	return -1
+	return !os.IsNotExist(err) && info.IsDir()
 }
 
 func boolToBytes(b bool) byte {

@@ -29,7 +29,7 @@
     let modal = null;
 
     onMount(() => {
-        modal = new Modal("#modal-properties");
+        modal = new Modal("#modal-properties", {bodyScrolling: true});
         const modalQuery = document.querySelector("#modal-properties");
         modalQuery.addEventListener("ax.modal.closed", function () {
             destroy("#modal-properties");
@@ -143,53 +143,36 @@
 </script>
 
 <div class="modal shadow-1 white rounded-3 modal-bouncing" id="modal-properties">
-    <div class="modal-header text-center ellipsis">
+    <div class="modal-header ellipsis">
         <img alt={item.icon} src="icons/48x48/{item.icon}.svg"/>&nbsp;{item.name}
     </div>
     <div class="modal-content container">
-        <div class="grix xs1 md3 gutter-md2">
-            <div class="text-left col-md2">
-                <table>
-                    <tr>
-                        <th>File name:</th>
-                        <td>{item.name}</td>
-                    </tr>
-                    <tr>
-                        <th>Size:</th>
-                        <td>{item.size}</td>
-                    </tr>
-                    <tr>
-                        <th>Mod. date:</th>
-                        <td>{item.chDate}</td>
-                    </tr>
-                    <tr>
-                        <th>Type:</th>
-                        <td>{item.mimeType}</td>
-                    </tr>
-                    <tr>
-                        <th>Owner:</th>
-                        <td>{item.owner}</td>
-                    </tr>
-                    <tr>
-                        <th>Group:</th>
-                        <td>{item.group}</td>
-                    </tr>
-                    <tr>
-                        <th>Permissions:</th>
-                        <td>{item.permissions}</td>
-                    </tr>
-                </table>
-                <div>&nbsp;</div>
-            </div>
-            <div>
-                {#if !readOnly && (!item.isDir || item.name != '../')}
-                    <div class="pup-a font-s3 mb-2 cursor-pointer" on:click|stopPropagation={toPaste(true)}>Cut</div>
-                    <div class="pup-a font-s3 mb-2 cursor-pointer" on:click|stopPropagation={toPaste(false)}>Copy</div>
-                    <div class="pup-a font-s3 mb-2 cursor-pointer" on:click|stopPropagation={rename}>Rename</div>
-                    <div class="pup-a font-s3 mb-2 cursor-pointer" on:click|stopPropagation={del}>Delete</div>
-                {/if}
-            </div>
-        </div>
+        <p class="ellipsis"><b>File name:</b> <span title={item.name}>{item.name}</span></p>
+        <p class="ellipsis"><b>Size:</b> {item.size}</p>
+        <p class="ellipsis"><b>Mod. date:</b> {item.chDate}</p>
+        <p class="ellipsis"><b>Type:</b> {item.mimeType}</p>
+        <p class="ellipsis"><b>Owner:</b> {item.owner}</p>
+        <p class="ellipsis"><b>Group:</b> {item.group}</p>
+        <p class="ellipsis"><b>Permissions:</b> {item.permissions}</p>
         <div>&nbsp;</div>
+        {#if !readOnly && (!item.isDir || item.name != '../')}
+            <div class="btn-group btn-group-small rounded-1 hide-xs mx-auto">
+                <div class="btn primary" on:click|stopPropagation={toPaste(true)}>Cut</div>
+                <div class="btn primary" on:click|stopPropagation={toPaste(false)}>Copy</div>
+                <div class="btn primary" on:click|stopPropagation={rename}>Rename</div>
+                <div class="btn error" on:click|stopPropagation={del}>Delete</div>
+            </div>
+            <div class="hide-sm-up">
+                <div class="btn-group btn-group-small rounded-1 mx-auto">
+                    <div class="btn primary" on:click|stopPropagation={toPaste(true)}>Cut</div>
+                    <div class="btn primary" on:click|stopPropagation={toPaste(false)}>Copy</div>
+                </div>
+                <div>&nbsp;</div>
+                <div class="btn-group btn-group-small rounded-1 mx-auto">
+                    <div class="btn primary" on:click|stopPropagation={rename}>Rename</div>
+                    <div class="btn error" on:click|stopPropagation={del}>Delete</div>
+                </div>
+            </div>
+        {/if}
     </div>
 </div>

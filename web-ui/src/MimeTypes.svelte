@@ -17,6 +17,8 @@
     ]);
     */
 
+    import {File} from "./Struct.svelte";
+
     export function isMimeTypeImage(mt: string) {
         return mt.startsWith("image/");
     }
@@ -47,19 +49,17 @@
         );
     }
 
-    export function getIcon(mt: string): string {
-        return mt == "directory"
-            ? "file-manager"
-            : isMimeTypeImage(mt)
-                ? "image-x-generic"
-                : isMimeTypeVideo(mt)
-                    ? "video-x-generic"
-                    : isMimeTypeAudio(mt)
-                        ? "audio-x-generic"
-                        : isMimeTypeText(mt)
-                            ? "text-x-generic"
-                            : isMimeTypePDF(mt)
-                                ? "application-pdf"
-                                : "application-octet-stream";
+    export function getIcon(f: File): string[] {
+        const icon: string =
+            f.mimeType == "#directory" ? "file-manager"
+                : isMimeTypeImage(f.mimeType) ? "image-x-generic"
+                    : isMimeTypeVideo(f.mimeType) ? "video-x-generic"
+                        : isMimeTypeAudio(f.mimeType) ? "audio-x-generic"
+                            : isMimeTypeText(f.mimeType) ? "text-x-generic"
+                                : isMimeTypePDF(f.mimeType) ? "application-pdf"
+                                    : "application-octet-stream"; // this is also for links
+        return f.mimeType == "#unresolved" ? [icon, "invalidLink", "🔗 "]
+            : f.isLink ? [icon, "link", "🔗 "]
+                : [icon, null, ""];
     }
 </script>

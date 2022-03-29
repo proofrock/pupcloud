@@ -16,8 +16,10 @@
      * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
      */
 
-    import {createEventDispatcher} from "svelte";
+    import {onMount, onDestroy, createEventDispatcher} from "svelte";
     import {fade} from "svelte/transition";
+    import * as Hammer from 'hammerjs';
+
     import type {File} from "../Struct.svelte";
     import {
         isMimeTypeText,
@@ -30,27 +32,46 @@
     import TextShower from "../Snippets/TextShower.svelte";
     import IconDownload from "../SVG/IconDownload.svelte";
 
-    export let files: File[] = [];
-    export let fileIdx: number = 0;
-
-    $: fullscreen = false;
+    export let files: File[];
+    export let fileIdx: number;
 
     const dispatch = createEventDispatcher();
 
+    let manager;
+
+    onMount(() => {
+        document.addEventListener('keydown', handleKeyboardEvent);
+
+        manager = new Hammer.Manager(document.getElementById("slide-container"));
+        manager.add(new Hammer.Swipe());
+        manager.on('swipeleft', next);
+        manager.on('swiperight', prev);
+    });
+
+    onDestroy(() => {
+        document.removeEventListener('keydown', handleKeyboardEvent);
+        manager.destroy();
+    });
+
+    // adapted from https://siongui.github.io/2012/06/25/javascript-keyboard-event-arrow-key-example/
+    function handleKeyboardEvent(evt) {
+        const keycode = evt.keyCode || evt.which;
+        switch (keycode) {
+            case 37: // Left
+                prev();
+                break;
+            case 39: // Right
+                next();
+                break;
+        }
+    }
+
     function close(e: Event) {
-        dispatch("message", {});
+        dispatch("closePreview", {});
     }
 
-    function getWS(f: File, forDl: boolean = false): string {
-        return "/file?path=" + encodeURIComponent(f.path) + (forDl ? "&dl=1" : "");
-    }
-
-    function openFullscreen() {
-        fullscreen = true;
-    }
-
-    async function closeFullscreen() {
-        fullscreen = false;
+    function stepMode() {
+        dispatch("stepMode", {});
     }
 
     function next() {
@@ -74,13 +95,6 @@
         color: white;
         content: "×";
         font-size: 32px;
-    }
-
-    .centered {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
     }
 
     .centered-maxscreen {
@@ -131,8 +145,10 @@
         color: white;
         font-weight: bold;
         font-size: 16px;
-        top: 48vh;
+        top: 50px;
+        bottom: 0px;
         padding: 16px;
+        padding-top: 48vh;
         user-select: none;
     }
 
@@ -150,8 +166,8 @@
         font-size: 16px;
         padding: 8px 12px;
         top: 12px;
-        left: 30px;
-        right: 30px;
+        left: 50px;
+        right: 50px;
         text-align: center;
     }
 
@@ -166,57 +182,48 @@
 </style>
 
 <!-- svelte-ignore a11y-media-has-caption -->
-<!-- svelte-ignore missing-declaration -->
-{#if fullscreen}
-    <div class="blanket cursor-pointer" transition:fade/>
-    <img alt={files[fileIdx].name} title={files[fileIdx].name} class="centered cursor-pointer"
-         src={getWS(files[fileIdx])} on:click={closeFullscreen} transition:fade/>
-{:else}
-    <div class="blanket" transition:fade>
-        <div class="x-top-right cursor-pointer" on:click={close}/>
-        {#each files as file, idx (file.uuid)}
-            {#if fileIdx == idx}
-                <div class="slideshow-container" transition:fade>
-                    <div class="numbertext">{idx + 1} / {files.length}</div>
-                    {#if isMimeTypeSupported(file.mimeType)}
-                        {#if isMimeTypeText(file.mimeType)}
-                            <div class="centered centered-maxscreen text-pane">
-                                <TextShower url={getWS(file)} {file}/>
-                            </div>
-                        {:else if isMimeTypeImage(file.mimeType)}
-                            <img alt={file.name} title={file.name} class="centered centered-maxscreen cursor-pointer"
-                                 src={getWS(file)} on:click={openFullscreen}/>
-                        {:else if isMimeTypeVideo(file.mimeType)}
-                            <div class="centered">
-                                <video controls>
-                                    <source src={getWS(file)} type={file.mimeType}/>
-                                    Your browser does not support the video tag.
-                                </video>
-                            </div>
-                        {:else if isMimeTypeAudio(file.mimeType)}
-                            <div class="centered">
-                                <audio controls>
-                                    <source src={getWS(file)} type={file.mimeType}/>
-                                    Your browser does not support the audio tag.
-                                </audio>
-                            </div>
-                        {:else if isMimeTypePDF(file.mimeType)}
-                            <embed class="centered centered-maxscreen w100 h100" type={file.mimeType}
-                                   src={getWS(file)}/>
-                        {/if}
-                    {:else}
-                        <img class="centered" alt={file.icon} src="icons/48x48/{file.icon}.svg"/>
-                    {/if}
-                    <div class="caption">{file.name}</div>
+<div id="slide-container" class="blanket" transition:fade>
+    <div class="x-top-right cursor-pointer" on:click={close}></div>
+    <div class="slideshow-container">
+        <div class="numbertext">{fileIdx + 1} / {files.length}</div>
+        {#if isMimeTypeSupported(files[fileIdx].mimeType)}
+            {#if isMimeTypeText(files[fileIdx].mimeType)}
+                <div class="centered-slide centered-maxscreen text-pane">
+                    <TextShower url={files[fileIdx].getWS(false)} file={files[fileIdx]}/>
                 </div>
+            {:else if isMimeTypeImage(files[fileIdx].mimeType)}
+                <img alt={files[fileIdx].name} title={files[fileIdx].name} draggable="false"
+                     ondragstart="return false;" class="centered-slide centered-maxscreen cursor-zoom-in"
+                     src={files[fileIdx].getWS(false)} on:click={stepMode}/>
+            {:else if isMimeTypeVideo(files[fileIdx].mimeType)}
+                <div class="centered-slide">
+                    <video controls>
+                        <source src={files[fileIdx].getWS(false)} type={files[fileIdx].mimeType}/>
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            {:else if isMimeTypeAudio(files[fileIdx].mimeType)}
+                <div class="centered-slide">
+                    <audio controls>
+                        <source src={files[fileIdx].getWS(false)} type={files[fileIdx].mimeType}/>
+                        Your browser does not support the audio tag.
+                    </audio>
+                </div>
+            {:else if isMimeTypePDF(files[fileIdx].mimeType)}
+                <embed class="centered-slide centered-maxscreen w100 h100" type={files[fileIdx].mimeType}
+                       src={files[fileIdx].getWS(false)}/>
             {/if}
-        {/each}
-        <div class="download" title="Download">
-            <a target="_blank" href={getWS(files[fileIdx], true)}>
-                <IconDownload size={24} color="white"/>
-            </a>
-        </div>
-        <div class="prev" on:click={prev}>&#10094;</div>
-        <div class="next" on:click={next}>&#10095;</div>
+        {:else}
+            <img class="centered-slide" alt={files[fileIdx].icon} draggable="false" ondragstart="return false;"
+                 src="icons/48x48/{files[fileIdx].icon}.svg"/>
+        {/if}
+        <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
     </div>
-{/if}
+    <div class="download" title="Download">
+        <a target="_blank" href={files[fileIdx].getWS(true)}>
+            <IconDownload size={24} color="white"/>
+        </a>
+    </div>
+    <div class="prev" on:click={prev}>&#10094;</div>
+    <div class="next" on:click={next}>&#10095;</div>
+</div>

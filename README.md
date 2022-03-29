@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.5.0
+# 🐶 Pupcloud v0.6.0
 
 Put your files on the web!
 
@@ -46,7 +46,10 @@ Execute `pupcloud -h` to see the other configuration options. For now you can:
 - specify a title/brand for the window (`--title`);
 - use a different port (`-p`);
 - bind to a network interface (`--bind-to`);
+- instruct pupcloud to follow symlinks (`--follow-symlinks`);
 - specify a maximum size for upload (`--max-upload-size`).
+
+By default, it's forbidden to run it as root. Use `--allow-root` if you (really) want to.
 
 ### Supported file types for viewing
 
@@ -73,6 +76,9 @@ pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
 
 You can use [this site](https://emn178.github.io/online-tools/sha256.html) to hash the password, it doesn't send the
 password on the net (at least at the time I am writing, you may want to check).
+
+**BEWARE**: The password is sent in clear text over the net, so *always use a HTTPS-capable reverse proxy* if you plan
+to serve over the public internet.
 
 ## <a name="sharing"></a>Folder sharing
 
@@ -126,6 +132,7 @@ Kindly supported by [JetBrains for Open Source development](https://jb.gg/OpenSo
 #### Web UI
 
 - [axentix](https://useaxentix.com/) [MIT]
+- [hammer.js](https://github.com/hammerjs/hammer.js) [MIT]
 - [Material Design Icons](https://materialdesignicons.com/) [Pictogrammers Free]
 - [svelte](https://svelte.dev/) [MIT]
 - [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT]

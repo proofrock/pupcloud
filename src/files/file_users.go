@@ -1,4 +1,4 @@
-// +build !windows
+//go:build !windows
 
 /*
  * This file is part of PupCloud, Copyright (c) 2022-2078, Germano Rizzo
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with PupCloud.  If not, see <http://www.gnu.org/licenses/>.
  */
-package main
+package files
 
 import (
 	"fmt"
