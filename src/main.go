@@ -150,6 +150,11 @@ func main() {
 		fmt.Println("   + With password")
 	}
 	fmt.Println("   + With max upload size:", *uploadSize, "MiB")
+	if *followLinks {
+		fmt.Println("   + Will follow symbolic links")
+	} else {
+		fmt.Println("   + Will NOT follow symbolic links")
+	}
 
 	if sharing.Allowed {
 		fmt.Println(" - Sharing enabled")
