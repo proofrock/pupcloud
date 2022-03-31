@@ -2,27 +2,30 @@
 
 Put your files on the web!
 
+[Documentation](https://germ.gitbook.io/pupcloud/) and [Demo](https://pupcloud.vercel.app/)
+
 Point pupcloud to a local folder and instantly get its contents exposed as a web application. Browse, manage, share
-files... _without a database_!
+files... in a truly portable way!
 
-Pupcloud aims to be as simple as possible, while retaining all the features you would like it to have. It doesn't need a
-database, config files or a particular installation procedure. Just run it! It has everything that fits in a pup-sized
-cloud ;-)
+Pupcloud doesn't need a database, nor it leaves .dotfiles on the filesystem; it is packaged as a single executable
+file (written in Go+Svelte+Typescript), so you'll just need to download and run it.
 
-It's packaged as a single executable file (written in Go+Svelte+Typescript), so you'll just need to download and run it.
+It is an exercise in minimalism: it aims to be as simple as possible, while retaining all the features you would like it
+to have. Just run it! It has everything that fits in a pup-sized cloud ;-)
 
 If you are curious, go see the [Demo](https://pupcloud.vercel.app/)!
 
 ## Features
 
-- Nothing is saved on disk (no database, no dotfiles...);
-- Authentication;
+- Web interface that scales well on mobile;
+- Nothing is saved on disk (no database, no .dotfiles...);
+- Authentication (see [below](#auth));
 - Read-only mode for avoiding fs writes;
-- File previews (see [below](#auth));
+- File previews;
 - (Revokable) folder sharing, on a separate URL (instructions [below](#sharing)):
-    - Optionally read only;
-    - Authentication mandatory;
-    - Expiry date for sharing link;
+- Optionally read only;
+- Authentication;
+- Expiry date for sharing link;
 - "Branding" (you can specify the title of the app screen).
 
 It doesn't include HTTPS, as this can be done easily (and much more securely) with a reverse proxy.
@@ -41,15 +44,16 @@ pupcloud -r /my/dir
 
 Then, open `http://localhost:17178` with a browser. As simple as that!
 
-Execute `pupcloud -h` to see the other configuration options. For now you can:
+Execute `pupcloud --help` to see the other configuration options. For now you can:
 
 - disable all the write operations (`--readonly`);
-- setup authentication (`-P`, see [below](#auth));
+- setup [authentication](#auth) (`-P`);
+- setup [folder sharing](#sharing) (`--share-profile`, `--share-port`, `--share-prefix`)
 - specify a title/brand for the window (`--title`);
-- use a different port (`-p`);
+- use a different port then the default of 17178 (`-p`);
 - bind to a network interface (`--bind-to`);
 - instruct pupcloud to follow symlinks (`--follow-symlinks`);
-- specify a maximum size for upload (`--max-upload-size`).
+- specify a maximum size for upload, in Megabytes (`--max-upload-size`).
 
 By default, it's forbidden to run it as root. Use `--allow-root` if you (really) want to.
 
@@ -79,8 +83,8 @@ pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
 You can use [this site](https://emn178.github.io/online-tools/sha256.html) to hash the password, it doesn't send the
 password on the net (at least at the time I am writing, you may want to check).
 
-**BEWARE**: The password is sent in clear text over the net, so *always use a HTTPS-capable reverse proxy* if you plan
-to serve over the public internet.
+**BEWARE**: The password is sent in clear text over the net, so *(always use a HTTPS-capable reverse
+proxy)[https://germ.gitbook.io/pupcloud/guides/reverse-proxy]* if you plan to serve over the public internet.
 
 ## <a name="sharing"></a>Folder sharing
 
@@ -120,7 +124,9 @@ instructions.
 
 - In rare cases, MIME type detection is wrong. It relies on Go builtin functions, so it needs to be investigated more.
 - On mobile, some glitches may be present. Please report them in the issue tracker!
-- In general, pupcloud is not (yet) mature and well audited. Take appropriate measures if you want to publish it over the public internet!
+- In general, pupcloud is not (yet) mature and well
+  audited. [Take appropriate measures](https://app.gitbook.com/s/BIkxAX0ktzzPPM6PIcMj/security) if you want to publish
+  it over the public internet!
 
 ## Credits
 
