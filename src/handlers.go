@@ -112,9 +112,6 @@ func shareLink(c *fiber.Ctx) error {
 	sharing := c.Locals("sharing").(*sharing)
 
 	pwd := c.Query("pwd")
-	if pwd == "" {
-		return fiber.NewError(fiber.StatusBadRequest, "'pwd' not specified")
-	}
 
 	dir := c.Query("dir")
 	if dir == "" {
@@ -148,7 +145,12 @@ func shareLink(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
 	}
 	secret := sharing.ProfileSecrets[prfIdx]
-	password := pwd + "|" + secret
+	var password string
+	if pwd != "" {
+		password = pwd + "|" + secret
+	} else {
+		password = secret
+	}
 
 	ret, err := commons.EncryptSharingURL(password, dir, readOnly, expiry)
 	if err != nil {

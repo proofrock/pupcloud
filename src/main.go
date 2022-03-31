@@ -279,9 +279,10 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwdHash string) error {
 
 // Stored in the session map, to recover it from the session cookie
 type sharInfo struct {
-	path     string
-	readOnly bool
-	expiry   *uint32
+	path        string
+	hasPassword bool
+	readOnly    bool
+	expiry      *uint32
 }
 
 func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalReadOnly, followLinks bool, sharing *sharing) {
@@ -319,7 +320,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 		c.Locals("title", title)
 		c.Locals("readOnly", sharinfo.readOnly)
 		c.Locals("maxRequestSize", uploadSize*MiB)
-		c.Locals("hasPassword", true)
+		c.Locals("hasPassword", sharinfo.hasPassword)
 		c.Locals("followLinks", followLinks)
 		return c.Next()
 	})
@@ -369,16 +370,19 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 
 	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
-	if pwd == "" {
-		return nil, fiber.NewError(499, "Password required")
-	}
 
 	prfIdx := slices.Index(sharing.ProfileNames, profile)
 	if prfIdx < 0 {
 		return nil, fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
 	}
 	secret := sharing.ProfileSecrets[prfIdx]
-	password := pwd + "|" + secret
+
+	var password string
+	if pwd != "" {
+		password = pwd + "|" + secret
+	} else {
+		password = secret
+	}
 
 	x := c.Query("x")
 	if x == "" {
@@ -394,7 +398,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(499, "Wrong password or invalid address")
 	}
 
-	sharinfo := sharInfo{filepath.Join(root, partialPath), readOnly, date}
+	sharinfo := sharInfo{filepath.Join(root, partialPath), pwd != "", readOnly, date}
 
 	if date != nil && uint32(now) > *date {
 		return nil, fiber.NewError(499, "Link expired")

@@ -9,7 +9,9 @@ Pupcloud aims to be as simple as possible, while retaining all the features you 
 database, config files or a particular installation procedure. Just run it! It has everything that fits in a pup-sized
 cloud ;-)
 
-[Demo here](https://pupcloud.vercel.app/)
+It's packaged as a single executable file (written in Go+Svelte+Typescript), so you'll just need to download and run it.
+
+If you are curious, go see the [Demo](https://pupcloud.vercel.app/)!
 
 ## Features
 
@@ -91,7 +93,7 @@ the secret must not be shared with the recipient, and it's used to protect the c
 In the Web interface, the sharing URL can be obtained using the "share" button, and specifying:
 
 - the profile;
-- a password (mandatory);
+- a password (optional);
 - an expiry date (optional);
 - if the share must be read-only.
 
@@ -118,6 +120,7 @@ instructions.
 
 - In rare cases, MIME type detection is wrong. It relies on Go builtin functions, so it needs to be investigated more.
 - On mobile, some glitches may be present. Please report them in the issue tracker!
+- In general, pupcloud is not (yet) mature and well audited. Take appropriate measures if you want to publish it over the public internet!
 
 ## Credits
 
