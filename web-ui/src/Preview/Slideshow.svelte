@@ -214,8 +214,8 @@
                        src={files[fileIdx].getWS(false)}/>
             {/if}
         {:else}
-            <img class="centered-slide" alt={files[fileIdx].icon} draggable="false" ondragstart="return false;"
-                 src="icons/48x48/{files[fileIdx].icon}.svg"/>
+            <img class="centered-slide" alt={files[fileIdx].icon[0]} draggable="false" ondragstart="return false;"
+                 src="icons/48x48/{files[fileIdx].icon[0]}.svg"/>
         {/if}
         <div class="caption ellipsis" title={files[fileIdx].name}>{files[fileIdx].name}</div>
     </div>

@@ -43,7 +43,7 @@
                 <img alt={item.icon[0]} src="icons/48x48/{item.icon[0]}.svg" style="position: relative; left: 12px"/>
                 {#if item.icon[1] == "link"}
                     <IconLink size="22"/>
-                {:else }
+                {:else}
                     <IconInvalidLink size="22"/>
                 {/if}
             {:else}

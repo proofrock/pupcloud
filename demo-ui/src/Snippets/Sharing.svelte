@@ -78,7 +78,8 @@
             <div class="grix xs1 lg2 gutter-lg2">
                 <div class="form-field">
                     <label for="shPassword">Password</label>
-                    <input type="password" id="shPassword" class="form-control rounded-1" bind:value={shPassword}/>
+                    <input type="password" id="shPassword" class="form-control rounded-1" bind:value={shPassword}
+                           placeholder="Leave empty for no password"/>
                     <div>&nbsp;</div>
                 </div>
                 <div class="form-field">
