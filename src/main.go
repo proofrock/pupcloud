@@ -177,6 +177,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 			ErrorHandler:          errHandler,
 			DisableStartupMessage: true,
 			BodyLimit:             uploadSize * MiB,
+			Network:               fiber.NetworkTCP,
 		},
 	)
 
@@ -291,6 +292,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 			ErrorHandler:          errHandler,
 			DisableStartupMessage: true,
 			BodyLimit:             uploadSize * MiB,
+			Network:               fiber.NetworkTCP,
 		},
 	)
 
