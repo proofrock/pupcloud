@@ -56,7 +56,7 @@ build-static:
 
 zbuild-static:
 	make build-static
-	cd bin; 7zr a -mx9 -t7z pupcloud-v0.6.3-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
+	cd bin; 7zr a -mx9 -t7z pupcloud-v0.6.4-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
 run:
 	make build-ui
