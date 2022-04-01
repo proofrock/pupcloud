@@ -258,10 +258,7 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
 		}
 	}
 
-	pwdFromWeb := c.Query("pwd")
-	if pwdFromWeb == "" {
-		pwdFromWeb = c.Get("x-pupcloud-pwd")
-	}
+	pwdFromWeb := c.Get("x-pupcloud-pwd")
 
 	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
