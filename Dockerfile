@@ -2,7 +2,7 @@ FROM alpine:edge AS build
 
 RUN apk update
 RUN apk upgrade
-RUN apk add --update go gcc g++ git nodejs npm
+RUN apk add --update go gcc g++ git
 WORKDIR /app
 ENV GOPATH /app
 RUN git clone https://github.com/proofrock/pupcloud
