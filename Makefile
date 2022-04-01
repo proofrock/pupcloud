@@ -50,10 +50,32 @@ zbuild-static:
 	make build-static
 	cd bin; 7zr a -mx9 -t7z pupcloud-v0.6.4-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
+zbuild-all:
+	make build-prepare
+	make build-ui
+	cd src; CGO=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
+	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.6.4-linux-amd64.7z pupcloud
+	rm src/pupcloud
+	cd src; CGO=0 GOOS=linux GOARCH=arm go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
+	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.6.4-linux-arm.7z pupcloud
+	rm src/pupcloud
+	cd src; CGO=0 GOOS=linux GOARCH=arm64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
+	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.6.4-linux-arm64.7z pupcloud
+	rm src/pupcloud
+	cd src; CGO=0 GOOS=darwin GOARCH=amd64 go build
+	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.6.4-darwin-amd64.7z pupcloud
+	rm src/pupcloud
+	cd src; CGO=0 GOOS=darwin GOARCH=arm64 go build
+	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.6.4-darwin-arm64.7z pupcloud
+	rm src/pupcloud
+	cd src; CGO=0 GOOS=windows GOARCH=amd64 go build
+	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.6.4-win-amd64.7z pupcloud.exe
+	rm src/pupcloud.exe
+
 run:
 	make build-ui
 	make build
-	bin/pupcloud -r demo-ui/public/testFs/ --share-prefix "http://localhost:17179" --follow-symlinks
+	bin/pupcloud -r demo-ui/public/testFs/
 
 run-demo-ui:
 	make cleanup-demo-ui
