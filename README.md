@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.6.3
+# 🐶 Pupcloud v0.6.4
 
 Put your files on the web!
 
@@ -8,7 +8,9 @@ Point pupcloud to a local folder and instantly get its contents exposed as a web
 files... in a truly portable way!
 
 Pupcloud doesn't need a database, nor it leaves .dotfiles on the filesystem; it is packaged as a single executable
-file (written in Go+Svelte+Typescript), so you'll just need to download and run it.
+file (written in Go+Svelte+Typescript), so you'll just need
+to [download](https://germ.gitbook.io/pupcloud/guides/installation-and-building)
+and [run](https://germ.gitbook.io/pupcloud/guides/running-pupcloud) it.
 
 It is an exercise in minimalism: it aims to be as simple as possible, while retaining all the features you would like it
 to have. Just run it! It has everything that fits in a pup-sized cloud ;-)
@@ -17,18 +19,17 @@ If you are curious, go see the [Demo](https://pupcloud.vercel.app/)!
 
 ## Features
 
-- Web interface that scales well on mobile;
+- [Web interface](https://germ.gitbook.io/pupcloud/guides/basic-usage) that scales well on mobile;
 - Nothing is saved on disk (no database, no .dotfiles...);
-- Authentication (see [below](#auth));
-- Read-only mode for avoiding fs writes;
-- File previews;
-- (Revokable) folder sharing, on a separate URL (instructions [below](#sharing)):
-- Optionally read only;
-- Authentication;
-- Expiry date for sharing link;
-- "Branding" (you can specify the title of the app screen).
+- [Authentication](https://germ.gitbook.io/pupcloud/guides/authentication) (also see [below](#auth));
+- [Read-only mode](https://germ.gitbook.io/pupcloud/guides/running-pupcloud) for avoiding fs writes;
+- [File previews](https://germ.gitbook.io/pupcloud/guides/basic-usage#preview-screen);
+- (Revokable) [folder sharing](https://germ.gitbook.io/pupcloud/guides/sharing-a-folder), on a separate URL (also
+  see [below](#sharing)):
+- "[Branding](https://germ.gitbook.io/pupcloud/guides/running-pupcloud)" (you can specify the title of the app screen).
 
-It doesn't include HTTPS, as this can be done easily (and much more securely) with a reverse proxy.
+It doesn't include HTTPS, as this can be done easily (and much more securely) with
+a [reverse proxy](https://germ.gitbook.io/pupcloud/guides/reverse-proxy).
 
 See the [ROADMAP](ROADMAP.md) file for a glimpse of what's in store!
 
@@ -44,7 +45,8 @@ pupcloud -r /my/dir
 
 Then, open `http://localhost:17178` with a browser. As simple as that!
 
-Execute `pupcloud --help` to see the other configuration options. For now you can:
+Run `pupcloud --help` to see the other [config options](https://germ.gitbook.io/pupcloud/guides/running-pupcloud). You
+can:
 
 - disable all the write operations (`--readonly`);
 - setup [authentication](#auth) (`-P`);
