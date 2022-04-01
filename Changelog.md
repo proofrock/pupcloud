@@ -11,9 +11,14 @@
 | Folder sharing                             | v0.5.x  |
 | Follow symlinks                            | v0.6.x  |
 
+## v0.6.4
+
+- IPV6 support
+- "splash footer" disappears after 1,5s
+
 ## v0.6.1 - 0.6.3
 
-- fixes 
+- fixes
 - library updates
 
 ## v0.6.0

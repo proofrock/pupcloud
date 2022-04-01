@@ -43,7 +43,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const Version = "v0.6.3"
+const Version = "v0.6.4"
 
 const MiB = 1024 * 1024
 
@@ -177,6 +177,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 			ErrorHandler:          errHandler,
 			DisableStartupMessage: true,
 			BodyLimit:             uploadSize * MiB,
+			Network:               fiber.NetworkTCP,
 		},
 	)
 
@@ -291,6 +292,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 			ErrorHandler:          errHandler,
 			DisableStartupMessage: true,
 			BodyLimit:             uploadSize * MiB,
+			Network:               fiber.NetworkTCP,
 		},
 	)
 
