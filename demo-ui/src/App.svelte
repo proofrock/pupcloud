@@ -20,6 +20,8 @@
     import "../node_modules/axentix/dist/axentix.min.css";
     import "./global.css";
 
+    import {onMount} from "svelte";
+    import {fade} from 'svelte/transition';
     import {Config, File, Mule, SORTERS} from "./Struct.svelte";
     import Preview from "./Preview/Preview.svelte";
     import FileManager from "./FileManager/FileManager.svelte";
@@ -34,6 +36,8 @@
     $: sorter = SORTERS.ABC;
     $: mode = "GRID";
 
+    $: splash = true;
+
     $: {
         loadPath(path);
     }
@@ -41,6 +45,12 @@
     $: {
         mule = mule.sort(sorter);
     }
+
+    onMount(() => {
+        setTimeout(() => {
+            splash = false;
+        }, 1500);
+    });
 
     async function loadPath(path: string[]) {
         mule = Mule.fromAny(
@@ -78,13 +88,15 @@
         </nav>
         <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:openItem={openSlideshow}
                      on:reload={reload} on:logout/>
-        <footer class="footer blue dark-2 font-s1 lh-1 hide-sm-down"><span>
+        {#if splash}
+            <footer class="footer blue dark-2 font-s1 lh-1" out:fade><span>
           <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
-            {config.version} - Made with <a class="pup-a" target="_blank" href="https://gofiber.io/">Fiber</a>,
+                {config.version} - Made with <a class="pup-a" target="_blank" href="https://gofiber.io/">Fiber</a>,
           <a class="pup-a" target="_blank" href="https://useaxentix.com/">Axentix</a>,
           <a class="pup-a" target="_blank" href="https://svelte.dev/">Svelte</a>,
           <a class="pup-a" target="_blank" href="https://go.dev/">Go</a> and ❤️
         </span></footer>
+        {/if}
     {:else}
         <Preview files={mule.files} fileIdx={slideshowIndex} on:closePreview={closeSlideshow}/>
     {/if}
