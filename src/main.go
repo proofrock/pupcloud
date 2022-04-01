@@ -391,7 +391,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(499, "No sharing details specified")
 	}
 
-	partialPath, readOnly, date, err := commons.DecryptSharingURL(password, x)
+	partialPath, readOnly, date, err := commons.DecryptSharingURL(profile, password, x)
 	readOnly = readOnly || globalReadOnly
 	if err != nil {
 		authFailureMutex.Lock()

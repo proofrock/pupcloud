@@ -22,6 +22,7 @@ import (
 	"github.com/proofrock/pupcloud/commons"
 	filess "github.com/proofrock/pupcloud/files"
 	"golang.org/x/exp/slices"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -152,12 +153,18 @@ func shareLink(c *fiber.Ctx) error {
 		password = secret
 	}
 
-	ret, err := commons.EncryptSharingURL(password, dir, readOnly, expiry)
+	x, err := commons.EncryptSharingURL(profile, password, dir, readOnly, expiry)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
+	url := fmt.Sprintf(
+		"%s?p=%s&x=%s",
+		sharing.Prefix,
+		url.QueryEscape(profile),
+		url.QueryEscape(x),
+	)
 
-	return c.Status(200).SendString(fmt.Sprintf("%s/?p=%s&x=%s", sharing.Prefix, profile, ret))
+	return c.Status(200).SendString(url)
 }
 
 func fsDel(c *fiber.Ctx) error {

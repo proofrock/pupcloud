@@ -18,7 +18,6 @@ package commons
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/binary"
 	"github.com/proofrock/pupcloud/crypgo"
 	"os"
@@ -51,9 +50,7 @@ func bytesToInt(data []byte) uint32 {
 	return binary.BigEndian.Uint32(data)
 }
 
-func EncryptSharingURL(pwd, path string, readOnly bool, date *uint32) (string, error) {
-	crypgo.SetVariant(base64.URLEncoding)
-	defer crypgo.SetVariant(base64.StdEncoding)
+func EncryptSharingURL(profile, pwd, path string, readOnly bool, date *uint32) (string, error) {
 	var b bytes.Buffer
 	b.Write([]byte{boolToBytes(readOnly)})
 	b.WriteString(path)
@@ -62,14 +59,11 @@ func EncryptSharingURL(pwd, path string, readOnly bool, date *uint32) (string, e
 	if date != nil {
 		b.Write(intToBytes(*date))
 	}
-	return crypgo.EncryptBytes(pwd, b.Bytes())
+	return crypgo.EncryptBytes(pwd, b.Bytes(), []byte(profile))
 }
 
-func DecryptSharingURL(pwd, encoded string) (path string, readOnly bool, date *uint32, err error) {
-	crypgo.SetVariant(base64.URLEncoding)
-	defer crypgo.SetVariant(base64.StdEncoding)
-
-	plain, err := crypgo.DecryptBytes(pwd, encoded)
+func DecryptSharingURL(profile, pwd, encoded string) (path string, readOnly bool, date *uint32, err error) {
+	plain, err := crypgo.DecryptBytes(pwd, encoded, []byte(profile))
 	if err != nil {
 		return
 	}
