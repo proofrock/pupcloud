@@ -20,9 +20,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"encoding/binary"
+	"github.com/proofrock/pupcloud/crypgo"
 	"os"
-
-	"github.com/proofrock/crypgo"
 )
 
 type ErrorRes struct {
@@ -63,7 +62,7 @@ func EncryptSharingURL(pwd, path string, readOnly bool, date *uint32) (string, e
 	if date != nil {
 		b.Write(intToBytes(*date))
 	}
-	return crypgo.CompressAndEncryptBytes(pwd, b.Bytes(), 19)
+	return crypgo.EncryptBytes(pwd, b.Bytes())
 }
 
 func DecryptSharingURL(pwd, encoded string) (path string, readOnly bool, date *uint32, err error) {

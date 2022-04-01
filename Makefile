@@ -36,7 +36,7 @@ build-prepare:
 
 build:
 	make build-prepare
-	cd src; go build -o ../bin/pupcloud
+	cd src; CGO=0 go build -o ../bin/pupcloud
 
 zbuild:
 	make build
@@ -44,7 +44,7 @@ zbuild:
 
 build-static:
 	make build-prepare
-	cd src; go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -o ../bin/pupcloud
+	cd src; CGO=0 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -o ../bin/pupcloud
 
 zbuild-static:
 	make build-static
@@ -60,7 +60,7 @@ run-demo-ui:
 	cd demo-ui && npm install && npm run dev
 
 docker:
-	sudo docker build --no-cache --build-arg arch=`uname -m` -t local_pupcloud:latest .
+	sudo docker build --no-cache -t local_pupcloud:latest .
 
 docker-publish:
 	make docker
