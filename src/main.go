@@ -90,7 +90,8 @@ func main() {
 	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to")
 	port := flag.IntP("port", "p", 17178, "The port to run on")
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
-	pwdHash := flag.StringP("pwd-hash", "P", "", "SHA256 hash of the main access password, if desired")
+	pwd := flag.StringP("password", "P", "", "The main access password, if desired. Use --pwd-hash for a safer alternative")
+	pwdHash := flag.StringP("pwd-hash", "H", "", "SHA256 hash of the main access password, if desired")
 	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: don't)")
 	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in the form name:secret, multiple profiles allowed")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
@@ -100,6 +101,11 @@ func main() {
 	followLinks := flag.Bool("follow-symlinks", false, "Follow symlinks when traversing directories (default: don't)")
 
 	flag.Parse()
+
+	if *pwd != "" && *pwdHash != "" {
+		println("ERROR: cannot specify both a password and a hashed password")
+		os.Exit(-1)
+	}
 
 	if os.Geteuid() == 0 && !*allowRoot {
 		println("ERROR: running as root is forbidden; use --allow-root if you are really sure")
@@ -147,7 +153,11 @@ func main() {
 		fmt.Println("   + Read Only")
 	}
 	if *pwdHash != "" {
+		fmt.Println("   + With hashed password")
+	} else if *pwd != "" {
 		fmt.Println("   + With password")
+	} else {
+		fmt.Println("   + Without password")
 	}
 	fmt.Println("   + With max upload size:", *uploadSize, "MiB")
 	if *followLinks {
@@ -164,14 +174,14 @@ func main() {
 		time.Sleep(1 * time.Second)
 	}
 
-	launchMainApp(*bindTo, *root, *title, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
+	launchMainApp(*bindTo, *root, *title, *pwd, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
 }
 
 // FIXME limit growth
 var sessions sync.Map
 var authFailureMutex sync.Mutex
 
-func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, readOnly, followLinks bool, sharing *sharing) {
+func launchMainApp(bindTo, root, title, pwd, pwdHash string, port, uploadSize int, readOnly, followLinks bool, sharing *sharing) {
 	app := fiber.New(
 		fiber.Config{
 			ErrorHandler:          errHandler,
@@ -195,7 +205,7 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 	}))
 
 	app.Use(func(c *fiber.Ctx) error {
-		if err := doAuth4MainApp(c, root, pwdHash); err != nil {
+		if err := doAuth4MainApp(c, root, pwd, pwdHash); err != nil {
 			return err
 		}
 
@@ -230,10 +240,12 @@ func launchMainApp(bindTo, root, title, pwdHash string, port, uploadSize int, re
 	log.Fatal(app.Listen(fmt.Sprintf("%s:%d", bindTo, port)))
 }
 
-func doAuth4MainApp(c *fiber.Ctx, root, pwdHash string) error {
-	if pwdHash == "" {
+func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
+	if pwdHash == "" && pwd == "" {
 		return nil
 	}
+
+	pwdHash = strings.ToLower(pwdHash)
 
 	val := c.Cookies("pupcloud-session")
 	if val != "" {
@@ -246,19 +258,26 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwdHash string) error {
 		}
 	}
 
-	pwd := c.Query("pwd")
-	if pwd == "" {
-		pwd = c.Get("x-pupcloud-pwd")
+	pwdFromWeb := c.Query("pwd")
+	if pwdFromWeb == "" {
+		pwdFromWeb = c.Get("x-pupcloud-pwd")
 	}
 
 	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
-	if pwd == "" {
+	if pwdFromWeb == "" {
 		return fiber.NewError(499, "Password required")
 	}
 
-	hash := sha256.Sum256([]byte(pwd))
-	if !strings.HasPrefix(hex.EncodeToString(hash[:]), strings.ToLower(pwdHash)) {
+	auth := false
+	if pwdHash != "" {
+		hash := sha256.Sum256([]byte(pwdFromWeb))
+		auth = strings.HasPrefix(hex.EncodeToString(hash[:]), strings.ToLower(pwdHash))
+	} else {
+		auth = pwdFromWeb == pwd
+	}
+
+	if !auth {
 		authFailureMutex.Lock()
 		defer authFailureMutex.Unlock()
 		time.Sleep(1 * time.Second)
