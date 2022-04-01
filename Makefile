@@ -50,14 +50,6 @@ zbuild-static:
 	make build-static
 	cd bin; 7zr a -mx9 -t7z pupcloud-v0.6.4-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
-build-static:
-	make build-prepare
-	cd src; go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"' -o ../bin/pupcloud
-
-zbuild-static:
-	make build-static
-	cd bin; 7zr a -mx9 -t7z pupcloud-v0.6.4-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
-
 run:
 	make build-ui
 	make build
