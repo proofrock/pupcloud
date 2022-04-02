@@ -18,6 +18,7 @@
 - Shorter sharing links
   - breaking change: you'll need to re-generate any link you had from previous versions
 - Cross-compilation support (removed CGO dependency)
+- Manual mimetype resolution for problematic files
 
 ## v0.6.4
 
