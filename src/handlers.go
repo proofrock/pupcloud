@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/proofrock/pupcloud/commons"
+	"github.com/proofrock/pupcloud/crypgo"
 	filess "github.com/proofrock/pupcloud/files"
 	"golang.org/x/exp/slices"
 	"net/url"
@@ -110,6 +111,7 @@ func file(c *fiber.Ctx) error {
 }
 
 func shareLink(c *fiber.Ctx) error {
+	root := c.Locals("root").(string)
 	sharing := c.Locals("sharing").(*sharing)
 
 	pwd := c.Query("pwd")
@@ -153,14 +155,15 @@ func shareLink(c *fiber.Ctx) error {
 		password = secret
 	}
 
-	x, err := commons.EncryptSharingURL(profile, password, dir, readOnly, expiry)
+	x, err := commons.EncryptSharingURL(profile, password, dir, root, readOnly, expiry)
 	if err != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	url := fmt.Sprintf(
-		"%s?p=%s&x=%s",
+		"%s?p=%s&r=%s&x=%s",
 		sharing.Prefix,
 		url.QueryEscape(profile),
+		url.QueryEscape(crypgo.Sha256(root)[:6]),
 		url.QueryEscape(x),
 	)
 

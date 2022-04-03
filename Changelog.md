@@ -15,7 +15,7 @@
 
 - Plain-text password for auth (`-P`)
   - breaking change: old `-P` is now `-H` (for hashed password)
-- Shorter sharing links
+- Shorter sharing links and better detection of failures (root changes after sharing, ...)
   - breaking change: you'll need to re-generate any link you had from previous versions
 - Cross-compilation support (removed CGO dependency)
 - Manual mimetype resolution for problematic files

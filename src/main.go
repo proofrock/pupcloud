@@ -17,12 +17,11 @@
 package main
 
 import (
-	"crypto/sha256"
 	"embed"
-	"encoding/hex"
 	"fmt"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/proofrock/pupcloud/commons"
+	"github.com/proofrock/pupcloud/crypgo"
 	filess "github.com/proofrock/pupcloud/files"
 	"golang.org/x/exp/slices"
 	"io/fs"
@@ -86,7 +85,7 @@ func main() {
 		fmt.Println(fmt.Sprintf("Pupcloud %s (c) 2022-%d Germano Rizzo", Version, year))
 	}
 
-	root := flag.StringP("root", "r", "", "The document root to serve")
+	rootDir := flag.StringP("root", "r", "", "The document root to serve")
 	bindTo := flag.String("bind-to", "0.0.0.0", "The address to bind to")
 	port := flag.IntP("port", "p", 17178, "The port to run on")
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
@@ -103,23 +102,25 @@ func main() {
 	flag.Parse()
 
 	if *pwd != "" && *pwdHash != "" {
-		println("ERROR: cannot specify both a password and a hashed password")
-		os.Exit(-1)
+		commons.Abort("ERROR: cannot specify both a password and a hashed password")
 	}
 
 	if os.Geteuid() == 0 && !*allowRoot {
-		println("ERROR: running as root is forbidden; use --allow-root if you are really sure")
-		os.Exit(-1)
+		commons.Abort("ERROR: running as root is forbidden; use --allow-root if you are really sure")
 	}
 
-	if *root == "" {
-		println("ERROR: you must specify a root (-r)")
-		os.Exit(-1)
+	if *rootDir == "" {
+		commons.Abort("ERROR: you must specify a root dir (-r)")
 	}
 
-	if !commons.DirExists(*root) {
-		println("ERROR: root must exist")
-		os.Exit(-1)
+	if !commons.DirExists(*rootDir) {
+		commons.Abort("ERROR: root dir must exist")
+	}
+
+	var err error
+	*rootDir, err = filepath.Abs(*rootDir)
+	if err != nil {
+		commons.Abort("ERROR: cannot make root dir absolute")
 	}
 
 	sharing := sharing{}
@@ -127,8 +128,9 @@ func main() {
 	if *sharePrefix != "" {
 		if !(strings.HasPrefix(*sharePrefix, "http://") || strings.HasPrefix(*sharePrefix, "https://")) ||
 			strings.HasSuffix(*sharePrefix, "/") {
-			println("ERROR: malformed '--share-prefix': protocol must be http or https, and it must not end with a '/'")
-			os.Exit(-1)
+			commons.Abort(
+				"ERROR: malformed '--share-prefix': protocol must be http or https, and it must not end with a '/'",
+			)
 		}
 	} else {
 		*sharePrefix = fmt.Sprintf("http://localhost:%d", *sharePort)
@@ -140,15 +142,14 @@ func main() {
 		for i, tok := range *shareProfiles {
 			pos := strings.Index(tok, ":")
 			if pos < 0 {
-				println(fmt.Sprintf("ERROR: malformed profile #%d: it must have a ':'", i+1))
-				os.Exit(-1)
+				commons.Abort(fmt.Sprintf("ERROR: malformed profile #%d: it must have a ':'", i+1))
 			}
 			sharing.ProfileNames = append(sharing.ProfileNames, tok[0:pos])
 			sharing.ProfileSecrets = append(sharing.ProfileSecrets, tok[pos+1:])
 		}
 	}
 
-	fmt.Println(fmt.Sprintf(" - Serving dir %s", *root))
+	fmt.Println(fmt.Sprintf(" - Serving dir %s", *rootDir))
 	if *readOnly {
 		fmt.Println("   + Read Only")
 	}
@@ -170,11 +171,11 @@ func main() {
 		fmt.Println(" - Sharing enabled")
 		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ", "))
 		fmt.Println("   + At", sharing.Prefix)
-		go launchSharingApp(*bindTo, *root, *title, *sharePort, *uploadSize, *readOnly, *followLinks, &sharing)
+		go launchSharingApp(*bindTo, *rootDir, *title, *sharePort, *uploadSize, *readOnly, *followLinks, &sharing)
 		time.Sleep(1 * time.Second)
 	}
 
-	launchMainApp(*bindTo, *root, *title, *pwd, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
+	launchMainApp(*bindTo, *rootDir, *title, *pwd, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
 }
 
 // FIXME limit growth
@@ -254,7 +255,7 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
 		}
 
 		if !commons.DirExists(root) {
-			return fiber.NewError(499, "Folder doesn't exist anymore")
+			return fiber.NewError(498, "Folder doesn't exist anymore")
 		}
 	}
 
@@ -268,8 +269,7 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
 
 	auth := false
 	if pwdHash != "" {
-		hash := sha256.Sum256([]byte(pwdFromWeb))
-		auth = strings.HasPrefix(hex.EncodeToString(hash[:]), strings.ToLower(pwdHash))
+		auth = strings.HasPrefix(crypgo.Sha256(pwdFromWeb), strings.ToLower(pwdHash))
 	} else {
 		auth = pwdFromWeb == pwd
 	}
@@ -296,6 +296,7 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
 
 // Stored in the session map, to recover it from the session cookie
 type sharInfo struct {
+	root        string
 	path        string
 	hasPassword bool
 	readOnly    bool
@@ -365,11 +366,15 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		if si, ok := sessions.Load(val); ok {
 			sinfo := si.(*sharInfo)
 			if sinfo.expiry != nil && uint32(now) > *sinfo.expiry {
-				return nil, fiber.NewError(499, "Link expired")
+				return nil, fiber.NewError(498, "Link expired")
 			}
 
 			if !commons.DirExists(sinfo.path) {
-				return nil, fiber.NewError(499, "Shared folder doesn't exist anymore")
+				return nil, fiber.NewError(498, "Shared folder doesn't exist anymore")
+			}
+
+			if sinfo.root != root {
+				return nil, fiber.NewError(498, "Root has changed")
 			}
 
 			return si.(*sharInfo), nil
@@ -378,7 +383,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 
 	profile := c.Query("p")
 	if profile == "" {
-		return nil, fiber.NewError(499, "No profile specified")
+		return nil, fiber.NewError(498, "No profile specified")
 	}
 
 	pwd := c.Query("pwd")
@@ -386,12 +391,12 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		pwd = c.Get("x-pupcloud-pwd")
 	}
 
-	// XXX I use 499 because 401 plus a reverse proxy seems to trigger a Basic Authentication
+	// XXX I use 499/498 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
 
 	prfIdx := slices.Index(sharing.ProfileNames, profile)
 	if prfIdx < 0 {
-		return nil, fiber.NewError(fiber.StatusBadRequest, "Unknown profile")
+		return nil, fiber.NewError(498, "Unknown profile")
 	}
 	secret := sharing.ProfileSecrets[prfIdx]
 
@@ -402,12 +407,16 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		password = secret
 	}
 
-	x := c.Query("x")
-	if x == "" {
-		return nil, fiber.NewError(499, "No sharing details specified")
+	if c.Query("r") != crypgo.Sha256(root)[:6] {
+		return nil, fiber.NewError(498, "Server root dir changed")
 	}
 
-	partialPath, readOnly, date, err := commons.DecryptSharingURL(profile, password, x)
+	x := c.Query("x")
+	if x == "" {
+		return nil, fiber.NewError(498, "No sharing details specified")
+	}
+
+	partialPath, readOnly, date, err := commons.DecryptSharingURL(profile, password, root, x)
 	readOnly = readOnly || globalReadOnly
 	if err != nil {
 		authFailureMutex.Lock()
@@ -416,7 +425,13 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(499, "Wrong password or invalid address")
 	}
 
-	sharinfo := sharInfo{filepath.Join(root, partialPath), pwd != "", readOnly, date}
+	sharinfo := sharInfo{
+		root,
+		filepath.Join(root, partialPath),
+		pwd != "",
+		readOnly,
+		date,
+	}
 
 	if date != nil && uint32(now) > *date {
 		return nil, fiber.NewError(499, "Link expired")

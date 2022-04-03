@@ -35,7 +35,10 @@
 
         let url = "/features";
         if (params.has("x")) {
-            url += "?x=" + encodeURIComponent(params.get("x")) + "&p=" + encodeURIComponent(params.get("p"));
+            url +=
+                "?p=" + encodeURIComponent(params.get("p")) +
+                "&r=" + encodeURIComponent(params.get("r")) +
+                "&x=" + encodeURIComponent(params.get("x"));
         }
 
         let password: string = "";
@@ -57,33 +60,41 @@
             if (res.status == 200) {
                 const cfgObj = await res.json();
                 config = Config.fromAny(cfgObj);
-                if (config.hasPassword)
-                    cycleHandler = setTimeout(auth, 2000);
+                firstAuth = false;
+                cycleHandler = setTimeout(auth, 2000);
                 break;
             }
 
             config = null;
 
-            if (firstAuth)
-                firstAuth = false;
-            else {
+            if (res.status == 499) {
+                if (firstAuth)
+                    firstAuth = false;
+                else {
+                    await Swal.fire({
+                        icon: "error",
+                        text: await res.text(),
+                        confirmButtonColor: "#0a6bb8",
+                    });
+                }
+
+                const {value: pwd} = await Swal.fire({
+                    titleText: "Enter password",
+                    confirmButtonColor: "#0a6bb8",
+                    input: "password",
+                    inputAttributes: {
+                        autocapitalize: "off",
+                        autocorrect: "off",
+                    },
+                });
+                password = pwd;
+            } else {
                 await Swal.fire({
                     icon: "error",
                     text: await res.text(),
                     confirmButtonColor: "#0a6bb8",
                 });
             }
-
-            const {value: pwd} = await Swal.fire({
-                titleText: "Enter password",
-                confirmButtonColor: "#0a6bb8",
-                input: "password",
-                inputAttributes: {
-                    autocapitalize: "off",
-                    autocorrect: "off",
-                },
-            });
-            password = pwd;
         }
     }
 

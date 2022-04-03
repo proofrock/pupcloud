@@ -22,7 +22,9 @@ package crypgo
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"golang.org/x/crypto/chacha20poly1305"
 	"golang.org/x/crypto/scrypt"
 )
@@ -34,6 +36,11 @@ const scryptSaltSize = 8
 const scryptN = 1024
 const scryptR = 8
 const scryptP = 1
+
+func Sha256(str string) string {
+	hash := sha256.Sum256([]byte(str))
+	return hex.EncodeToString(hash[:])
+}
 
 func pwdToKey(salt []byte, password string) ([]byte, error) {
 	dk, err := scrypt.Key([]byte(password), salt, scryptN, scryptR, scryptP, keySize)
