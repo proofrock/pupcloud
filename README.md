@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.6.4
+# 🐶 Pupcloud v0.7.0
 
 Put your files on the web!
 
