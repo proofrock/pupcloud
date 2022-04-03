@@ -11,6 +11,15 @@
 | Folder sharing                             | v0.5.x  |
 | Follow symlinks                            | v0.6.x  |
 
+## v0.7.0
+
+- Plain-text password for auth (`-P`)
+  - breaking change: old `-P` is now `-H` (for hashed password)
+- Shorter sharing links and better detection of failures (root changes after sharing, ...)
+  - breaking change: you'll need to re-generate any sharing link you had from previous versions
+- Cross-compilation support (removed CGO dependency)
+- Manual mimetype resolution for problematic files
+
 ## v0.6.4
 
 - IPV6 support

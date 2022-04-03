@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.6.4
+# 🐶 Pupcloud v0.7.0
 
 Put your files on the web!
 
@@ -49,7 +49,7 @@ Run `pupcloud --help` to see the other [config options](https://germ.gitbook.io/
 can:
 
 - disable all the write operations (`--readonly`);
-- setup [authentication](#auth) (`-P`);
+- setup [authentication](#auth) (`-P`/`-H`);
 - setup [folder sharing](#sharing) (`--share-profile`, `--share-port`, `--share-prefix`)
 - specify a title/brand for the window (`--title`);
 - use a different port then the default of 17178 (`-p`);
@@ -71,8 +71,10 @@ Detection of file types is done by mime type, and viewing relies on the browser'
 
 ## <a name="auth"></a>Authentication
 
-You can set a password for accessing pupcloud, by using the `-P` parameter on the commandline. You must provide the
-SHA-256 sum of the password you want to use, in hex format.
+You can set a password for accessing pupcloud, by using the `-P` or `-H` parameter on the commandline.
+
+Using `-P`, you can specify the password in plain text. There is a more secure option, `-H`, using which you must
+provide the SHA-256 sum of the password you want to use, in (lowercase) hex format.
 
 You can provide the whole hash, or just the first part, of any length you want to keep the commandline short. Of course,
 the longer the hash, the safer the system.
@@ -85,8 +87,9 @@ pupcloud -r /my/dir -P b133a0c0e9bee3be20163d2ad31d6248
 You can use [this site](https://emn178.github.io/online-tools/sha256.html) to hash the password, it doesn't send the
 password on the net (at least at the time I am writing, you may want to check).
 
-**BEWARE**: The password is sent in clear text over the net, so *(always use a HTTPS-capable reverse
-proxy)[https://germ.gitbook.io/pupcloud/guides/reverse-proxy]* if you plan to serve over the public internet.
+**BEWARE**: The password is sent in clear text over the net,
+so *[always use a HTTPS-capable reverse proxy](https://germ.gitbook.io/pupcloud/guides/reverse-proxy)* if you plan to
+serve over the public internet.
 
 ## <a name="sharing"></a>Folder sharing
 

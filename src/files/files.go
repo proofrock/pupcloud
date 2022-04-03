@@ -21,52 +21,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/proofrock/pupcloud/commons"
 	"io/ioutil"
-	"mime"
-	"net/http"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func FileExists(filename string) bool {
 	info, err := os.Lstat(filename)
 	return !os.IsNotExist(err) && !info.IsDir()
-}
-
-const mimeTypeTextPlain = "text/plain"
-
-// Adapted from https://golangcode.com/get-the-content-type-of-file/
-func getFileContentType(path string) string {
-	// First, quick lookup by extension
-	ext := filepath.Ext(path)
-	if ext != "" {
-		// IDK why, but .txt is not translated by Go :-(
-		if strings.EqualFold(ext, ".txt") {
-			return mimeTypeTextPlain
-		}
-		contentType := mime.TypeByExtension(ext)
-		if contentType != "" {
-			return contentType
-		}
-	}
-
-	// If inconclusive, look up by contents
-	file, err := os.Open(path)
-	if err != nil {
-		return mimeTypeTextPlain
-	}
-	defer file.Close()
-
-	buffer := make([]byte, 512)
-
-	_, err = file.Read(buffer)
-	if err != nil {
-		return mimeTypeTextPlain
-	}
-
-	contentType := http.DetectContentType(buffer)
-
-	return contentType
 }
 
 func cleanPath(path string, followLinks bool) (string, error) {
