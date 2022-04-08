@@ -1,6 +1,6 @@
 # 🐶 Pupcloud v0.7.0
 
-Put your files on the web!
+Put your files on the browser!
 
 [Documentation](https://germ.gitbook.io/pupcloud/) and [Demo](https://pupcloud.vercel.app/)
 
