@@ -39,7 +39,8 @@
     $: splash = true;
 
     $: {
-        loadPath(path);
+        path;
+        reload();
     }
 
     $: {
@@ -49,7 +50,7 @@
     onMount(() => {
         setTimeout(() => {
             splash = false;
-        }, 1500);
+        }, 3000);
     });
 
     async function loadPath(path: string[]) {
@@ -78,6 +79,10 @@
     function reload() {
         loadPath(path);
     }
+
+    function goToRoot() {
+        path = [];
+    }
 </script>
 
 <svelte:head>
@@ -86,7 +91,7 @@
 <main>
     {#if slideshowIndex < 0}
         <nav class="navbar blue dark-2">
-            <p class="navbar-brand">{config.title}</p>
+            <p class="navbar-brand cursor-pointer" on:click={goToRoot}>{config.title}</p>
         </nav>
         <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:openItem={openSlideshow}
                      on:reload={reload} on:logout/>
