@@ -352,7 +352,7 @@
 {#if mode == 'GRID'}
     <Grid itemList={mule.items} on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List itemList={mule.items} on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
+    <List itemList={mule.items} bind:sorter on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>
