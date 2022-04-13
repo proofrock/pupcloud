@@ -55,7 +55,7 @@
     <td>{item.size}</td>
     <td class="hide-sm-down">{item.chDate}</td>
     <td>
-        <div class="w100 dropdown dd-fix">
+        <div class="w100">
             <span on:click|stopPropagation={toProperties} class="cursor-pointer menu">️</span>
         </div>
     </td>

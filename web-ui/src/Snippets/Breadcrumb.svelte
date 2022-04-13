@@ -55,11 +55,11 @@
         {/if}&nbsp;/&nbsp;
     {/each}
 </div>
-<div class="dropdown dd-fix hide-sm-up" id="Breadcrumb" style="top: -8px;">
+<div class="dropdown hide-sm-up" id="Breadcrumb" style="top: -8px;">
     <div class="navbar-link" data-target="Breadcrumb" title="Folder stack" style="height: 40px;">
         📍&nbsp;<span class="triangle"></span>
     </div>
-    <div class="dropdown-content dd-cnt-fix white shadow-1 rounded-1">
+    <div class="dropdown-content white shadow-1 rounded-1">
         {#if path.length > 0}
             <div class="dropdown-item pup-a-nobold cursor-pointer" on:click={goto(-1)}>
                 <i>root</i>

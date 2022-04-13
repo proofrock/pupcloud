@@ -106,10 +106,6 @@ nav {
     width: 220px;
 }
 
-.dd-fix {
-    z-index: unset !important;
-}
-
-.dd-cnt-fix {
-    z-index: var(--ax-dropdown-z-index) !important;
+.noSelect {
+    user-select: none;
 }
