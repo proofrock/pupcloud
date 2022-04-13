@@ -191,7 +191,7 @@
             await Swal.fire({
                 icon: "error",
                 html: "File too large; try launching the server<br/>" +
-                    "with a larger <code>--upload-size</code>.",
+                    "with a larger <code>--max-upload-size</code>.",
                 confirmButtonColor: "#0a6bb8",
             });
             return;
