@@ -37,27 +37,34 @@
     $: mode = "GRID";
 
     $: splash = true;
-
-    $: {
-        path;
-        reload();
-    }
+    $: errorFooter = "";
 
     $: {
         mule = mule.sort(sorter);
+    }
+
+    $: {
+        errorFooter;
+        setTimeout(() => {
+            errorFooter = "";
+        }, 2000);
     }
 
     onMount(() => {
         setTimeout(() => {
             splash = false;
         }, 3000);
+        goToRoot();
     });
 
-    async function loadPath(path: string[]) {
-        mule = Mule.fromAny(
-            await (await fetch("/mocks/ls" + path.length + ".json")).json(),
-            path
-        ).sort(sorter);
+    async function loadPath(nuPath: string[]) {
+        const res: Response = await fetch("/ls?path=" + encodeURIComponent(nuPath.join("")));
+        if (res.status != 200) {
+            errorFooter = "In changing dir: " + await res.text();
+        } else {
+            mule = Mule.fromAny(await res.json(), nuPath).sort(sorter);
+            path = nuPath;
+        }
     }
 
     function openSlideshow(event) {
@@ -67,7 +74,7 @@
     }
 
     function chPath(event) {
-        path = event.detail.path;
+        loadPath(event.detail.path);
     }
 
     function closeSlideshow() {
@@ -79,7 +86,7 @@
     }
 
     function goToRoot() {
-        path = [];
+        loadPath([]);
     }
 </script>
 
@@ -91,7 +98,8 @@
         <nav class="navbar blue dark-2">
             <p class="navbar-brand cursor-pointer" on:click={goToRoot}>{config.title}</p>
         </nav>
-        <FileManager {path} {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath} on:openItem={openSlideshow}
+        <FileManager bind:path {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath}
+                     on:openItem={openSlideshow}
                      on:reload={reload} on:logout/>
         {#if splash}
             <footer class="footer blue dark-2 font-s1 lh-1" out:fade><span>
@@ -101,6 +109,9 @@
             <a class="pup-a" href="https://github.com/proofrock/pupcloud">Github Page</a> -
             <a class="pup-a" href="https://pupcloud.vercel.app/">Demo site</a>
         </span></footer>
+        {/if}
+        {#if errorFooter}
+            <footer class="footer red dark-1 lh-1" in:fade out:fade>{errorFooter}</footer>
         {/if}
     {:else}
         <Preview files={mule.files} fileIdx={slideshowIndex} on:closePreview={closeSlideshow}/>

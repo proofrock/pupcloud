@@ -71,9 +71,10 @@
         const file = mule.items.find((i: File) => i.uuid == event.detail.uuid);
         if (file.isDir) {
             // cd
-            if (file.name == "../") path = path.slice(0, path.length - 1);
-            else path = [...path, file.name];
-            dispatch("pathEvent", {path: path});
+            let nuPath: string[] = path;
+            if (file.name == "../") nuPath = nuPath.slice(0, nuPath.length - 1);
+            else nuPath = [...nuPath, file.name];
+            dispatch("pathEvent", {path: nuPath});
         } else {
             dispatch("openItem", event.detail);
         }
@@ -94,20 +95,16 @@
 
         const dest = path.join("") + "/";
 
-        const res: Response = await fetch(
-            "/fsOps/" +
-            srv +
-            "?path=" +
-            encodeURIComponent(toPaste.path) +
-            "&destDir=" +
-            encodeURIComponent(dest),
-            {
-                method: "POST",
-                headers: {
-                    "X-Csrf-Token": getCookie("csrf_"),
-                },
-            }
-        );
+        const res: Response =
+            await fetch(
+                "/fsOps/" + srv + "?path=" + encodeURIComponent(toPaste.path) + "&destDir=" + encodeURIComponent(dest),
+                {
+                    method: "POST",
+                    headers: {
+                        "X-Csrf-Token": getCookie("csrf_"),
+                    },
+                }
+            );
         if (res.status != 200) {
             await Swal.fire({
                 icon: "error",
@@ -151,16 +148,16 @@
             return;
         }
 
-        const res: Response = await fetch(
-            "/fsOps/newFolder?path=" +
-            encodeURIComponent(path.join("") + "/" + name),
-            {
-                method: "PUT",
-                headers: {
-                    "X-Csrf-Token": getCookie("csrf_"),
-                },
-            }
-        );
+        const res: Response =
+            await fetch(
+                "/fsOps/newFolder?path=" + encodeURIComponent(path.join("") + "/" + name),
+                {
+                    method: "PUT",
+                    headers: {
+                        "X-Csrf-Token": getCookie("csrf_"),
+                    },
+                }
+            );
         if (res.status != 200) {
             await Swal.fire({
                 icon: "error",
@@ -201,16 +198,17 @@
         fd.append("doc", file);
 
         try {
-            const res: Response = await fetch(
-                "/fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
-                {
-                    method: "PUT",
-                    body: fd,
-                    headers: {
-                        "X-Csrf-Token": getCookie("csrf_"),
-                    },
-                }
-            );
+            const res: Response =
+                await fetch(
+                    "/fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
+                    {
+                        method: "PUT",
+                        body: fd,
+                        headers: {
+                            "X-Csrf-Token": getCookie("csrf_"),
+                        },
+                    }
+                );
 
             if (res.status != 200) {
                 await Swal.fire({
@@ -265,7 +263,7 @@
 </script>
 
 <nav class="navbar" style="height: 40px;">
-    <Breadcrumb {path} on:pathEvent/>
+    <Breadcrumb bind:path on:pathEvent/>
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
             <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>

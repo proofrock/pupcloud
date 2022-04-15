@@ -71,9 +71,10 @@
         const file = mule.items.find((i: File) => i.uuid == event.detail.uuid);
         if (file.isDir) {
             // cd
-            if (file.name == "../") path = path.slice(0, path.length - 1);
-            else path = [...path, file.name];
-            dispatch("pathEvent", {path: path});
+            let nuPath: string[] = path;
+            if (file.name == "../") nuPath = nuPath.slice(0, nuPath.length - 1);
+            else nuPath = [...nuPath, file.name];
+            dispatch("pathEvent", {path: nuPath});
         } else {
             dispatch("openItem", event.detail);
         }
@@ -175,7 +176,7 @@
 </script>
 
 <nav class="navbar" style="height: 40px;">
-    <Breadcrumb {path} on:pathEvent/>
+    <Breadcrumb bind:path on:pathEvent/>
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
             <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
