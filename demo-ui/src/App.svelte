@@ -58,7 +58,7 @@
     });
 
     async function loadPath(nuPath: string[]) {
-        const res: Response = await fetch("/ls?path=" + encodeURIComponent(nuPath.join("")));
+        const res: Response = await fetch("/mocks/ls" + path.length + ".json");
         if (res.status != 200) {
             errorFooter = "In changing dir: " + await res.text();
         } else {
