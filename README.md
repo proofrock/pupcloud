@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.7.0
+# 🐶 Pupcloud v0.7.1
 
 Put your files on the browser!
 
@@ -152,10 +152,6 @@ Kindly supported by [JetBrains for Open Source development](https://jb.gg/OpenSo
 - [SweetAlert2](https://github.com/sweetalert2/sweetalert2) [MIT]
 - yeyushengfan258's
   [Win10Sur-icon-theme](https://github.com/yeyushengfan258/Win10Sur-icon-theme) [GPLv3]
-
-#### Deploy
-
-- tianon's [gosu](https://github.com/tianon/gosu/) [Apache 2]
 
 #### Languages
 

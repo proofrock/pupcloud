@@ -115,7 +115,7 @@ func LsDir(path string, followLinks bool) ([]Item, *commons.ErrorRes) {
 	}
 
 	files, err := ioutil.ReadDir(path)
-	var ret []Item
+	ret := make([]Item, 0)
 	for _, f := range files {
 		item := LsFile(filepath.Join(path, f.Name()), followLinks)
 		if item != nil {

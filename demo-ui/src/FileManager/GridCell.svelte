@@ -34,7 +34,7 @@
     <!-- svelte-ignore missing-declaration -->
     <div class="card-content lh-1">
         <span class="font-w100 hide-sm-down">{item.size}</span>
-        <div class="dropdown dd-fix" style="float: right;">
+        <div style="float: right;">
             <span on:click|stopPropagation={toProperties} class="cursor-pointer menu mr-1">️</span>
         </div>
         <div style="clear: both;">&nbsp;</div>

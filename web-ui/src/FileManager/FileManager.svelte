@@ -71,9 +71,10 @@
         const file = mule.items.find((i: File) => i.uuid == event.detail.uuid);
         if (file.isDir) {
             // cd
-            if (file.name == "../") path = path.slice(0, path.length - 1);
-            else path = [...path, file.name];
-            dispatch("pathEvent", {path: path});
+            let nuPath: string[] = path;
+            if (file.name == "../") nuPath = nuPath.slice(0, nuPath.length - 1);
+            else nuPath = [...nuPath, file.name];
+            dispatch("pathEvent", {path: nuPath});
         } else {
             dispatch("openItem", event.detail);
         }
@@ -94,20 +95,16 @@
 
         const dest = path.join("") + "/";
 
-        const res: Response = await fetch(
-            "/fsOps/" +
-            srv +
-            "?path=" +
-            encodeURIComponent(toPaste.path) +
-            "&destDir=" +
-            encodeURIComponent(dest),
-            {
-                method: "POST",
-                headers: {
-                    "X-Csrf-Token": getCookie("csrf_"),
-                },
-            }
-        );
+        const res: Response =
+            await fetch(
+                "/fsOps/" + srv + "?path=" + encodeURIComponent(toPaste.path) + "&destDir=" + encodeURIComponent(dest),
+                {
+                    method: "POST",
+                    headers: {
+                        "X-Csrf-Token": getCookie("csrf_"),
+                    },
+                }
+            );
         if (res.status != 200) {
             await Swal.fire({
                 icon: "error",
@@ -151,16 +148,16 @@
             return;
         }
 
-        const res: Response = await fetch(
-            "/fsOps/newFolder?path=" +
-            encodeURIComponent(path.join("") + "/" + name),
-            {
-                method: "PUT",
-                headers: {
-                    "X-Csrf-Token": getCookie("csrf_"),
-                },
-            }
-        );
+        const res: Response =
+            await fetch(
+                "/fsOps/newFolder?path=" + encodeURIComponent(path.join("") + "/" + name),
+                {
+                    method: "PUT",
+                    headers: {
+                        "X-Csrf-Token": getCookie("csrf_"),
+                    },
+                }
+            );
         if (res.status != 200) {
             await Swal.fire({
                 icon: "error",
@@ -191,7 +188,7 @@
             await Swal.fire({
                 icon: "error",
                 html: "File too large; try launching the server<br/>" +
-                    "with a larger <code>--upload-size</code>.",
+                    "with a larger <code>--max-upload-size</code>.",
                 confirmButtonColor: "#0a6bb8",
             });
             return;
@@ -201,16 +198,17 @@
         fd.append("doc", file);
 
         try {
-            const res: Response = await fetch(
-                "/fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
-                {
-                    method: "PUT",
-                    body: fd,
-                    headers: {
-                        "X-Csrf-Token": getCookie("csrf_"),
-                    },
-                }
-            );
+            const res: Response =
+                await fetch(
+                    "/fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
+                    {
+                        method: "PUT",
+                        body: fd,
+                        headers: {
+                            "X-Csrf-Token": getCookie("csrf_"),
+                        },
+                    }
+                );
 
             if (res.status != 200) {
                 await Swal.fire({
@@ -265,7 +263,7 @@
 </script>
 
 <nav class="navbar" style="height: 40px;">
-    <Breadcrumb {path} on:pathEvent/>
+    <Breadcrumb bind:path on:pathEvent/>
     <div class="navbar-menu ml-auto" style="height: 40px;">
         {#if !!toPaste}
             <div class="navbar-link" title="Paste" transition:fade on:click={doPaste}>
@@ -299,7 +297,7 @@
                 <IconList size={24}/>
             {/if}
         </div>
-        <div class="dropdown dd-fix" id="SortBy">
+        <div class="dropdown" id="SortBy">
             <div class="navbar-link" data-target="SortBy" title="Sort by" style="height: 40px;">
                 {#if sorter == SORTERS.ABC}
                     <IconSortAlphAsc size={24}/>
@@ -315,7 +313,7 @@
                     <IconSortSizeDesc size={24}/>
                 {/if}
             </div>
-            <div class="dropdown-content dd-cnt-fix dropdown-right white shadow-1">
+            <div class="dropdown-content dropdown-right white shadow-1">
                 <div class="dropdown-item" on:click={resort(SORTERS.ABC)} class:active={sorter == SORTERS.ABC}
                      title="Sort alphabetically, ascending">
                     <IconSortAlphAsc size={24}/>
@@ -352,7 +350,7 @@
 {#if mode == 'GRID'}
     <Grid itemList={mule.items} on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {:else}
-    <List itemList={mule.items} on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
+    <List itemList={mule.items} bind:sorter on:openItem={click} on:reload on:openPropsModal={doOpenPropsModal}/>
 {/if}
 <div>&nbsp;</div>
 <div>&nbsp;</div>
