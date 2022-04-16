@@ -11,6 +11,17 @@
 | Folder sharing                             | v0.5.x  |
 | Follow symlinks                            | v0.6.x  |
 
+## v0.7.1
+
+- [#2] Can't enter directory made by pupcloud
+- [#4] When cd to a dir fails, dir name gets appended to the breadcrumb "forever"
+- [#5] Provide systemd example/docs (in proofrock/pupcloud-docs)
+- [#6] More functional footer
+- [#7] Click on title to go to root
+- [#8] Listview's whole row should be clickable
+- [#9] Listviews' columns should be clickable to change sorting
+- Library upgrades
+
 ## v0.7.0
 
 - Plain-text password for auth (`-P`)
