@@ -87,14 +87,14 @@ docker:
 docker-publish:
 	## Prepare system with:
 	## (verify which is latest at https://hub.docker.com/r/docker/binfmt/tags)
-    # docker run --privileged --rm docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
+	# docker run --privileged --rm docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
 	sudo docker buildx build -t germanorizzo/pupcloud:v0.7.1-amd64 .
-    sudo docker buildx build --platform linux/arm/v7 -t germanorizzo/pupcloud:v0.7.1-arm .
-    sudo docker buildx build --platform linux/arm64/v8 -t germanorizzo/pupcloud:v0.7.1-arm64 .
-    sudo docker push germanorizzo/pupcloud:v0.7.1-amd64
-    sudo docker push germanorizzo/pupcloud:v0.7.1-arm
-    sudo docker push germanorizzo/pupcloud:v0.7.1-arm64
-    sudo docker manifest create germanorizzo/pupcloud:v0.7.1 germanorizzo/pupcloud:v0.7.1-amd64 germanorizzo/pupcloud:v0.7.1-arm germanorizzo/pupcloud:v0.7.1-arm64
-    sudo docker manifest push germanorizzo/pupcloud:v0.7.1
-    sudo docker manifest create germanorizzo/pupcloud:latest germanorizzo/pupcloud:v0.7.1-amd64 germanorizzo/pupcloud:v0.7.1-arm germanorizzo/pupcloud:v0.7.1-arm64
-    sudo docker manifest push germanorizzo/pupcloud:latest
+	sudo docker buildx build --platform linux/arm/v7 -t germanorizzo/pupcloud:v0.7.1-arm .
+	sudo docker buildx build --platform linux/arm64/v8 -t germanorizzo/pupcloud:v0.7.1-arm64 .
+	sudo docker push germanorizzo/pupcloud:v0.7.1-amd64
+	sudo docker push germanorizzo/pupcloud:v0.7.1-arm
+	sudo docker push germanorizzo/pupcloud:v0.7.1-arm64
+	sudo docker manifest create germanorizzo/pupcloud:v0.7.1 germanorizzo/pupcloud:v0.7.1-amd64 germanorizzo/pupcloud:v0.7.1-arm germanorizzo/pupcloud:v0.7.1-arm64
+	sudo docker manifest push germanorizzo/pupcloud:v0.7.1
+	sudo docker manifest create germanorizzo/pupcloud:latest germanorizzo/pupcloud:v0.7.1-amd64 germanorizzo/pupcloud:v0.7.1-arm germanorizzo/pupcloud:v0.7.1-arm64
+	sudo docker manifest push germanorizzo/pupcloud:latest
