@@ -28,6 +28,8 @@
 
     export let config: Config;
 
+    let hashPathWasSetByMe: boolean = true;
+
     $: mule = Mule.empty();
 
     $: path = [];
@@ -50,22 +52,46 @@
         }, 2000);
     }
 
+    function hash2path(): string[] {
+        return window.location.hash
+            .substr(1) // removes '#'
+            .replace(/^\/+/, '').replace(/\/+$/, '') // removes trailing and leading '/'
+            .split("/") // splits over '/'
+            .filter((el) => el != "" && el != null);
+    }
+
+    function setPathAsHash() {
+        const nuHash = ('#/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
+        if (nuHash != window.location.hash) {
+            hashPathWasSetByMe = true;
+            window.location.hash = nuHash;
+        }
+    }
+
     onMount(() => {
         setTimeout(() => {
             splash = false;
         }, 3000);
-        goToRoot();
+        loadPath(hash2path());
     });
 
     async function loadPath(nuPath: string[]) {
-        const res: Response = await fetch("/ls?path=" + encodeURIComponent(nuPath.join("")));
+        const res: Response = await fetch("/ls?path=" + encodeURIComponent(nuPath.join("/")));
         if (res.status != 200) {
             errorFooter = "In changing dir: " + await res.text();
         } else {
             mule = Mule.fromAny(await res.json(), nuPath).sort(sorter);
             path = nuPath;
+            setPathAsHash();
         }
     }
+
+    window.addEventListener('hashchange', () => {
+        if (hashPathWasSetByMe)
+            hashPathWasSetByMe = false;
+        else
+            loadPath(hash2path());
+    }, false);
 
     function openSlideshow(event) {
         slideshowIndex = mule.files.findIndex(
@@ -104,7 +130,7 @@
         {#if splash}
             <footer class="footer blue dark-2 font-s1 lh-1" out:fade><span>
           🐶 <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
-            {config.version} -
+                {config.version} -
             <a class="pup-a" href="https://germ.gitbook.io/pupcloud/">Documentation</a> -
             <a class="pup-a" href="https://github.com/proofrock/pupcloud">Github Page</a> -
             <a class="pup-a" href="https://pupcloud.vercel.app/">Demo site</a>
