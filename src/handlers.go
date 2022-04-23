@@ -64,6 +64,9 @@ func ls(c *fiber.Ctx) error {
 	followLinks := c.Locals("followLinks").(bool)
 
 	path := c.Query("path", "/")
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
+	}
 
 	rootAndPath := filepath.Join(root, path)
 
@@ -89,6 +92,9 @@ func file(c *fiber.Ctx) error {
 	forDownload := c.Query("dl", "0") == "1"
 	if path == "" {
 		return fiber.ErrNotFound
+	}
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
 	}
 
 	root := c.Locals("root").(string)
@@ -179,6 +185,9 @@ func fsDel(c *fiber.Ctx) error {
 	if path == "" {
 		return fiber.ErrBadRequest
 	}
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
+	}
 
 	root := c.Locals("root").(string)
 
@@ -199,6 +208,9 @@ func fsRename(c *fiber.Ctx) error {
 	nuName := c.Query("name")
 	if path == "" || nuName == "" {
 		return fiber.ErrBadRequest
+	}
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
 	}
 
 	root := c.Locals("root").(string)
@@ -223,6 +235,10 @@ func fsMove(c *fiber.Ctx) error {
 	}
 
 	path := c.Query("path")
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
+	}
+
 	destDir := c.Query("destDir")
 	if path == "" || destDir == "" {
 		return fiber.ErrBadRequest
@@ -250,6 +266,10 @@ func fsCopy(c *fiber.Ctx) error {
 	}
 
 	path := c.Query("path")
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
+	}
+
 	destDir := c.Query("destDir")
 	if path == "" || destDir == "" {
 		return fiber.ErrBadRequest
@@ -280,6 +300,9 @@ func fsNewFolder(c *fiber.Ctx) error {
 	if path == "" {
 		return fiber.ErrBadRequest
 	}
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
+	}
 
 	root := c.Locals("root").(string)
 
@@ -309,6 +332,9 @@ func fsUpload(c *fiber.Ctx) error {
 	path := c.Query("path")
 	if path == "" {
 		return fiber.ErrBadRequest
+	}
+	if strings.Contains(path, "..") {
+		return c.Status(fiber.StatusBadRequest).SendString("../ elements are not allowed")
 	}
 
 	root := c.Locals("root").(string)
