@@ -93,6 +93,7 @@ func main() {
 	pwdHash := flag.StringP("pwd-hash", "H", "", "SHA256 hash of the main access password, if desired")
 	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: don't)")
 	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in the form name:secret, multiple profiles allowed")
+	shareProfilesCSV := flag.String("share-profiles", "", "Profiles for sharing, in the form name:secret, multiple profiles comma-separated")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
 	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
 	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB")
@@ -100,6 +101,71 @@ func main() {
 	followLinks := flag.Bool("follow-symlinks", false, "Follow symlinks when traversing directories (default: don't)")
 
 	flag.Parse()
+
+	// If env vars are specified, overwrite the flags
+
+	if _rootDir, present := os.LookupEnv("ROOT"); present {
+		rootDir = &_rootDir
+	}
+	if _bindTo, present := os.LookupEnv("BIND_TO"); present {
+		bindTo = &_bindTo
+	}
+	if _strPort, present := os.LookupEnv("PORT"); present {
+		_port, err := strconv.Atoi(_strPort)
+		if err != nil {
+			commons.Abort("ERROR: env var PORT should be an integer")
+		}
+		port = &_port
+	}
+	if _title, present := os.LookupEnv("TITLE"); present {
+		title = &_title
+	}
+	if _pwd, present := os.LookupEnv("PASSWORD"); present {
+		pwd = &_pwd
+	}
+	if _pwdHash, present := os.LookupEnv("PWD_HASH"); present {
+		pwdHash = &_pwdHash
+	}
+	if _readOnly, present := os.LookupEnv("READONLY"); present {
+		if _readOnly == "1" {
+			ro := true
+			readOnly = &ro
+		}
+	}
+	if _shareProfilesCSV, present := os.LookupEnv("SHARE_PROFILES"); present {
+		shareProfilesCSV = &_shareProfilesCSV
+	}
+	if _sharePrefix, present := os.LookupEnv("SHARE_PREFIX"); present {
+		sharePrefix = &_sharePrefix
+	}
+	if _strSharePort, present := os.LookupEnv("SHARE_PORT"); present {
+		_sharePort, err := strconv.Atoi(_strSharePort)
+		if err != nil {
+			commons.Abort("ERROR: env var SHARE_PORT should be an integer")
+		}
+		sharePort = &_sharePort
+	}
+	if _strUploadSize, present := os.LookupEnv("MAX_UPLOAD_SIZE"); present {
+		_uploadSize, err := strconv.Atoi(_strUploadSize)
+		if err != nil {
+			commons.Abort("ERROR: env var MAX_UPLOAD_SIZE should be an integer")
+		}
+		uploadSize = &_uploadSize
+	}
+	if _allowRoot, present := os.LookupEnv("ALLOW_ROOT"); present {
+		if _allowRoot == "1" {
+			ar := true
+			allowRoot = &ar
+		}
+	}
+	if _followLinks, present := os.LookupEnv("FOLLOW_SYMLINKS"); present {
+		if _followLinks == "1" {
+			fl := true
+			followLinks = &fl
+		}
+	}
+
+	// let's continue
 
 	if *pwd != "" && *pwdHash != "" {
 		commons.Abort("ERROR: cannot specify both a password and a hashed password")
@@ -134,6 +200,14 @@ func main() {
 		}
 	} else {
 		*sharePrefix = fmt.Sprintf("http://localhost:%d", *sharePort)
+	}
+
+	if *shareProfilesCSV != "" {
+		if len(*shareProfiles) > 0 {
+			commons.Abort("ERROR: cannot specify both '--share-profile' and '--share-profiles'")
+		}
+		_shareProfiles := strings.Split(*shareProfilesCSV, ",")
+		shareProfiles = &_shareProfiles
 	}
 
 	if len(*shareProfiles) > 0 {

@@ -1,5 +1,7 @@
 # Changelog
 
+## Main features history
+
 | Feature                                    | Version |
 |--------------------------------------------|---------|
 | Basic navigation                           | v0.1.x  |
@@ -10,6 +12,11 @@
 | File upload                                | v0.4.x  |
 | Folder sharing                             | v0.5.x  |
 | Follow symlinks                            | v0.6.x  |
+
+## v0.8.0
+
+- Every CLI parameter can be specified as an env variable
+- Added parameter `--share-profiles` to specify profiles as comma-separated [addresses #14]
 
 ## v0.7.2
 
