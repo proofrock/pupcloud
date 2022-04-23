@@ -15,7 +15,7 @@
 
 ## v0.8.0
 
-- Every CLI parameter can be specified as an env variable
+- Every CLI parameter can be specified as an env variable [addresses #10]
 - Added parameter `--share-profiles` to specify profiles as comma-separated [addresses #14]
 
 ## v0.7.2
