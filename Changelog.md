@@ -11,6 +11,12 @@
 | Folder sharing                             | v0.5.x  |
 | Follow symlinks                            | v0.6.x  |
 
+## v0.7.2
+
+- [#1] Support for browser's back/forward buttons navigation
+- [#11] Webservices allows paths with '..'
+- Docker cross-compiling for amd64, arm, arm64 and multiplatform manifest
+
 ## v0.7.1
 
 - [#2] Can't enter directory made by pupcloud
