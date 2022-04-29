@@ -31,7 +31,7 @@
     }
 </script>
 
-<div class="grix xs2 sm3 md4 lg6 xl12">
+<div class="grix xs2 sm3 md4 lg6 xl8">
     {#each itemList as item, i (item.uuid)}
         <!-- z-index is a workaround for a CSS "bug": the dropdown
              would be rendered "behind" the card under it -->
