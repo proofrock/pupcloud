@@ -54,22 +54,22 @@ zbuild-all:
 	make build-prepare
 	make build-ui
 	cd src; CGO=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
-	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.7.2-linux-amd64.7z pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.7.2-linux-amd64.tar.gz pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=linux GOARCH=arm go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
-	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.7.2-linux-arm.7z pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.7.2-linux-arm.tar.gz pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=linux GOARCH=arm64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
-	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.7.2-linux-arm64.7z pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.7.2-linux-arm64.tar.gz pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=darwin GOARCH=amd64 go build
-	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.7.2-darwin-amd64.7z pupcloud
+	cd src; zip -9 ../bin/pupcloud-v0.7.2-darwin-amd64.zip pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=darwin GOARCH=arm64 go build
-	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.7.2-darwin-arm64.7z pupcloud
+	cd src; zip -9 ../bin/pupcloud-v0.7.2-darwin-arm64.zip pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=windows GOARCH=amd64 go build
-	cd src; 7zr a -mx9 -t7z ../bin/pupcloud-v0.7.2-win-amd64.7z pupcloud.exe
+	cd src; zip -9 ../bin/pupcloud-v0.7.2-win-amd64.zip pupcloud.exe
 	rm src/pupcloud.exe
 
 run:
