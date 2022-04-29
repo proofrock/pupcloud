@@ -39,29 +39,33 @@
     $: mode = "GRID";
 
     $: splash = true;
-    $: errorFooter = "";
+    $: footer = {
+        type: 0, // 0=none, 1=info, 2=warning, 3=error
+        html: ""
+    };
 
     $: {
         mule = mule.sort(sorter);
     }
 
     $: {
-        errorFooter;
-        setTimeout(() => {
-            errorFooter = "";
-        }, 2000);
+        footer;
+        if (footer.type > 0) {
+            setTimeout(() => {
+                footer.type = 0;
+            }, 2000);
+        }
     }
 
     function hash2path(): string[] {
-        return window.location.hash
-            .substr(1) // removes '#'
+        return decodeURIComponent(window.location.hash.substring(1))
             .replace(/^\/+/, '').replace(/\/+$/, '') // removes trailing and leading '/'
             .split("/") // splits over '/'
             .filter((el) => el != "" && el != null);
     }
 
     function setPathAsHash() {
-        const nuHash = ('#/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
+        const nuHash = '#' + encodeURIComponent('/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
         if (nuHash != window.location.hash) {
             hashPathWasSetByMe = true;
             window.location.hash = nuHash;

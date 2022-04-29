@@ -53,15 +53,14 @@
     }
 
     function hash2path(): string[] {
-        return window.location.hash
-            .substr(1) // removes '#'
+        return decodeURIComponent(window.location.hash.substring(1))
             .replace(/^\/+/, '').replace(/\/+$/, '') // removes trailing and leading '/'
             .split("/") // splits over '/'
             .filter((el) => el != "" && el != null);
     }
 
     function setPathAsHash() {
-        const nuHash = ('#/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
+        const nuHash = '#' + encodeURIComponent('/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
         if (nuHash != window.location.hash) {
             hashPathWasSetByMe = true;
             window.location.hash = nuHash;
