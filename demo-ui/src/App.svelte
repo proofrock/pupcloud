@@ -46,10 +46,11 @@
     }
 
     $: {
-        errorFooter;
-        setTimeout(() => {
-            errorFooter = "";
-        }, 2000);
+        if (errorFooter != "") {
+            setTimeout(() => {
+                errorFooter = "";
+            }, 2000);
+        }
     }
 
     function hash2path(): string[] {
@@ -60,7 +61,7 @@
     }
 
     function setPathAsHash() {
-        const nuHash = '#' + encodeURIComponent('/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
+        const nuHash = '#' + encodeURIComponent('/' + path.join('/').replace(/\/+$/, '').replaceAll(/\/+/g, '\/'));
         if (nuHash != window.location.hash) {
             hashPathWasSetByMe = true;
             window.location.hash = nuHash;
