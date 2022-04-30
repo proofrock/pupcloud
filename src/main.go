@@ -91,7 +91,8 @@ func main() {
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwd := flag.StringP("password", "P", "", "The main access password, if desired. Use --pwd-hash for a safer alternative")
 	pwdHash := flag.StringP("pwd-hash", "H", "", "SHA256 hash of the main access password, if desired")
-	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: don't)")
+	readOnly := flag.Bool("readonly", false, "DEPRECATED: no effect, default is read only. Kept for backwards compatibility.")
+	allowEdits := flag.BoolP("allow-edits", "E", false, "Allows changes to FS (default: don't)")
 	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in the form name:secret, multiple profiles allowed")
 	shareProfilesCSV := flag.String("share-profiles", "", "Profiles for sharing, in the form name:secret, multiple profiles comma-separated")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
@@ -126,10 +127,10 @@ func main() {
 	if _pwdHash, present := os.LookupEnv("PWD_HASH"); present {
 		pwdHash = &_pwdHash
 	}
-	if _readOnly, present := os.LookupEnv("READONLY"); present {
-		if _readOnly == "1" {
-			ro := true
-			readOnly = &ro
+	if _allowEdits, present := os.LookupEnv("ALLOW_EDITS"); present {
+		if _allowEdits == "1" {
+			ae := true
+			allowEdits = &ae
 		}
 	}
 	if _shareProfilesCSV, present := os.LookupEnv("SHARE_PROFILES"); present {
@@ -166,6 +167,10 @@ func main() {
 	}
 
 	// let's continue
+
+	if *readOnly {
+		fmt.Fprint(os.Stdout, "WARNING: --readonly is deprecated and will be removed")
+	}
 
 	if *pwd != "" && *pwdHash != "" {
 		commons.Abort("ERROR: cannot specify both a password and a hashed password")
@@ -224,8 +229,10 @@ func main() {
 	}
 
 	fmt.Println(fmt.Sprintf(" - Serving dir %s", *rootDir))
-	if *readOnly {
+	if *allowEdits {
 		fmt.Println("   + Read Only")
+	} else {
+		fmt.Println("   + Read/Write")
 	}
 	if *pwdHash != "" {
 		fmt.Println("   + With hashed password")
@@ -245,11 +252,11 @@ func main() {
 		fmt.Println(" - Sharing enabled")
 		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ", "))
 		fmt.Println("   + At", sharing.Prefix)
-		go launchSharingApp(*bindTo, *rootDir, *title, *sharePort, *uploadSize, *readOnly, *followLinks, &sharing)
+		go launchSharingApp(*bindTo, *rootDir, *title, *sharePort, *uploadSize, !*allowEdits, *followLinks, &sharing)
 		time.Sleep(1 * time.Second)
 	}
 
-	launchMainApp(*bindTo, *rootDir, *title, *pwd, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
+	launchMainApp(*bindTo, *rootDir, *title, *pwd, *pwdHash, *port, *uploadSize, !*allowEdits, *followLinks, &sharing)
 }
 
 // FIXME limit growth
