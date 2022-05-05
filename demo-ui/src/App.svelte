@@ -102,7 +102,7 @@
     });
 
     async function loadPath(nuPath: string[]) {
-        const res: Response = await fetch("/mocks/ls" + nuPath.length + ".json");
+        const res: Response = await fetch("mocks/ls" + nuPath.length + ".json");
         if (res.status != 200) {
             addFooter({
                 color: "red",

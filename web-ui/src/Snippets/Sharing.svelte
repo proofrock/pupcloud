@@ -53,7 +53,7 @@
         error = "";
 
         const url =
-            "/shareLink?pwd=" +
+            "shareLink?pwd=" +
             encodeURIComponent(shPassword) +
             "&dir=" +
             encodeURIComponent(dir) +

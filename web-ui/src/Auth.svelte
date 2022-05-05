@@ -33,7 +33,7 @@
     async function auth() {
         const params = new URLSearchParams(window.location.search);
 
-        let url = "/features";
+        let url = "features";
         if (params.has("x")) {
             url +=
                 "?p=" + encodeURIComponent(params.get("p")) +

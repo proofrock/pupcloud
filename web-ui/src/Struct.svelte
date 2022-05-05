@@ -134,7 +134,7 @@
         }
 
         getWS(forDl: boolean = false): string {
-            return "/file?path=" + encodeURIComponent(this.path) + (forDl ? "&dl=1" : "");
+            return "file?path=" + encodeURIComponent(this.path) + (forDl ? "&dl=1" : "");
         }
     }
 
