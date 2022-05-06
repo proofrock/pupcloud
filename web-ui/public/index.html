@@ -30,6 +30,12 @@
 </head>
 
 <body>
+<script>
+	const pn = window.location.pathname;
+	if (!pn.toLowerCase().endsWith("index.html") && !pn.endsWith("/"))
+		window.location.pathname = pn + "/index.html";
+</script>
+<div id="app"></div>
 </body>
 
 </html>
