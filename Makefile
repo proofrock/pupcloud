@@ -71,6 +71,12 @@ zbuild-all:
 	cd src; CGO=0 GOOS=windows GOARCH=amd64 go build
 	cd src; zip -9 ../bin/pupcloud-v0.7.2-win-amd64.zip pupcloud.exe
 	rm src/pupcloud.exe
+	cd src; CGO=0 GOOS=windows GOARCH=arm64 go build
+	cd src; zip -9 ../bin/pupcloud-v0.7.2-win-arm64.zip pupcloud.exe
+	rm src/pupcloud.exe
+	cd src; CGO=0 GOOS=freebsd GOARCH=amd64 go build
+	cd src; tar czf ../bin/pupcloud-v0.7.2-freebsd-arm64.tar.gz pupcloud
+	rm src/pupcloud
 
 run:
 	make build-ui
