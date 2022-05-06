@@ -32,6 +32,7 @@
     $: expires = false;
     $: expiryDate = "";
     $: error = "";
+    $: link = "";
 
     const dispatch = createEventDispatcher();
 
@@ -67,15 +68,16 @@
         if (res.status != 200) {
             error = await res.text();
         } else {
-            await navigator.clipboard.writeText(await res.text());
-            await Swal.fire({
-                icon: "success",
-                titleText: "Done! Link copied to clipboard.",
-                confirmButtonColor: "#0a6bb8",
-            });
+            link = await res.text();
         }
     }
 </script>
+
+<style>
+    .monospace {
+        font-family: monospace;
+    }
+</style>
 
 <div class="modal shadow-1 white rounded-3" id="modal-share">
     <div class="modal-header text-center">Sharing</div>
@@ -130,6 +132,11 @@
         {#if !!error}
             <div class="p-3 my-2 rounded-2 red light-3 text-red text-dark-4" transition:fade>
                 {error}
+            </div>
+        {/if}
+        {#if !!link}
+            <div class="p-3 my-2 rounded-2 viride light-4 monospace" transition:fade>
+                {link}
             </div>
         {/if}
     </div>
