@@ -296,7 +296,7 @@ func launchMainApp(bindTo, root, title, pwd, pwdHash string, port, uploadSize in
 		c.Locals("readOnly", readOnly)
 		c.Locals("sharing", sharing)
 		c.Locals("maxRequestSize", uploadSize*MiB)
-		c.Locals("hasPassword", pwdHash != "")
+		c.Locals("hasPassword", pwdHash != "" || pwd != "")
 		c.Locals("followLinks", followLinks)
 		return c.Next()
 	})
