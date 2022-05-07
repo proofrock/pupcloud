@@ -15,7 +15,7 @@
 
 ## v0.8.0
 
-- Readonly mode is not the default, `-E` to make it read-write [#16]
+- Readonly mode is now the default, `-E` to make it read-write [#16]
 - Every CLI parameter can be specified as an env variable [addresses #10]
 - Added parameter `--share-profiles` to specify profiles as comma-separated [addresses #14]
 - Fixed back button management [addresses #15]
