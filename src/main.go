@@ -429,7 +429,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
-	app.Get("/logout", logout)
+	app.Get("/logout", logoutSharing)
 	app.Delete("/fsOps/del", fsDel)
 	app.Post("/fsOps/rename", fsRename)
 	app.Post("/fsOps/move", fsMove)
