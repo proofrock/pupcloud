@@ -143,10 +143,16 @@
     function goToRoot() {
         loadPath([]);
     }
+
+    function composeTitle(_title, _path) {
+        return _title.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').trim()
+            + " - /"
+            + _path.join("/").replaceAll("//", "/");
+    }
 </script>
 
 <svelte:head>
-    <title>{config.title.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').trim()}</title>
+    <title>{composeTitle(config.title, path)}</title>
 </svelte:head>
 <main>
     {#if slideshowIndex < 0}
