@@ -105,61 +105,61 @@ func main() {
 
 	// If env vars are specified, overwrite the flags
 
-	if _rootDir, present := os.LookupEnv("ROOT"); present {
+	if _rootDir, present := os.LookupEnv("PUP_ROOT"); present {
 		rootDir = &_rootDir
 	}
-	if _bindTo, present := os.LookupEnv("BIND_TO"); present {
+	if _bindTo, present := os.LookupEnv("PUP_BIND_TO"); present {
 		bindTo = &_bindTo
 	}
-	if _strPort, present := os.LookupEnv("PORT"); present {
+	if _strPort, present := os.LookupEnv("PUP_PORT"); present {
 		_port, err := strconv.Atoi(_strPort)
 		if err != nil {
-			commons.Abort("ERROR: env var PORT should be an integer")
+			commons.Abort("ERROR: env var PUP_PORT should be an integer")
 		}
 		port = &_port
 	}
-	if _title, present := os.LookupEnv("TITLE"); present {
+	if _title, present := os.LookupEnv("PUP_TITLE"); present {
 		title = &_title
 	}
-	if _pwd, present := os.LookupEnv("PASSWORD"); present {
+	if _pwd, present := os.LookupEnv("PUP_PASSWORD"); present {
 		pwd = &_pwd
 	}
-	if _pwdHash, present := os.LookupEnv("PWD_HASH"); present {
+	if _pwdHash, present := os.LookupEnv("PUP_PWD_HASH"); present {
 		pwdHash = &_pwdHash
 	}
-	if _allowEdits, present := os.LookupEnv("ALLOW_EDITS"); present {
+	if _allowEdits, present := os.LookupEnv("PUP_ALLOW_EDITS"); present {
 		if _allowEdits == "1" {
 			ae := true
 			allowEdits = &ae
 		}
 	}
-	if _shareProfilesCSV, present := os.LookupEnv("SHARE_PROFILES"); present {
+	if _shareProfilesCSV, present := os.LookupEnv("PUP_SHARE_PROFILES"); present {
 		shareProfilesCSV = &_shareProfilesCSV
 	}
-	if _sharePrefix, present := os.LookupEnv("SHARE_PREFIX"); present {
+	if _sharePrefix, present := os.LookupEnv("PUP_SHARE_PREFIX"); present {
 		sharePrefix = &_sharePrefix
 	}
-	if _strSharePort, present := os.LookupEnv("SHARE_PORT"); present {
+	if _strSharePort, present := os.LookupEnv("PUP_SHARE_PORT"); present {
 		_sharePort, err := strconv.Atoi(_strSharePort)
 		if err != nil {
-			commons.Abort("ERROR: env var SHARE_PORT should be an integer")
+			commons.Abort("ERROR: env var PUP_SHARE_PORT should be an integer")
 		}
 		sharePort = &_sharePort
 	}
-	if _strUploadSize, present := os.LookupEnv("MAX_UPLOAD_SIZE"); present {
+	if _strUploadSize, present := os.LookupEnv("PUP_MAX_UPLOAD_SIZE"); present {
 		_uploadSize, err := strconv.Atoi(_strUploadSize)
 		if err != nil {
-			commons.Abort("ERROR: env var MAX_UPLOAD_SIZE should be an integer")
+			commons.Abort("ERROR: env var PUP_MAX_UPLOAD_SIZE should be an integer")
 		}
 		uploadSize = &_uploadSize
 	}
-	if _allowRoot, present := os.LookupEnv("ALLOW_ROOT"); present {
+	if _allowRoot, present := os.LookupEnv("PUP_ALLOW_ROOT"); present {
 		if _allowRoot == "1" {
 			ar := true
 			allowRoot = &ar
 		}
 	}
-	if _followLinks, present := os.LookupEnv("FOLLOW_SYMLINKS"); present {
+	if _followLinks, present := os.LookupEnv("PUP_FOLLOW_SYMLINKS"); present {
 		if _followLinks == "1" {
 			fl := true
 			followLinks = &fl
