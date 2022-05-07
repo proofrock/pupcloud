@@ -304,6 +304,7 @@ func launchMainApp(bindTo, root, title, pwd, pwdHash string, port, uploadSize in
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/logout", logout)
 	if sharing != nil && sharing.Allowed {
 		app.Get("/shareLink", shareLink)
 	}
@@ -428,6 +429,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/logout", logout)
 	app.Delete("/fsOps/del", fsDel)
 	app.Post("/fsOps/rename", fsRename)
 	app.Post("/fsOps/move", fsMove)
