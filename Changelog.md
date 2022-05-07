@@ -20,7 +20,7 @@
 - Added parameter `--share-profiles` to specify profiles as comma-separated [addresses #14]
 - Fixed back button management [addresses #15]
 - Copying the sharing link to clipboard wouldn't work if not in a secure context [#19]
-- Improvements to better support reverse proxies in subpaths [#18]
+- Improvements to better support reverse proxies with subpaths [#18, #22]
 - Added path to the browser tab's title, so that it figures in the history list
 - Reduced number of columns in grid view for xl screens
 - Fix: Only the first sharing profile was selectable [#21]
