@@ -23,6 +23,8 @@
 - Improvements to better support reverse proxies in subpaths [#18]
 - Added path to the browser tab's title, so that it figures in the history list
 - Reduced number of columns in grid view for xl screens
+- Fix: Only the first sharing profile was selectable [#21]
+- Fix: Logout button wouldn't show when using a "normal" password [#23]
 - Ditch 7z format for distribution, use .tar.gz & zip instead (according to the OS)
 - Updates to libraries
 - Binaries for win/arm64 and freebsd/amd64

@@ -28,7 +28,7 @@
 
     $: shPassword = "";
     $: readOnly = true;
-    $: profile = config.sharing.profiles[0];
+    $: profile = 0;
     $: expires = false;
     $: expiryDate = "";
     $: error = "";
@@ -61,7 +61,7 @@
             "&readOnly=" +
             (readOnly ? "1" : "0") +
             "&profile=" +
-            encodeURIComponent(profile) +
+            encodeURIComponent(config.sharing.profiles[profile]) +
             (expires ? "&expiry=" + encodeURIComponent(expiryDate) : "");
 
         link = "Not implemented in the demo site";
@@ -88,8 +88,8 @@
                 <div class="form-field">
                     <label for="profile">Profile</label>
                     <select class="form-control rounded-1" id="profile" bind:value={profile}>
-                        {#each config.sharing.profiles as prf}
-                            <option>{prf}</option>
+                        {#each config.sharing.profiles as prf, idx}
+                            <option value={idx}>{prf}</option>
                         {/each}
                     </select>
                 </div>
