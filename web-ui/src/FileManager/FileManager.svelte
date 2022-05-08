@@ -97,7 +97,7 @@
 
         const res: Response =
             await fetch(
-                "/fsOps/" + srv + "?path=" + encodeURIComponent(toPaste.path) + "&destDir=" + encodeURIComponent(dest),
+                "fsOps/" + srv + "?path=" + encodeURIComponent(toPaste.path) + "&destDir=" + encodeURIComponent(dest),
                 {
                     method: "POST",
                     headers: {
@@ -150,7 +150,7 @@
 
         const res: Response =
             await fetch(
-                "/fsOps/newFolder?path=" + encodeURIComponent(path.join("") + "/" + name),
+                "fsOps/newFolder?path=" + encodeURIComponent(path.join("") + "/" + name),
                 {
                     method: "PUT",
                     headers: {
@@ -200,7 +200,7 @@
         try {
             const res: Response =
                 await fetch(
-                    "/fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
+                    "fsOps/upload?path=" + encodeURIComponent(path.join("") + "/"),
                     {
                         method: "PUT",
                         body: fd,

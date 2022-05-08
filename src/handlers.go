@@ -116,6 +116,18 @@ func file(c *fiber.Ctx) error {
 	return c.Status(200).SendFile(fullPath)
 }
 
+func logout(c *fiber.Ctx) error {
+	sessions.Delete(c.Cookies("pupcloud-session"))
+	c.ClearCookie("pupcloud-session")
+	return c.Status(200).SendString("")
+}
+
+func logoutSharing(c *fiber.Ctx) error {
+	sessions.Delete(c.Cookies("pupcloud-sharing-session"))
+	c.ClearCookie("pupcloud-sharing-session")
+	return c.Status(200).SendString("")
+}
+
 func shareLink(c *fiber.Ctx) error {
 	root := c.Locals("root").(string)
 	sharing := c.Locals("sharing").(*sharing)

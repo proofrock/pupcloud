@@ -42,7 +42,7 @@ import (
 	"github.com/gofiber/fiber/v2/utils"
 )
 
-const Version = "v0.7.2"
+const Version = "v0.8.0"
 
 const MiB = 1024 * 1024
 
@@ -91,8 +91,10 @@ func main() {
 	title := flag.String("title", "🐶 Pupcloud", "Title of the window")
 	pwd := flag.StringP("password", "P", "", "The main access password, if desired. Use --pwd-hash for a safer alternative")
 	pwdHash := flag.StringP("pwd-hash", "H", "", "SHA256 hash of the main access password, if desired")
-	readOnly := flag.Bool("readonly", false, "Disallow all changes to FS (default: don't)")
+	readOnly := flag.Bool("readonly", false, "DEPRECATED: no effect, default is read only. Kept for backwards compatibility.")
+	allowEdits := flag.BoolP("allow-edits", "E", false, "Allows changes to FS (default: don't)")
 	shareProfiles := flag.StringArray("share-profile", []string{}, "Profile for sharing, in the form name:secret, multiple profiles allowed")
+	shareProfilesCSV := flag.String("share-profiles", "", "Profiles for sharing, in the form name:secret, multiple profiles comma-separated")
 	sharePrefix := flag.String("share-prefix", "", "The base URL of the sharing interface (default: 'http://localhost:' + the port)")
 	sharePort := flag.Int("share-port", 17179, "The port of the sharing interface")
 	uploadSize := flag.Int("max-upload-size", 32, "The max size of an upload, in MiB")
@@ -100,6 +102,75 @@ func main() {
 	followLinks := flag.Bool("follow-symlinks", false, "Follow symlinks when traversing directories (default: don't)")
 
 	flag.Parse()
+
+	// If env vars are specified, overwrite the flags
+
+	if _rootDir, present := os.LookupEnv("PUP_ROOT"); present {
+		rootDir = &_rootDir
+	}
+	if _bindTo, present := os.LookupEnv("PUP_BIND_TO"); present {
+		bindTo = &_bindTo
+	}
+	if _strPort, present := os.LookupEnv("PUP_PORT"); present {
+		_port, err := strconv.Atoi(_strPort)
+		if err != nil {
+			commons.Abort("ERROR: env var PUP_PORT should be an integer")
+		}
+		port = &_port
+	}
+	if _title, present := os.LookupEnv("PUP_TITLE"); present {
+		title = &_title
+	}
+	if _pwd, present := os.LookupEnv("PUP_PASSWORD"); present {
+		pwd = &_pwd
+	}
+	if _pwdHash, present := os.LookupEnv("PUP_PWD_HASH"); present {
+		pwdHash = &_pwdHash
+	}
+	if _allowEdits, present := os.LookupEnv("PUP_ALLOW_EDITS"); present {
+		if _allowEdits == "1" {
+			ae := true
+			allowEdits = &ae
+		}
+	}
+	if _shareProfilesCSV, present := os.LookupEnv("PUP_SHARE_PROFILES"); present {
+		shareProfilesCSV = &_shareProfilesCSV
+	}
+	if _sharePrefix, present := os.LookupEnv("PUP_SHARE_PREFIX"); present {
+		sharePrefix = &_sharePrefix
+	}
+	if _strSharePort, present := os.LookupEnv("PUP_SHARE_PORT"); present {
+		_sharePort, err := strconv.Atoi(_strSharePort)
+		if err != nil {
+			commons.Abort("ERROR: env var PUP_SHARE_PORT should be an integer")
+		}
+		sharePort = &_sharePort
+	}
+	if _strUploadSize, present := os.LookupEnv("PUP_MAX_UPLOAD_SIZE"); present {
+		_uploadSize, err := strconv.Atoi(_strUploadSize)
+		if err != nil {
+			commons.Abort("ERROR: env var PUP_MAX_UPLOAD_SIZE should be an integer")
+		}
+		uploadSize = &_uploadSize
+	}
+	if _allowRoot, present := os.LookupEnv("PUP_ALLOW_ROOT"); present {
+		if _allowRoot == "1" {
+			ar := true
+			allowRoot = &ar
+		}
+	}
+	if _followLinks, present := os.LookupEnv("PUP_FOLLOW_SYMLINKS"); present {
+		if _followLinks == "1" {
+			fl := true
+			followLinks = &fl
+		}
+	}
+
+	// let's continue
+
+	if *readOnly {
+		fmt.Fprint(os.Stdout, "WARNING: --readonly is deprecated and will be removed")
+	}
 
 	if *pwd != "" && *pwdHash != "" {
 		commons.Abort("ERROR: cannot specify both a password and a hashed password")
@@ -136,6 +207,14 @@ func main() {
 		*sharePrefix = fmt.Sprintf("http://localhost:%d", *sharePort)
 	}
 
+	if *shareProfilesCSV != "" {
+		if len(*shareProfiles) > 0 {
+			commons.Abort("ERROR: cannot specify both '--share-profile' and '--share-profiles'")
+		}
+		_shareProfiles := strings.Split(*shareProfilesCSV, ",")
+		shareProfiles = &_shareProfiles
+	}
+
 	if len(*shareProfiles) > 0 {
 		sharing.Allowed = true
 		sharing.Prefix = *sharePrefix
@@ -150,8 +229,10 @@ func main() {
 	}
 
 	fmt.Println(fmt.Sprintf(" - Serving dir %s", *rootDir))
-	if *readOnly {
+	if *allowEdits {
 		fmt.Println("   + Read Only")
+	} else {
+		fmt.Println("   + Read/Write")
 	}
 	if *pwdHash != "" {
 		fmt.Println("   + With hashed password")
@@ -171,11 +252,11 @@ func main() {
 		fmt.Println(" - Sharing enabled")
 		fmt.Println("   + With profiles:", strings.Join(sharing.ProfileNames, ", "))
 		fmt.Println("   + At", sharing.Prefix)
-		go launchSharingApp(*bindTo, *rootDir, *title, *sharePort, *uploadSize, *readOnly, *followLinks, &sharing)
+		go launchSharingApp(*bindTo, *rootDir, *title, *sharePort, *uploadSize, !*allowEdits, *followLinks, &sharing)
 		time.Sleep(1 * time.Second)
 	}
 
-	launchMainApp(*bindTo, *rootDir, *title, *pwd, *pwdHash, *port, *uploadSize, *readOnly, *followLinks, &sharing)
+	launchMainApp(*bindTo, *rootDir, *title, *pwd, *pwdHash, *port, *uploadSize, !*allowEdits, *followLinks, &sharing)
 }
 
 // FIXME limit growth
@@ -215,7 +296,7 @@ func launchMainApp(bindTo, root, title, pwd, pwdHash string, port, uploadSize in
 		c.Locals("readOnly", readOnly)
 		c.Locals("sharing", sharing)
 		c.Locals("maxRequestSize", uploadSize*MiB)
-		c.Locals("hasPassword", pwdHash != "")
+		c.Locals("hasPassword", pwdHash != "" || pwd != "")
 		c.Locals("followLinks", followLinks)
 		return c.Next()
 	})
@@ -223,6 +304,7 @@ func launchMainApp(bindTo, root, title, pwd, pwdHash string, port, uploadSize in
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/logout", logout)
 	if sharing != nil && sharing.Allowed {
 		app.Get("/shareLink", shareLink)
 	}
@@ -347,6 +429,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 	app.Get("/features", features)
 	app.Get("/ls", ls)
 	app.Get("/file", file)
+	app.Get("/logout", logoutSharing)
 	app.Delete("/fsOps/del", fsDel)
 	app.Post("/fsOps/rename", fsRename)
 	app.Post("/fsOps/move", fsMove)

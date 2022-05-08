@@ -23,13 +23,19 @@
 
 	<title>Pupcloud</title>
 
-	<link rel='icon' type='image/png' href='/favicon.png'>
+	<link rel='icon' type='image/png' href='favicon.png'>
 
-	<link rel='stylesheet' href='/build/bundle.css'>
-	<script defer src='/build/bundle.js'></script>
+	<link rel='stylesheet' href='build/bundle.css'>
+	<script defer src='build/bundle.js'></script>
 </head>
 
 <body>
+<script>
+	const pn = window.location.pathname;
+	if (!pn.toLowerCase().endsWith("index.html") && !pn.endsWith("/"))
+		window.location.pathname = pn + "/index.html";
+</script>
+<div id="app"></div>
 </body>
 
 </html>

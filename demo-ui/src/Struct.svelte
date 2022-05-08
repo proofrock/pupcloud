@@ -134,7 +134,7 @@
         }
 
         getWS(forDl: boolean = false): string {
-            return "/testFs/" + this.path;
+            return "testFs/" + this.path;
         }
     }
 

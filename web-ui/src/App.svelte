@@ -38,30 +38,41 @@
     $: sorter = SORTERS.ABC;
     $: mode = "GRID";
 
-    $: splash = true;
-    $: errorFooter = "";
+    $: footer = null;
+    let footers = [];
+    let footerHandler = -1;
 
     $: {
         mule = mule.sort(sorter);
     }
 
-    $: {
-        errorFooter;
-        setTimeout(() => {
-            errorFooter = "";
-        }, 2000);
+    function addFooter(obj: any) {
+        function nxtFooter() {
+            footer = footers.shift();
+            if (!footer) {
+                footerHandler = -1;
+            } else {
+                footerHandler = setTimeout(nxtFooter, 2000);
+            }
+        }
+
+        if (footerHandler < 0) {
+            footer = obj;
+            footerHandler = setTimeout(nxtFooter, 2000);
+        } else {
+            footers.push(obj);
+        }
     }
 
     function hash2path(): string[] {
-        return window.location.hash
-            .substr(1) // removes '#'
+        return decodeURIComponent(window.location.hash.substring(1))
             .replace(/^\/+/, '').replace(/\/+$/, '') // removes trailing and leading '/'
             .split("/") // splits over '/'
             .filter((el) => el != "" && el != null);
     }
 
     function setPathAsHash() {
-        const nuHash = ('#/' + path.join('/').replace(/\/+$/, '')).replaceAll(/\/+/g, '\/');
+        const nuHash = '#' + encodeURIComponent('/' + path.join('/').replace(/\/+$/, '').replaceAll(/\/+/g, '\/'));
         if (nuHash != window.location.hash) {
             hashPathWasSetByMe = true;
             window.location.hash = nuHash;
@@ -69,16 +80,34 @@
     }
 
     onMount(() => {
-        setTimeout(() => {
-            splash = false;
-        }, 3000);
+        addFooter({
+            color: "blue dark-2",
+            html: `<span>
+          🐶 <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
+                ${config.version} -
+            <a class="pup-a" href="https://germ.gitbook.io/pupcloud/">Documentation</a> -
+            <a class="pup-a" href="https://github.com/proofrock/pupcloud">Github Page</a> -
+            <a class="pup-a" href="https://pupcloud.vercel.app/">Demo site</a>
+        </span>`
+        });
+
+        if (config.readOnly) {
+            addFooter({
+                color: "yellow",
+                html: "<span>🐶 Pupcloud is in <b>read only</b> mode.</span>"
+            });
+        }
+
         loadPath(hash2path());
     });
 
     async function loadPath(nuPath: string[]) {
-        const res: Response = await fetch("/ls?path=" + encodeURIComponent(nuPath.join("/")));
+        const res: Response = await fetch("ls?path=" + encodeURIComponent(nuPath.join("/")));
         if (res.status != 200) {
-            errorFooter = "In changing dir: " + await res.text();
+            addFooter({
+                color: "red",
+                html: "<span><b>ERROR</b> In changing dir: " + await res.text() + "</span>"
+            });
         } else {
             mule = Mule.fromAny(await res.json(), nuPath).sort(sorter);
             path = nuPath;
@@ -114,10 +143,16 @@
     function goToRoot() {
         loadPath([]);
     }
+
+    function composeTitle(_title, _path) {
+        return _title.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').trim()
+            + " - /"
+            + _path.join("/").replaceAll("//", "/");
+    }
 </script>
 
 <svelte:head>
-    <title>{config.title.replace(/[^\p{L}\p{N}\p{P}\p{Z}^$\n]/gu, '').trim()}</title>
+    <title>{composeTitle(config.title, path)}</title>
 </svelte:head>
 <main>
     {#if slideshowIndex < 0}
@@ -127,17 +162,8 @@
         <FileManager bind:path {config} bind:mule bind:sorter bind:mode on:pathEvent={chPath}
                      on:openItem={openSlideshow}
                      on:reload={reload} on:logout/>
-        {#if splash}
-            <footer class="footer blue dark-2 font-s1 lh-1" out:fade><span>
-          🐶 <a class="pup-a" target="_blank" href="https://github.com/proofrock/pupcloud/">Pupcloud</a>
-                {config.version} -
-            <a class="pup-a" href="https://germ.gitbook.io/pupcloud/">Documentation</a> -
-            <a class="pup-a" href="https://github.com/proofrock/pupcloud">Github Page</a> -
-            <a class="pup-a" href="https://pupcloud.vercel.app/">Demo site</a>
-        </span></footer>
-        {/if}
-        {#if errorFooter}
-            <footer class="footer red dark-1 lh-1" in:fade out:fade>{errorFooter}</footer>
+        {#if !!footer}
+            <footer class="footer font-s1 lh-1 {footer.color}" out:fade>{@html footer.html}</footer>
         {/if}
     {:else}
         <Preview files={mule.files} fileIdx={slideshowIndex} on:closePreview={closeSlideshow}/>

@@ -18,7 +18,7 @@
 import Auth from "./Auth.svelte";
 
 const app = new Auth({
-    target: document.body,
+    target: document.getElementById("app"),
 });
 
 export default app;

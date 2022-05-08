@@ -1,5 +1,7 @@
 # Changelog
 
+## Main features history
+
 | Feature                                    | Version |
 |--------------------------------------------|---------|
 | Basic navigation                           | v0.1.x  |
@@ -10,6 +12,22 @@
 | File upload                                | v0.4.x  |
 | Folder sharing                             | v0.5.x  |
 | Follow symlinks                            | v0.6.x  |
+
+## v0.8.0
+
+- Readonly mode is now the default, `-E` to make it read-write [#16]
+- Every CLI parameter can be specified as an env variable [addresses #10]
+- Added parameter `--share-profiles` to specify profiles as comma-separated [addresses #14]
+- Fixed back button management [addresses #15]
+- Copying the sharing link to clipboard wouldn't work if not in a secure context [#19]
+- Improvements to better support reverse proxies with subpaths [#18, #22]
+- Added path to the browser tab's title, so that it figures in the history list
+- Reduced number of columns in grid view for xl screens
+- Fix: Only the first sharing profile was selectable [#21]
+- Fix: Logout button wouldn't show when using a "normal" password [#23]
+- Ditch 7z format for distribution, use .tar.gz & zip instead (according to the OS)
+- Updates to libraries
+- Binaries for win/arm64 and freebsd/amd64
 
 ## v0.7.2
 

@@ -1,4 +1,4 @@
-# 🐶 Pupcloud v0.7.2
+# 🐶 Pupcloud v0.8.0
 
 Put your files on the browser!
 
@@ -7,9 +7,9 @@ Put your files on the browser!
 Point pupcloud to a local folder and instantly get its contents exposed as a web application. Browse, manage, share
 files... in a truly portable way!
 
-Pupcloud doesn't need a database, nor it leaves .dotfiles on the filesystem; it is packaged as a single executable
-file (written in Go+Svelte+Typescript), so you'll just need
-to [download](https://germ.gitbook.io/pupcloud/guides/installation-and-building)
+Pupcloud doesn't need a database, [a config file](https://github.com/proofrock/pupcloud/discussions/26), nor it leaves
+.dotfiles on the filesystem; it is packaged as a single executable file (written in Go+Svelte+Typescript), so you'll
+just need to [download](https://germ.gitbook.io/pupcloud/guides/installation-and-building)
 and [run](https://germ.gitbook.io/pupcloud/guides/running-pupcloud) it.
 
 It is an exercise in minimalism: it aims to be as simple as possible, while retaining all the features you would like it
@@ -46,9 +46,9 @@ pupcloud -r /my/dir
 Then, open `http://localhost:17178` with a browser. As simple as that!
 
 Run `pupcloud --help` to see the other [config options](https://germ.gitbook.io/pupcloud/guides/running-pupcloud). You
-can:
+can also:
 
-- disable all the write operations (`--readonly`);
+- enable "write" operations (delete/cut/paste/upload...; `-E` or `--allow-edits`);
 - setup [authentication](#auth) (`-P`/`-H`);
 - setup [folder sharing](#sharing) (`--share-profile`, `--share-port`, `--share-prefix`)
 - specify a title/brand for the window (`--title`);

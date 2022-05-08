@@ -33,7 +33,7 @@
     async function auth() {
         const params = new URLSearchParams(window.location.search);
 
-        let url = "/features";
+        let url = "features";
         if (params.has("x")) {
             url +=
                 "?p=" + encodeURIComponent(params.get("p")) +
@@ -98,20 +98,13 @@
         }
     }
 
-    // adapted from https://www.geeksforgeeks.org/how-to-clear-all-cookies-using-javascript/
-    function deleteCookies() {
-        const allCookies = document.cookie.split(';');
-        for (let i = 0; i < allCookies.length; i++)
-            document.cookie = allCookies[i] + "=;expires=" + new Date(0).toUTCString();
-    }
-
     async function logout() {
-        deleteCookies();
+        await fetch("logout");
         config = null;
         firstAuth = true;
         if (cycleHandler >= 0)
             clearTimeout(cycleHandler);
-        await auth();
+        window.location.reload();
     }
 </script>
 

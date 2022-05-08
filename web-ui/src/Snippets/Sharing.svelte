@@ -28,10 +28,11 @@
 
     $: shPassword = "";
     $: readOnly = true;
-    $: profile = config.sharing.profiles[0];
+    $: profile = 0;
     $: expires = false;
     $: expiryDate = "";
     $: error = "";
+    $: link = "";
 
     const dispatch = createEventDispatcher();
 
@@ -53,29 +54,30 @@
         error = "";
 
         const url =
-            "/shareLink?pwd=" +
+            "shareLink?pwd=" +
             encodeURIComponent(shPassword) +
             "&dir=" +
             encodeURIComponent(dir) +
             "&readOnly=" +
             (readOnly ? "1" : "0") +
             "&profile=" +
-            encodeURIComponent(profile) +
+            encodeURIComponent(config.sharing.profiles[profile]) +
             (expires ? "&expiry=" + encodeURIComponent(expiryDate) : "");
 
         const res: Response = await fetch(url);
         if (res.status != 200) {
             error = await res.text();
         } else {
-            await navigator.clipboard.writeText(await res.text());
-            await Swal.fire({
-                icon: "success",
-                titleText: "Done! Link copied to clipboard.",
-                confirmButtonColor: "#0a6bb8",
-            });
+            link = await res.text();
         }
     }
 </script>
+
+<style>
+    .monospace {
+        font-family: monospace;
+    }
+</style>
 
 <div class="modal shadow-1 white rounded-3" id="modal-share">
     <div class="modal-header text-center">Sharing</div>
@@ -91,8 +93,8 @@
                 <div class="form-field">
                     <label for="profile">Profile</label>
                     <select class="form-control rounded-1" id="profile" bind:value={profile}>
-                        {#each config.sharing.profiles as prf}
-                            <option>{prf}</option>
+                        {#each config.sharing.profiles as prf, idx}
+                            <option value={idx}>{prf}</option>
                         {/each}
                     </select>
                 </div>
@@ -125,11 +127,16 @@
     </div>
     <div class="modal-footer w-100 text-center">
         <div class="btn btn-small rounded-1 primary mb-3" on:click={gen}>
-            Copy link
+            Generate link
         </div>
         {#if !!error}
             <div class="p-3 my-2 rounded-2 red light-3 text-red text-dark-4" transition:fade>
                 {error}
+            </div>
+        {/if}
+        {#if !!link}
+            <div class="p-3 my-2 rounded-2 viride light-4 monospace" transition:fade>
+                {link}
             </div>
         {/if}
     </div>

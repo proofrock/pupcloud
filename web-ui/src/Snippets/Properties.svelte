@@ -65,7 +65,7 @@
         }
 
         const res: Response = await fetch(
-            "/fsOps/rename?path=" +
+            "fsOps/rename?path=" +
             encodeURIComponent(item.path) +
             "&name=" +
             encodeURIComponent(nuName),
@@ -109,7 +109,7 @@
         }
 
         const res: Response = await fetch(
-            "/fsOps/del?path=" + encodeURIComponent(item.path),
+            "fsOps/del?path=" + encodeURIComponent(item.path),
             {
                 method: "DELETE",
                 headers: {
