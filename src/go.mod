@@ -6,7 +6,7 @@ require (
 	github.com/gofiber/fiber/v2 v2.33.0
 	github.com/otiai10/copy v1.7.0
 	github.com/spf13/pflag v1.0.5
-	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f
+	golang.org/x/crypto v0.0.0-20220507011949-2cf3adece122
 	golang.org/x/exp v0.0.0-20220428152302-39d4317da171
 )
 
