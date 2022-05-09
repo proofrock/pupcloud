@@ -11,16 +11,12 @@ RUN make build-static
 
 FROM alpine:latest
 
-ENV PUID=1000
-ENV PGID=1000
-EXPOSE 12321
+RUN apk add --update su-exec
+
+EXPOSE 17178
+EXPOSE 17179
 VOLUME /data
 
 COPY --from=build /app/pupcloud/bin/pupcloud /
 
-RUN addgroup -g $PGID pup
-RUN adduser -u $PUID -G pup -D pup
-
-USER pup:pup
-
-ENTRYPOINT ["/pupcloud", "-r", "/data"]
+ENTRYPOINT su-exec $PUID:$PGID /pupcloud -r /data
