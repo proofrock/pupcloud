@@ -21,9 +21,6 @@ COPY --from=build /app/pupcloud/bin/pupcloud /
 RUN addgroup -g $PGID pup
 RUN adduser -u $PUID -G pup -D pup
 
-RUN mkdir /data
-RUN chown -R pup:pup /data
-
 USER pup:pup
 
 ENTRYPOINT ["/pupcloud", "-r", "/data"]
