@@ -230,9 +230,9 @@ func main() {
 
 	fmt.Println(fmt.Sprintf(" - Serving dir %s", *rootDir))
 	if *allowEdits {
-		fmt.Println("   + Read Only")
-	} else {
 		fmt.Println("   + Read/Write")
+	} else {
+		fmt.Println("   + Read Only")
 	}
 	if *pwdHash != "" {
 		fmt.Println("   + With hashed password")
