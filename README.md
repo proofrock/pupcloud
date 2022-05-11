@@ -2,7 +2,8 @@
 
 Put your files on the browser!
 
-[Documentation](https://germ.gitbook.io/pupcloud/) and [Demo](https://pupcloud.vercel.app/)
+[Documentation](https://germ.gitbook.io/pupcloud/) - [Demo](https://pupcloud.vercel.app/)
+- [Roadmap](https://github.com/proofrock/pupcloud/wiki/Roadmap)
 
 Point pupcloud to a local folder and instantly get its contents exposed as a web application. Browse, manage, share
 files... in a truly portable way!
