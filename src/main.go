@@ -442,7 +442,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 }
 
 func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *sharing) (*sharInfo, error) {
-	now, _ := strconv.Atoi(time.Now().Format("20170907"))
+	now, _ := strconv.Atoi(time.Now().Format("20060102"))
 
 	val := c.Cookies("pupcloud-sharing-session")
 	if val != "" {
@@ -469,10 +469,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 		return nil, fiber.NewError(498, "No profile specified")
 	}
 
-	pwd := c.Query("pwd")
-	if pwd == "" {
-		pwd = c.Get("x-pupcloud-pwd")
-	}
+	pwd := c.Get("x-pupcloud-pwd")
 
 	// XXX I use 499/498 because 401 plus a reverse proxy seems to trigger a Basic Authentication
 	// prompt in the browser
