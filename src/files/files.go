@@ -54,10 +54,12 @@ type Item struct {
 	Permissions string `json:"permissions"`
 }
 
-func LsFile(path string, followLinks bool) *Item {
+func LsFile(path string, followLinks bool) (*Item, error) {
 	info, errStating := os.Lstat(path)
 	if os.IsNotExist(errStating) {
-		return nil
+		return nil, nil
+	} else if errStating != nil {
+		return nil, errStating
 	}
 
 	var ret Item
@@ -78,8 +80,10 @@ func LsFile(path string, followLinks bool) *Item {
 				ret.MimeType = "#unresolved"
 				ret.Size = -1
 			} else {
-				target := LsFile(resolved, true)
-				if target == nil {
+				target, errLs := LsFile(resolved, true)
+				if errLs != nil {
+					return nil, errLs
+				} else if target == nil {
 					ret.MimeType = "#unresolved"
 				} else {
 					ret.MimeType = target.MimeType
@@ -97,7 +101,7 @@ func LsFile(path string, followLinks bool) *Item {
 	ret.Owner, ret.Group = getUserAndGroup(path)
 	ret.Permissions = info.Mode().String()
 
-	return &ret
+	return &ret, nil
 }
 
 func LsDir(path string, followLinks bool) ([]Item, *commons.ErrorRes) {
@@ -117,7 +121,10 @@ func LsDir(path string, followLinks bool) ([]Item, *commons.ErrorRes) {
 	files, err := ioutil.ReadDir(path)
 	ret := make([]Item, 0)
 	for _, f := range files {
-		item := LsFile(filepath.Join(path, f.Name()), followLinks)
+		item, errLs := LsFile(filepath.Join(path, f.Name()), followLinks)
+		if errLs != nil {
+			return nil, &commons.ErrorRes{Code: fiber.StatusInternalServerError, Message: errLs.Error()}
+		}
 		if item != nil {
 			ret = append(ret, *item)
 		}

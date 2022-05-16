@@ -100,8 +100,10 @@ func file(c *fiber.Ctx) error {
 	root := c.Locals("root").(string)
 
 	fullPath := filepath.Join(root, path)
-	item := filess.LsFile(fullPath, followLinks)
-	if item == nil {
+	item, errLs := filess.LsFile(fullPath, followLinks)
+	if errLs != nil {
+		return errLs
+	} else if item == nil {
 		return fiber.ErrNotFound
 	}
 
