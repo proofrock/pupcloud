@@ -40,7 +40,7 @@ build:
 
 zbuild:
 	make build
-	cd bin; 7zr a -mx9 -t7z pupcloud-v0.8.0-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
+	cd bin; 7zr a -mx9 -t7z pupcloud-v0.8.0_b1-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
 build-static:
 	make build-prepare
@@ -48,34 +48,34 @@ build-static:
 
 zbuild-static:
 	make build-static
-	cd bin; 7zr a -mx9 -t7z pupcloud-v0.8.0-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
+	cd bin; 7zr a -mx9 -t7z pupcloud-v0.8.0_b1-`uname -s|tr '[:upper:]' '[:lower:]'`-`uname -m`.7z pupcloud
 
 zbuild-all:
 	make build-prepare
 	make build-ui
 	cd src; CGO=0 GOOS=linux GOARCH=amd64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
-	cd src; tar czf ../bin/pupcloud-v0.8.0-linux-amd64.tar.gz pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.8.0_b1-linux-amd64.tar.gz pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=linux GOARCH=arm go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
-	cd src; tar czf ../bin/pupcloud-v0.8.0-linux-arm.tar.gz pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.8.0_b1-linux-arm.tar.gz pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=linux GOARCH=arm64 go build -a -tags netgo,osusergo -ldflags '-w -extldflags "-static"'
-	cd src; tar czf ../bin/pupcloud-v0.8.0-linux-arm64.tar.gz pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.8.0_b1-linux-arm64.tar.gz pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=darwin GOARCH=amd64 go build
-	cd src; zip -9 ../bin/pupcloud-v0.8.0-darwin-amd64.zip pupcloud
+	cd src; zip -9 ../bin/pupcloud-v0.8.0_b1-darwin-amd64.zip pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=darwin GOARCH=arm64 go build
-	cd src; zip -9 ../bin/pupcloud-v0.8.0-darwin-arm64.zip pupcloud
+	cd src; zip -9 ../bin/pupcloud-v0.8.0_b1-darwin-arm64.zip pupcloud
 	rm src/pupcloud
 	cd src; CGO=0 GOOS=windows GOARCH=amd64 go build
-	cd src; zip -9 ../bin/pupcloud-v0.8.0-win-amd64.zip pupcloud.exe
+	cd src; zip -9 ../bin/pupcloud-v0.8.0_b1-win-amd64.zip pupcloud.exe
 	rm src/pupcloud.exe
 	cd src; CGO=0 GOOS=windows GOARCH=arm64 go build
-	cd src; zip -9 ../bin/pupcloud-v0.8.0-win-arm64.zip pupcloud.exe
+	cd src; zip -9 ../bin/pupcloud-v0.8.0_b1-win-arm64.zip pupcloud.exe
 	rm src/pupcloud.exe
 	cd src; CGO=0 GOOS=freebsd GOARCH=amd64 go build
-	cd src; tar czf ../bin/pupcloud-v0.8.0-freebsd-arm64.tar.gz pupcloud
+	cd src; tar czf ../bin/pupcloud-v0.8.0_b1-freebsd-arm64.tar.gz pupcloud
 	rm src/pupcloud
 
 run:
@@ -94,13 +94,13 @@ docker-publish:
 	## Prepare system with:
 	## (verify which is latest at https://hub.docker.com/r/docker/binfmt/tags)
 	sudo docker run --privileged --rm docker/binfmt:a7996909642ee92942dcd6cff44b9b95f08dad64
-	sudo docker buildx build --no-cache -t germanorizzo/pupcloud:v0.8.0-amd64 .
-	sudo docker buildx build --no-cache --platform linux/arm/v7 -t germanorizzo/pupcloud:v0.8.0-arm .
-	sudo docker buildx build --no-cache --platform linux/arm64/v8 -t germanorizzo/pupcloud:v0.8.0-arm64 .
-	sudo docker push germanorizzo/pupcloud:v0.8.0-amd64
-	sudo docker push germanorizzo/pupcloud:v0.8.0-arm
-	sudo docker push germanorizzo/pupcloud:v0.8.0-arm64
-	sudo docker manifest create -a germanorizzo/pupcloud:v0.8.0 germanorizzo/pupcloud:v0.8.0-amd64 germanorizzo/pupcloud:v0.8.0-arm germanorizzo/pupcloud:v0.8.0-arm64
-	sudo docker manifest push germanorizzo/pupcloud:v0.8.0
-	sudo docker manifest create -a germanorizzo/pupcloud:latest germanorizzo/pupcloud:v0.8.0-amd64 germanorizzo/pupcloud:v0.8.0-arm germanorizzo/pupcloud:v0.8.0-arm64
+	sudo docker buildx build --no-cache -t germanorizzo/pupcloud:v0.8.0_b1-amd64 .
+	sudo docker buildx build --no-cache --platform linux/arm/v7 -t germanorizzo/pupcloud:v0.8.0_b1-arm .
+	sudo docker buildx build --no-cache --platform linux/arm64/v8 -t germanorizzo/pupcloud:v0.8.0_b1-arm64 .
+	sudo docker push germanorizzo/pupcloud:v0.8.0_b1-amd64
+	sudo docker push germanorizzo/pupcloud:v0.8.0_b1-arm
+	sudo docker push germanorizzo/pupcloud:v0.8.0_b1-arm64
+	sudo docker manifest create -a germanorizzo/pupcloud:v0.8.0_b1 germanorizzo/pupcloud:v0.8.0_b1-amd64 germanorizzo/pupcloud:v0.8.0_b1-arm germanorizzo/pupcloud:v0.8.0_b1-arm64
+	sudo docker manifest push germanorizzo/pupcloud:v0.8.0_b1
+	sudo docker manifest create -a germanorizzo/pupcloud:latest germanorizzo/pupcloud:v0.8.0_b1-amd64 germanorizzo/pupcloud:v0.8.0_b1-arm germanorizzo/pupcloud:v0.8.0_b1-arm64
 	sudo docker manifest push germanorizzo/pupcloud:latest
