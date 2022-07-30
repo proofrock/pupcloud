@@ -330,7 +330,7 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
 
 	pwdHash = strings.ToLower(pwdHash)
 
-	val := c.Cookies("pupcloud-session")
+	val := getSessionId(c)
 	if val != "" {
 		if _, ok := sessions.Load(val); ok {
 			return nil
@@ -364,19 +364,13 @@ func doAuth4MainApp(c *fiber.Ctx, root, pwd, pwdHash string) error {
 	}
 
 	rnd := utils.UUIDv4()
-	cookie := new(fiber.Cookie)
-	cookie.Name = "pupcloud-session"
-	cookie.Value = rnd
-	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.SessionOnly = true
-	cookie.SameSite = "strict"
-	c.Cookie(cookie)
+	c.Set("x-pupcloud-session", rnd)
 	sessions.Store(rnd, true)
 
 	return nil
 }
 
-// Stored in the session map, to recover it from the session cookie
+// Stored in the session map, to recover it from the session id
 type sharInfo struct {
 	root        string
 	path        string
@@ -444,7 +438,7 @@ func launchSharingApp(bindTo, root, title string, port, uploadSize int, globalRe
 func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *sharing) (*sharInfo, error) {
 	now, _ := strconv.Atoi(time.Now().Format("20060102"))
 
-	val := c.Cookies("pupcloud-sharing-session")
+	val := getSessionId(c)
 	if val != "" {
 		if si, ok := sessions.Load(val); ok {
 			sinfo := si.(*sharInfo)
@@ -522,13 +516,7 @@ func doAuth4SharingApp(c *fiber.Ctx, root string, globalReadOnly bool, sharing *
 	}
 
 	rnd := utils.UUIDv4()
-	cookie := new(fiber.Cookie)
-	cookie.Name = "pupcloud-sharing-session"
-	cookie.Value = rnd
-	cookie.Expires = time.Now().Add(24 * time.Hour)
-	cookie.SessionOnly = true
-	cookie.SameSite = "strict"
-	c.Cookie(cookie)
+	c.Set("x-pupcloud-session", rnd)
 	sessions.Store(rnd, &sharinfo)
 
 	return &sharinfo, nil

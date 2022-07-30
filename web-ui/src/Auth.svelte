@@ -48,6 +48,7 @@
                 res = await fetch(url, {
                     headers: {
                         "x-pupcloud-pwd": password,
+                        "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
                     },
                 });
             } catch (e) {
@@ -58,11 +59,17 @@
             }
 
             if (res.status == 200) {
-                const cfgObj = await res.json();
-                config = Config.fromAny(cfgObj);
-                firstAuth = false;
-                cycleHandler = setTimeout(auth, 2000);
-                break;
+                let sessionId = res.headers.get("x-pupcloud-session");
+                if (!sessionId)
+                    sessionId = sessionStorage.getItem("x-pupcloud-session")
+                if (!!sessionId) {
+                    sessionStorage.setItem("x-pupcloud-session", sessionId);
+                    const cfgObj = await res.json();
+                    config = Config.fromAny(cfgObj);
+                    firstAuth = false;
+                    cycleHandler = setTimeout(auth, 2000);
+                    break;
+                }
             }
 
             config = null;
@@ -99,7 +106,12 @@
     }
 
     async function logout() {
-        await fetch("logout");
+        await fetch("logout", {
+            headers: {
+                "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
+            },
+        });
+        sessionStorage.removeItem("x-pupcloud-session");
         config = null;
         firstAuth = true;
         if (cycleHandler >= 0)

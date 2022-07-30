@@ -25,7 +25,11 @@
     $: contents = "";
 
     onMount(async () => {
-        contents = await (await fetch(url)).text();
+        contents = await (await fetch(url, {
+            headers: {
+                "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
+            },
+        })).text();
     });
 </script>
 

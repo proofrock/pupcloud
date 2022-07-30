@@ -102,7 +102,11 @@
     });
 
     async function loadPath(nuPath: string[]) {
-        const res: Response = await fetch("ls?path=" + encodeURIComponent(nuPath.join("/")));
+        const res: Response = await fetch("ls?path=" + encodeURIComponent(nuPath.join("/")), {
+            headers: {
+                "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
+            },
+        });
         if (res.status != 200) {
             addFooter({
                 color: "red",
