@@ -18,7 +18,7 @@
 
     import {createEventDispatcher, onDestroy, onMount} from "svelte";
     import {fade} from "svelte/transition";
-    import {destroy, Dropdown} from "axentix";
+    import {destroy, Dropdown, Theme} from "axentix";
     import Swal from "sweetalert2";
 
     import Breadcrumb from "../Snippets/Breadcrumb.svelte";
@@ -43,6 +43,8 @@
     import Properties from "../Snippets/Properties.svelte";
     import Sharing from "../Snippets/Sharing.svelte";
     import IconLogout from "../SVG/IconLogout.svelte";
+    import IconNight from "../SVG/IconNight.svelte";
+    import IconDay from "../SVG/IconDay.svelte";
 
     export let path: string[];
     export let mule: Mule;
@@ -56,11 +58,17 @@
     $: propForFile = null;
     $: sharingOpen = false;
 
+    $: darkTheme = false;
+
     const dispatch = createEventDispatcher();
 
     onMount(() => {
+        Theme.enable();
         resort(SORTERS.ABC)();
         new Dropdown("#SortBy");
+        document.addEventListener('ax.theme.change', function() {
+            console.log(Theme.theme)
+        });
     });
 
     onDestroy(() => {
@@ -107,6 +115,15 @@
 
     function gridOrList() {
         mode = mode == "GRID" ? "LIST" : "GRID";
+    }
+
+    function lightOrDark() {
+        darkTheme = !darkTheme;
+    }
+
+    $: {
+        console.log(darkTheme);
+        Theme.toggle(darkTheme ? 'dark' : 'light');
     }
 
     async function newFolder() {
@@ -208,6 +225,13 @@
                 <IconGrid size={24}/>
             {:else}
                 <IconList size={24}/>
+            {/if}
+        </div>
+        <div class="navbar-link" title="Theme" on:click={lightOrDark}>
+            {#if darkTheme}
+                <IconNight size={24}/>
+            {:else}
+                <IconDay size={24}/>
             {/if}
         </div>
         <div class="dropdown" id="SortBy">
