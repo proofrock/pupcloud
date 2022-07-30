@@ -64,7 +64,11 @@
             encodeURIComponent(config.sharing.profiles[profile]) +
             (expires ? "&expiry=" + encodeURIComponent(expiryDate) : "");
 
-        const res: Response = await fetch(url);
+        const res: Response = await fetch(url, {
+            headers: {
+                "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
+            },
+        });
         if (res.status != 200) {
             error = await res.text();
         } else {

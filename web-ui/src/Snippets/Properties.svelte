@@ -73,6 +73,7 @@
                 method: "POST",
                 headers: {
                     "X-Csrf-Token": getCookie("csrf_"),
+                    "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
                 },
             }
         );
@@ -114,6 +115,7 @@
                 method: "DELETE",
                 headers: {
                     "X-Csrf-Token": getCookie("csrf_"),
+                    "x-pupcloud-session": sessionStorage.getItem("x-pupcloud-session"),
                 },
             }
         );

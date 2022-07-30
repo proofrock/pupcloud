@@ -118,15 +118,21 @@ func file(c *fiber.Ctx) error {
 	return c.Status(200).SendFile(fullPath)
 }
 
+func getSessionId(c *fiber.Ctx) string {
+	ret := c.Get("x-pupcloud-session", "")
+	if ret == "" {
+		return c.Query("s", "")
+	}
+	return ret
+}
+
 func logout(c *fiber.Ctx) error {
-	sessions.Delete(c.Cookies("pupcloud-session"))
-	c.ClearCookie("pupcloud-session")
+	sessions.Delete(getSessionId(c))
 	return c.Status(200).SendString("")
 }
 
 func logoutSharing(c *fiber.Ctx) error {
-	sessions.Delete(c.Cookies("pupcloud-sharing-session"))
-	c.ClearCookie("pupcloud-sharing-session")
+	sessions.Delete(getSessionId(c))
 	return c.Status(200).SendString("")
 }
 
