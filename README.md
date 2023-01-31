@@ -1,3 +1,11 @@
+## **Warning**
+
+> *This project is suspended - for now - as I cannot follow it as it would deserve, due to... lack of time, to make it short.
+> I am quite fond of it, so I really want to restart working on it again; but I cannot say when or how, unfortunately.
+> Thank you all for your appreciation and the support you've shown me, it's been really nice for me working on it so far.*
+>
+> *Of course, feel free to fork it as you like; and if I can be of any help on understanding the code, ask away!*
+
 # 🐶 Pupcloud v0.8.0
 
 Put your files on the browser!
